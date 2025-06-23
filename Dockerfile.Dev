@@ -1,0 +1,37 @@
+FROM python:3.10-slim-bullseye
+
+ARG ENV_STATE
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && apt install -y --no-install-recommends \
+    git make zsh curl \
+    fonts-powerline
+
+COPY --from=ghcr.io/astral-sh/uv:0.5.4 /uv /uvx /bin/
+
+RUN useradd -ms /bin/bash appuser
+USER appuser
+ENV HOME_PATH=/home/appuser
+
+# Default powerline10k theme, no plugins installed
+RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.2/zsh-in-docker.sh)" -- \
+    -t https://github.com/romkatv/powerlevel10k \
+    -p git \
+    -p git-flow \
+    -p https://github.com/zdharma-continuum/fast-syntax-highlighting \
+    -p https://github.com/zsh-users/zsh-autosuggestions \
+    -p https://github.com/zsh-users/zsh-completions \
+    -a "export TERM=xterm-256color"
+
+RUN echo '[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh' >> ~/.zshrc \
+    && echo 'HISTFILE=/home/appuser/zsh/.zsh_history' >> ~/.zshrc
+
+ENV APP_HOME=$HOME_PATH/app
+WORKDIR ${APP_HOME}
+
+ENV PROJECT_PATH=${APP_HOME}/sicoob
+ENV MY_PYTHON_PACKEGES=${APP_HOME}/.venv
+ENV PYTHONPATH=${PYTHONPATH}${PROJECT_PATH}:${MY_PYTHON_PACKEGES}/lib
+ENV PATH=$PATH:${MY_PYTHON_PACKEGES}/bin
+
+ENV ENV_STATE=$ENV_STATE

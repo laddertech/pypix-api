@@ -1,0 +1,82 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.245.2/containers/docker-existing-dockerfile
+{
+	"name": "PyPix API",
+
+	// Sets the run context to one level up instead of the .devcontainer folder.
+	"context": "..",
+
+	// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+	"dockerFile": "../Dockerfile.Dev",
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+    "appPort": [],
+
+	// Uncomment the next line to run commands after the container is created - for example installing curl.
+	// "postCreateCommand": "apt-get update && apt-get install -y curl",
+
+    "postCreateCommand": "/home/appuser/app/.docker/install_dependencies.sh",
+    // "postStartCommand": "/home/appuser/app/.docker/entrypoint.sh",
+
+	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
+	// "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+
+	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
+	// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
+    "mounts": [
+        "source=${localWorkspaceFolder}/.docker/zsh/powerlevel10k/.p10k.zsh,target=/home/appuser/.p10k.zsh,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/.docker/zsh/history,target=/home/appuser/zsh,type=bind,consistency=cached"
+    ],
+
+	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
+	// "remoteUser": "vscode"
+    "remoteUser": "appuser",
+
+    "workspaceFolder": "/home/appuser/app",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/appuser/app,type=bind",
+
+    "containerEnv": {
+        "ENV_STATE": "dev"
+    },
+
+    "runArgs": [
+        "--env-file",
+        ".env"
+    ],
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.pylint",
+                "ms-python.vscode-pylance",
+                "ms-python.isort",
+                "ms-python.black-formatter",
+                "sonarsource.sonarlint-vscode",
+                "streetsidesoftware.code-spell-checker-portuguese-brazilian",
+                "editorconfig.editorconfig",
+                "yzhang.markdown-all-in-one",
+                "tamasfe.even-better-toml",
+                "eamodio.gitlens",
+                "donjayamanne.githistory",
+                "vivaxy.vscode-conventional-commits",
+                "usernamehw.errorlens",
+                "vscode-icons-team.vscode-icons",
+                "ms-vscode.sublime-keybindings",
+                "sourcegraph.cody-ai",
+                "saoudrizwan.claude-dev",
+                "ms-vscode.makefile-tools",
+                "github.vscode-github-actions",
+                "amazonwebservices.amazon-q-vscode",
+                "charliermarsh.ruff",
+            ],
+
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "python.pythonPath": "/usr/local/bin/python"
+            }
+        }
+    }
+
+}
