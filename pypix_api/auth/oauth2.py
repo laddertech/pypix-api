@@ -8,7 +8,7 @@ from pypix_api.auth.mtls import get_session_with_mtls
 
 
 class OAuth2Client:
-    """Cliente OAuth2 para autenticação com a API Sicoob"""
+    """Cliente OAuth2 para autenticação com a API"""
 
     def __init__(
         self,

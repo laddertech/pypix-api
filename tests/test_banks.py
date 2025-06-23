@@ -20,8 +20,7 @@ def test_bankpixapibase_init():
         BASE_URL = "https://dummy"
         TOKEN_URL = "https://dummy/token"
         SCOPES = ["dummy.scope"]
-        def get_cobrancas(self):
-            return []
+
     import sys
     with patch("pypix_api.banks.base.OAuth2Client", MagicMock()), \
          patch("pypix_api.auth.mtls.get_session_with_mtls", MagicMock(return_value=object())):
