@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.auth.mtls import get_session_with_mtls
+from pypix_api.banks.cobv_methods import CobVMethods
 
-class BankPixAPIBase(ABC):
+class BankPixAPIBase(CobVMethods, ABC):
     """Classe base abstrata para clientes Pix de bancos."""
 
     BASE_URL = None
