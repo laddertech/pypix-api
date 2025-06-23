@@ -1,6 +1,7 @@
 from typing import Optional, Dict, Any
 import requests
 
+
 class CobVMethods:
     """
     Métodos para lidar com cobrança Pix com vencimento (CobV).
@@ -12,10 +13,10 @@ class CobVMethods:
         """
         token = self.oauth.get_token()
         headers = {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json',
         }
-        url = f"{self.BASE_URL}/cobv/{txid}"
+        url = f'{self.BASE_URL}/cobv/{txid}'
         resp = self.session.put(url, headers=headers, json=body)
         resp.raise_for_status()
         return resp.json()
@@ -26,26 +27,26 @@ class CobVMethods:
         """
         token = self.oauth.get_token()
         headers = {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json',
         }
-        url = f"{self.BASE_URL}/cobv/{txid}"
+        url = f'{self.BASE_URL}/cobv/{txid}'
         resp = self.session.patch(url, headers=headers, json=body)
         resp.raise_for_status()
         return resp.json()
 
-    def consultar_cobv(self, txid: str, revisao: Optional[int] = None) -> Dict[str, Any]:
+    def consultar_cobv(
+        self, txid: str, revisao: Optional[int] = None
+    ) -> Dict[str, Any]:
         """
         Consulta uma cobrança com vencimento (CobV) por txid.
         """
         token = self.oauth.get_token()
-        headers = {
-            "Authorization": f"Bearer {token}"
-        }
+        headers = {'Authorization': f'Bearer {token}'}
         params = {}
         if revisao is not None:
-            params["revisao"] = revisao
-        url = f"{self.BASE_URL}/cobv/{txid}"
+            params['revisao'] = revisao
+        url = f'{self.BASE_URL}/cobv/{txid}'
         resp = self.session.get(url, headers=headers, params=params)
         resp.raise_for_status()
         return resp.json()
@@ -60,35 +61,30 @@ class CobVMethods:
         status: Optional[str] = None,
         loteCobVId: Optional[int] = None,
         paginaAtual: Optional[int] = None,
-        itensPorPagina: Optional[int] = None
+        itensPorPagina: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
         Consulta lista de cobranças com vencimento (CobV).
         """
         token = self.oauth.get_token()
-        headers = {
-            "Authorization": f"Bearer {token}"
-        }
-        params = {
-            "inicio": inicio,
-            "fim": fim
-        }
+        headers = {'Authorization': f'Bearer {token}'}
+        params = {'inicio': inicio, 'fim': fim}
         if cpf:
-            params["cpf"] = cpf
+            params['cpf'] = cpf
         if cnpj:
-            params["cnpj"] = cnpj
+            params['cnpj'] = cnpj
         if locationPresente is not None:
-            params["locationPresente"] = str(locationPresente).lower()
+            params['locationPresente'] = str(locationPresente).lower()
         if status:
-            params["status"] = status
+            params['status'] = status
         if loteCobVId is not None:
-            params["loteCobVId"] = loteCobVId
+            params['loteCobVId'] = loteCobVId
         if paginaAtual is not None:
-            params["paginaAtual"] = paginaAtual
+            params['paginaAtual'] = paginaAtual
         if itensPorPagina is not None:
-            params["itensPorPagina"] = itensPorPagina
+            params['itensPorPagina'] = itensPorPagina
 
-        url = f"{self.BASE_URL}/cobv"
+        url = f'{self.BASE_URL}/cobv'
         resp = self.session.get(url, headers=headers, params=params)
         resp.raise_for_status()
         return resp.json()
