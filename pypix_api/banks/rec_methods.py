@@ -14,6 +14,7 @@ Classes:
 
 from typing import Any
 
+
 class RecMethods:  # pylint: disable=E1101
     """
     Classe que implementa métodos para operações de recorrência da API Pix.
