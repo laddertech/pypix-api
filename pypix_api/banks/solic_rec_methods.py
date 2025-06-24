@@ -49,7 +49,7 @@ class SolicRecMethods:  # pylint: disable=E1101
             resposta = self.criar_solicrec(body)
         """
         headers = self._create_headers()
-        url = f"{self.get_base_url()}/solicrec"
+        url = f'{self.get_base_url()}/solicrec'
 
         resp = self.session.post(url, headers=headers, json=body)
         resp.raise_for_status()
@@ -73,14 +73,16 @@ class SolicRecMethods:  # pylint: disable=E1101
             dados = self.consultar_solicrec("123e4567-e89b-12d3-a456-426614174000")
         """
         headers = self._create_headers()
-        url = f"{self.get_base_url()}/solicrec/{id_solic_rec}"
+        url = f'{self.get_base_url()}/solicrec/{id_solic_rec}'
 
         resp = self.session.get(url, headers=headers)
         resp.raise_for_status()
 
         return resp.json()
 
-    def revisar_solicrec(self, id_solic_rec: str, body: dict[str, Any]) -> dict[str, Any]:
+    def revisar_solicrec(
+        self, id_solic_rec: str, body: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Revisa uma solicitação de confirmação de recorrência (SolicRec) existente.
 
@@ -102,7 +104,7 @@ class SolicRecMethods:  # pylint: disable=E1101
             resposta = self.revisar_solicrec("123e4567-e89b-12d3-a456-426614174000", body)
         """
         headers = self._create_headers()
-        url = f"{self.get_base_url()}/solicrec/{id_solic_rec}"
+        url = f'{self.get_base_url()}/solicrec/{id_solic_rec}'
 
         resp = self.session.patch(url, headers=headers, json=body)
         resp.raise_for_status()

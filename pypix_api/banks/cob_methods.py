@@ -123,7 +123,7 @@ class CobMethods:  # pylint: disable=E1101
         params = {}
 
         if revisao is not None:
-            params["revisao"] = revisao
+            params['revisao'] = revisao
 
         resp = self.session.get(url, headers=headers, params=params)
         resp.raise_for_status()
@@ -138,7 +138,7 @@ class CobMethods:  # pylint: disable=E1101
         location_presente: bool | None = None,
         status: str | None = None,
         pagina_atual: int | None = None,
-        itens_por_pagina: int | None = None
+        itens_por_pagina: int | None = None,
     ) -> dict[str, Any]:
         """
         Consultar lista de cobranças imediatas.
@@ -164,28 +164,25 @@ class CobMethods:  # pylint: disable=E1101
             ValueError: Se CPF e CNPJ forem informados simultaneamente
         """
         if cpf and cnpj:
-            raise ValueError("CPF e CNPJ não podem ser utilizados simultaneamente")
+            raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
         headers = self._create_headers()
         url = f'{self.get_base_url()}/cob'
-        params = {
-            "inicio": inicio,
-            "fim": fim
-        }
+        params = {'inicio': inicio, 'fim': fim}
 
         # Adiciona parâmetros opcionais se fornecidos
         if cpf:
-            params["cpf"] = cpf
+            params['cpf'] = cpf
         if cnpj:
-            params["cnpj"] = cnpj
+            params['cnpj'] = cnpj
         if location_presente is not None:
-            params["locationPresente"] = location_presente
+            params['locationPresente'] = location_presente
         if status:
-            params["status"] = status
+            params['status'] = status
         if pagina_atual is not None:
-            params["paginaAtual"] = pagina_atual
+            params['paginaAtual'] = pagina_atual
         if itens_por_pagina is not None:
-            params["itensPorPagina"] = itens_por_pagina
+            params['itensPorPagina'] = itens_por_pagina
 
         resp = self.session.get(url, headers=headers, params=params)
         resp.raise_for_status()

@@ -31,7 +31,7 @@ dev = [
     "pytest-mock>=3.6.1",
     "build>=1.2.2.post1",
     "twine>=6.1.0",
-    "ruff>=0.4.2"
+    "ruff>=0.4.2",
 ]
 
 [build-system]
@@ -75,3 +75,4 @@ known-first-party = ["pypix_api"]
 
 [tool.ruff.format]
 quote-style = "single"
+

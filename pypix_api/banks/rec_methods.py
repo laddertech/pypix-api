@@ -28,7 +28,7 @@ class RecMethods:  # pylint: disable=E1101
         Criar uma nova recorrência.
         """
         headers = self._create_headers()
-        url = f"{self.get_base_url()}/rec/{id_rec}"
+        url = f'{self.get_base_url()}/rec/{id_rec}'
         resp = self.session.put(url, headers=headers, json=body)
         resp.raise_for_status()
         return resp.json()
@@ -38,15 +38,13 @@ class RecMethods:  # pylint: disable=E1101
         Revisar uma recorrência existente.
         """
         headers = self._create_headers()
-        url = f"{self.get_base_url()}/rec/{id_rec}"
+        url = f'{self.get_base_url()}/rec/{id_rec}'
         resp = self.session.patch(url, headers=headers, json=body)
         resp.raise_for_status()
         return resp.json()
 
     def consultar_recorrencia(
-        self,
-        id_rec: str,
-        txid: str | None = None
+        self, id_rec: str, txid: str | None = None
     ) -> dict[str, Any]:
         """
         Consultar uma recorrência específica.
@@ -55,7 +53,7 @@ class RecMethods:  # pylint: disable=E1101
         params = {}
         if txid:
             params['txid'] = txid
-        url = f"{self.get_base_url()}/rec/{id_rec}"
+        url = f'{self.get_base_url()}/rec/{id_rec}'
         resp = self.session.get(url, headers=headers, params=params)
         resp.raise_for_status()
         return resp.json()
@@ -70,19 +68,16 @@ class RecMethods:  # pylint: disable=E1101
         status: str | None = None,
         convenio: str | None = None,
         pagina_atual: int | None = None,
-        itens_por_pagina: int | None = None
+        itens_por_pagina: int | None = None,
     ) -> dict[str, Any]:
         """
         Consultar lista de recorrências com filtros.
         """
         if cpf and cnpj:
-            raise ValueError("CPF e CNPJ não podem ser utilizados simultaneamente")
+            raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
         headers = self._create_headers()
-        params = {
-            'inicio': inicio,
-            'fim': fim
-        }
+        params = {'inicio': inicio, 'fim': fim}
         if cpf:
             params['cpf'] = cpf
         if cnpj:
@@ -98,7 +93,7 @@ class RecMethods:  # pylint: disable=E1101
         if itens_por_pagina is not None:
             params['itensPorPagina'] = itens_por_pagina
 
-        url = f"{self.get_base_url()}/rec"
+        url = f'{self.get_base_url()}/rec'
         resp = self.session.get(url, headers=headers, params=params)
         resp.raise_for_status()
         return resp.json()

@@ -48,9 +48,7 @@ class CobVMethods:  # pylint: disable=E1101
         resp.raise_for_status()
         return resp.json()
 
-    def consultar_cobv(
-        self, txid: str, revisao: int | None
-    ) -> dict[str, Any]:
+    def consultar_cobv(self, txid: str, revisao: int | None) -> dict[str, Any]:
         """
         Consulta uma cobrança com vencimento (CobV) por txid.
         """
