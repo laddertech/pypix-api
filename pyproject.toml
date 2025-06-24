@@ -1,21 +1,42 @@
 [project]
 name = "pypix-api"
-version = "0.1.0"
+version = "0.0.1"
 description = "Biblioteca em Python para comunicação com APIs bancárias focada na integração com o PIX"
 readme = "README.md"
 requires-python = ">=3.10"
-
+authors = [
+    { name = "Fábio Thomaz", email = "fabio@ladder.dev.br" }
+]
+license.file = "LICENSE"
+keywords = ["pix", "api", "banco", "pagamento", "brasil"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
 dependencies = [
     "requests>=2.25.1",
     "python-dotenv>=0.15.0",
-    # Testes
-    "pytest>=7.0.0",
-    "pytest-mock>=3.6.1",
-    "requests-pkcs12>=1.25",
+    "requests-pkcs12>=1.25"
 ]
 
+[project.urls]
+Homepage = "https://github.com/laddertech/pypix-api"
+Repository = "https://github.com/laddertech/pypix-api"
 [dependency-groups]
-dev = ["build>=1.2.2.post1", "twine>=6.1.0", "ruff>=0.4.2"]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-mock>=3.6.1",
+    "build>=1.2.2.post1",
+    "twine>=6.1.0",
+    "ruff>=0.4.2"
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 # Configurações base do Ruff
