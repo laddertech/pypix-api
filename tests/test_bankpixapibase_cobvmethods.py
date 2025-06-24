@@ -2,12 +2,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from pypix_api.banks.base import BankPixAPIBase
-from pypix_api.banks.cobv_methods import CobVMethods
 
-class DummyCobVMethods(CobVMethods):
-    pass
-
-class DummyBankPixAPIBase(BankPixAPIBase, DummyCobVMethods):
+class DummyBankPixAPIBase(BankPixAPIBase):
     BASE_URL = "https://dummy"
     TOKEN_URL = "https://dummy/token"
     SCOPES = ["dummy.scope"]
