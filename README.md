@@ -9,8 +9,12 @@ Biblioteca em Python para comunicação com APIs bancárias, focada na integraç
   - [Visão Geral](#visão-geral)
   - [Instalação](#instalação)
   - [Exemplo de Uso](#exemplo-de-uso)
+    - [Banco do Brasil](#banco-do-brasil)
+    - [Sicoob](#sicoob)
   - [Estrutura do Projeto](#estrutura-do-projeto)
   - [Configuração](#configuração)
+    - [Parâmetros de Inicialização](#parâmetros-de-inicialização)
+    - [URLs das APIs](#urls-das-apis)
   - [Testes](#testes)
   - [Contribuição](#contribuição)
   - [Licença](#licença)
@@ -37,13 +41,14 @@ pip install -e .
 
 ## Exemplo de Uso
 
+### Banco do Brasil
+
 ```python
 from pypix_api.banks.bb import BancoDoBrasil
 
 # Instanciação do banco (OAuth2 é inicializado internamente)
 bb = BancoDoBrasil(
     client_id="SEU_CLIENT_ID",
-    client_secret="SEU_CLIENT_SECRET",
     cert_path="caminho/do/certificado.pem",
     key_path="caminho/da/chave.key"
 )
@@ -68,28 +73,62 @@ payload = {
     "valor": {
         "original": "123.45",
         "multa": {
-        "modalidade": "2",
-        "valorPerc": "15.00"
+            "modalidade": "2",
+            "valorPerc": "15.00"
         },
         "juros": {
-        "modalidade": "2",
-        "valorPerc": "2.00"
+            "modalidade": "2",
+            "valorPerc": "2.00"
         },
         "desconto": {
-        "modalidade": "1",
-        "descontoDataFixa": [
-            {
-            "data": "2025-11-30",
-            "valorPerc": "30.00"
-            }
-        ]
+            "modalidade": "1",
+            "descontoDataFixa": [
+                {
+                    "data": "2025-11-30",
+                    "valorPerc": "30.00"
+                }
+            ]
         }
     },
     "chave": "5f84a4c5-c5cb-4599-9f13-7eb4d419dacc",
     "solicitacaoPagador": "Cobrança dos serviços prestados."
-    }
+}
+
+# Criar cobrança com vencimento
 cobv = bb.criar_cobv(txid="uuid-unico", body=payload)
 print(cobv)
+```
+
+### Sicoob
+
+```python
+from pypix_api.banks.sicoob import Sicoob
+
+# Instanciação do Sicoob
+sicoob = Sicoob(
+    client_id="SEU_CLIENT_ID",
+    cert_path="caminho/do/certificado.pem",
+    key_path="caminho/da/chave.key"
+)
+
+# Exemplo: Cobrança imediata
+payload_cob = {
+    "calendario": {
+        "expiracao": 3600
+    },
+    "devedor": {
+        "cpf": "12345678909",
+        "nome": "Francisco da Silva"
+    },
+    "valor": {
+        "original": "37.00"
+    },
+    "chave": "5f84a4c5-c5cb-4599-9f13-7eb4d419dacc",
+    "solicitacaoPagador": "Pagamento de serviços."
+}
+
+cob = sicoob.criar_cob(txid="uuid-unico-2", body=payload_cob)
+print(cob)
 ```
 
 ## Estrutura do Projeto
@@ -108,6 +147,21 @@ Makefile            # Comandos úteis para desenvolvimento
 ```
 
 ## Configuração
+
+### Parâmetros de Inicialização
+
+Para todos os bancos suportados:
+
+- `client_id`: ID do cliente fornecido pelo banco
+- `cert_path`: Caminho para o certificado digital (.pem)
+- `key_path`: Caminho para a chave privada (.key)
+
+### URLs das APIs
+
+As URLs base são configuradas automaticamente por cada banco:
+
+- **Banco do Brasil**: Definido internamente pela classe `BBPixAPI`
+- **Sicoob**: Definido internamente pela classe `SicoobPixAPI`
 
 Crie um arquivo `.env` baseado em `.env.exemplo` com as credenciais e configurações necessárias para autenticação e acesso às APIs bancárias.
 
