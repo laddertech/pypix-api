@@ -32,11 +32,7 @@ class CobVMethods:  # pylint: disable=E1101
         """
         Cria uma cobrança com vencimento (CobV).
         """
-        token = self.oauth.get_token()
-        headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json',
-        }
+        headers = self._create_headers()
         url = f'{self.get_base_url()}/cobv/{txid}'
         resp = self.session.put(url, headers=headers, json=body)
         resp.raise_for_status()
@@ -46,11 +42,7 @@ class CobVMethods:  # pylint: disable=E1101
         """
         Revisa uma cobrança com vencimento (CobV).
         """
-        token = self.oauth.get_token()
-        headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json',
-        }
+        headers = self._create_headers()
         url = f'{self.get_base_url()}/cobv/{txid}'
         resp = self.session.patch(url, headers=headers, json=body)
         resp.raise_for_status()
@@ -62,8 +54,7 @@ class CobVMethods:  # pylint: disable=E1101
         """
         Consulta uma cobrança com vencimento (CobV) por txid.
         """
-        token = self.oauth.get_token()
-        headers = {'Authorization': f'Bearer {token}'}
+        headers = self._create_headers()
         params = {}
         if revisao is not None:
             params['revisao'] = revisao
@@ -87,8 +78,7 @@ class CobVMethods:  # pylint: disable=E1101
         """
         Consulta lista de cobranças com vencimento (CobV).
         """
-        token = self.oauth.get_token()
-        headers = {'Authorization': f'Bearer {token}'}
+        headers = self._create_headers()
         params = {'inicio': inicio, 'fim': fim}
         if cpf:
             params['cpf'] = cpf

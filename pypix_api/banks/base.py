@@ -25,6 +25,8 @@ class BankPixAPIBase(CobVMethods, ABC):
                 'BASE_URL, TOKEN_URL e SCOPES devem ser definidos na subclasse.'
             )
         self.sandbox_mode = sandbox_mode
+        self.client_id = client_id
+
         self.oauth = OAuth2Client(
             token_url=self.TOKEN_URL,
             client_id=client_id,
@@ -35,3 +37,14 @@ class BankPixAPIBase(CobVMethods, ABC):
             sandbox_mode=sandbox_mode,
         )
         self.session = self.oauth.session
+
+    def _create_headers(self) -> dict[str, str]:
+        """
+        Cria os headers necessários para as requisições.
+        """
+        token = self.oauth.get_token()
+        return {
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json',
+            'client_id': self.client_id or '',
+        }
