@@ -1,10 +1,12 @@
 from abc import ABC
 from typing import BinaryIO
+
 from pypix_api.auth.oauth2 import OAuth2Client
+from pypix_api.banks.cob_methods import CobMethods
 from pypix_api.banks.cobv_methods import CobVMethods
 
 
-class BankPixAPIBase(CobVMethods, ABC):
+class BankPixAPIBase(CobVMethods, CobMethods, ABC):
     """Classe base abstrata para clientes Pix de bancos."""
 
     BASE_URL = None
