@@ -1,14 +1,18 @@
 {
     "cSpell.language": "en,pt,pt_BR",
     "cSpell.words": [
+        "cnpj",
         "cob",
+        "cobv",
         "codigo",
         "Emissao",
         "lotecobv",
         "OAuth2",
         "pkcs",
         "pypix",
+        "revisao",
         "sicoob",
-        "Sicoob"
+        "Sicoob",
+        "txid"
     ]
 }

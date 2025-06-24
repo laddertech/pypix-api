@@ -24,6 +24,7 @@ class BankPixAPIBase(CobVMethods, ABC):
             raise ValueError(
                 'BASE_URL, TOKEN_URL e SCOPES devem ser definidos na subclasse.'
             )
+        self.sandbox_mode = sandbox_mode
         self.oauth = OAuth2Client(
             token_url=self.TOKEN_URL,
             client_id=client_id,
