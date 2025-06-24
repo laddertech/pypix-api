@@ -1,5 +1,6 @@
 from pypix_api.auth.oauth2 import OAuth2Client
 
+
 def test_oauth2client_init(monkeypatch):
     class DummySession:
         pass

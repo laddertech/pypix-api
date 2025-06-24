@@ -1,5 +1,5 @@
-import pytest
 from pypix_api.utils.http_client import get
+
 
 def test_get(monkeypatch):
     class DummyResponse:

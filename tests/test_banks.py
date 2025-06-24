@@ -1,9 +1,12 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
+
 from pypix_api.banks.base import BankPixAPIBase
 from pypix_api.banks.bb import BBPixAPI
-from pypix_api.banks.sicoob import SicoobPixAPI
 from pypix_api.banks.cobv_methods import CobVMethods
+from pypix_api.banks.sicoob import SicoobPixAPI
+
 
 class DummyCobVMethods(CobVMethods):
     def criar_cobv(self, txid, body):
@@ -21,7 +24,6 @@ def test_bankpixapibase_init():
         TOKEN_URL = "https://dummy/token"
         SCOPES = ["dummy.scope"]
 
-    import sys
     with patch("pypix_api.banks.base.OAuth2Client", MagicMock()), \
          patch("pypix_api.auth.mtls.get_session_with_mtls", MagicMock(return_value=object())):
         bank = DummyBank("id", "secret", "cert", "key")

@@ -1,7 +1,8 @@
 import os
 import time
-import requests
 from typing import BinaryIO
+
+import requests
 from dotenv import load_dotenv
 
 from pypix_api.auth.mtls import get_session_with_mtls
