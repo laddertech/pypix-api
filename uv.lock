@@ -440,6 +440,7 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "requests" },
     { name = "requests-pkcs12" },
+    { name = "ruff" },
 ]
 
 [package.optional-dependencies]
@@ -447,7 +448,6 @@ dev = [
     { name = "build" },
     { name = "pytest" },
     { name = "pytest-mock" },
-    { name = "ruff" },
     { name = "twine" },
 ]
 
@@ -459,7 +459,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=0.15.0" },
     { name = "requests", specifier = ">=2.25.1" },
     { name = "requests-pkcs12", specifier = ">=1.25" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4.2" },
+    { name = "ruff", specifier = ">=0.12.0" },
     { name = "twine", marker = "extra == 'dev'", specifier = ">=6.1.0" },
 ]
 
