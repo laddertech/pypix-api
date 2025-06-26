@@ -1,12 +1,11 @@
 from abc import ABC
 from typing import BinaryIO
 
-from banks.solic_rec_methods import SolicRecMethods
-
 from pypix_api.auth.oauth2 import OAuth2Client
-from pypix_api.banks.cob_methods import CobMethods
-from pypix_api.banks.cobv_methods import CobVMethods
-from pypix_api.banks.rec_methods import RecMethods
+from pypix_api.banks.methods.cob_methods import CobMethods
+from pypix_api.banks.methods.cobv_methods import CobVMethods
+from pypix_api.banks.methods.rec_methods import RecMethods
+from pypix_api.banks.methods.solic_rec_methods import SolicRecMethods
 
 
 class BankPixAPIBase(CobVMethods, CobMethods, RecMethods, SolicRecMethods, ABC):
