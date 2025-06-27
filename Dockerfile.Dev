@@ -9,9 +9,14 @@ RUN apt update && apt install -y --no-install-recommends \
 
 COPY --from=ghcr.io/astral-sh/uv:0.5.4 /uv /uvx /bin/
 
-RUN useradd -ms /bin/bash appuser
-USER appuser
-ENV HOME_PATH=/home/appuser
+ARG USERNAME=appuser
+
+RUN groupadd -g 1000 $USERNAME \
+  && useradd --uid 1000 --gid 1000 -m $USERNAME \
+  && chown -R $USERNAME:$USERNAME /home/$USERNAME
+
+USER $USERNAME
+ENV HOME_PATH=/home/$USERNAME
 
 # Default powerline10k theme, no plugins installed
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.2/zsh-in-docker.sh)" -- \

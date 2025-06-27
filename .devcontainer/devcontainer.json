@@ -45,6 +45,13 @@
         ".env"
     ],
 
+    "build": {
+        "args": {
+            "USER_UID": "${localEnv:UID}",
+            "USER_GID": "${localEnv:GID}"
+        }
+    },
+
     "customizations": {
         "vscode": {
             "extensions": [
