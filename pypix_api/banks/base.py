@@ -9,7 +9,6 @@ from pypix_api.banks.methods.cobv_methods import CobVMethods
 from pypix_api.banks.methods.rec_methods import RecMethods
 from pypix_api.banks.methods.solic_rec_methods import SolicRecMethods
 from pypix_api.banks.exceptions import (
-    PixAPIException,
     PixAcessoNegadoException,
     PixRecursoNaoEncontradoException,
     PixErroValidacaoException,
@@ -39,7 +38,6 @@ class BankPixAPIBase(CobVMethods, CobMethods, RecMethods, SolicRecMethods, ABC):
                 'BASE_URL, TOKEN_URL e SCOPES devem ser definidos na subclasse.'
             )
         self.sandbox_mode = sandbox_mode
-        self.client_id = client_id
 
         self.oauth = OAuth2Client(
             token_url=self.TOKEN_URL,
@@ -51,12 +49,22 @@ class BankPixAPIBase(CobVMethods, CobMethods, RecMethods, SolicRecMethods, ABC):
             sandbox_mode=sandbox_mode,
         )
         self.session = self.oauth.session
+        self.client_id = self.oauth.client_id
 
     def _create_headers(self) -> dict[str, str]:
         """
         Cria os headers necessários para as requisições.
         """
-        token = self.oauth.get_token()
+        if self.sandbox_mode:
+            import os
+
+            from dotenv import load_dotenv
+            load_dotenv()
+
+            token = os.getenv('SANDBOX_TOKEN', 'sandbox-token')
+        else:
+            token = self.oauth.get_token()
+
         return {
             'Authorization': f'Bearer {token}',
             'Content-Type': 'application/json',
