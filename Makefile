@@ -9,7 +9,7 @@ build: ## Build do pacote
 	python -m build
 
 test: ## Executar testes
-	pytest tests/
+	pytest tests/tests_mock
 
 publish: build ## Publicar no PyPI (requer TWINE_USERNAME e TWINE_PASSWORD)
 	twine upload dist/*
