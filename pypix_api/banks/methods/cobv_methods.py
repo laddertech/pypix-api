@@ -35,7 +35,7 @@ class CobVMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/cobv/{txid}'
         resp = self.session.put(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp)
         return resp.json()
 
     def revisar_cobv(self, txid: str, body: dict[str, Any]) -> dict[str, Any]:
@@ -45,7 +45,7 @@ class CobVMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/cobv/{txid}'
         resp = self.session.patch(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp)
         return resp.json()
 
     def consultar_cobv(self, txid: str, revisao: int | None) -> dict[str, Any]:
@@ -58,7 +58,7 @@ class CobVMethods:  # pylint: disable=E1101
             params['revisao'] = revisao
         url = f'{self.get_base_url()}/cobv/{txid}'
         resp = self.session.get(url, headers=headers, params=params)
-        resp.raise_for_status()
+        self._handle_error_response(resp)
         return resp.json()
 
     def listar_cobv(
@@ -95,5 +95,5 @@ class CobVMethods:  # pylint: disable=E1101
 
         url = f'{self.get_base_url()}/cobv'
         resp = self.session.get(url, headers=headers, params=params)
-        resp.raise_for_status()
+        self._handle_error_response(resp)
         return resp.json()

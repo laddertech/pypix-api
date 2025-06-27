@@ -30,7 +30,7 @@ class RecMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/rec/{id_rec}'
         resp = self.session.put(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp)
         return resp.json()
 
     def revisar_recorrencia(self, id_rec: str, body: dict[str, Any]) -> dict[str, Any]:
@@ -40,7 +40,7 @@ class RecMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/rec/{id_rec}'
         resp = self.session.patch(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp, error_class=None)
         return resp.json()
 
     def consultar_recorrencia(
@@ -55,7 +55,7 @@ class RecMethods:  # pylint: disable=E1101
             params['txid'] = txid
         url = f'{self.get_base_url()}/rec/{id_rec}'
         resp = self.session.get(url, headers=headers, params=params)
-        resp.raise_for_status()
+        self._handle_error_response(resp, error_class=None)
         return resp.json()
 
     def listar_recorrencias(
@@ -95,5 +95,5 @@ class RecMethods:  # pylint: disable=E1101
 
         url = f'{self.get_base_url()}/rec'
         resp = self.session.get(url, headers=headers, params=params)
-        resp.raise_for_status()
+        self._handle_error_response(resp)
         return resp.json()

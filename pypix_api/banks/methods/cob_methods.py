@@ -55,7 +55,7 @@ class CobMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/cob/{txid}'
         resp = self.session.put(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp)
         return resp.json()
 
     def criar_cob_auto_txid(self, body: dict[str, Any]) -> dict[str, Any]:
@@ -76,7 +76,9 @@ class CobMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/cob'
         resp = self.session.post(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp)
+        return resp.json()
+        self._handle_error_response(resp)
         return resp.json()
 
     def revisar_cob(self, txid: str, body: dict[str, Any]) -> dict[str, Any]:
@@ -99,7 +101,7 @@ class CobMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/cob/{txid}'
         resp = self.session.patch(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp)
         return resp.json()
 
     def consultar_cob(self, txid: str, revisao: int | None = None) -> dict[str, Any]:
@@ -126,7 +128,7 @@ class CobMethods:  # pylint: disable=E1101
             params['revisao'] = revisao
 
         resp = self.session.get(url, headers=headers, params=params)
-        resp.raise_for_status()
+        self._handle_error_response(resp)
         return resp.json()
 
     def consultar_cobs(
@@ -185,5 +187,5 @@ class CobMethods:  # pylint: disable=E1101
             params['itensPorPagina'] = itens_por_pagina
 
         resp = self.session.get(url, headers=headers, params=params)
-        resp.raise_for_status()
+        self._handle_error_response(resp)
         return resp.json()

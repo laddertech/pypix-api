@@ -52,7 +52,7 @@ class SolicRecMethods:  # pylint: disable=E1101
         url = f'{self.get_base_url()}/solicrec'
 
         resp = self.session.post(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp, error_class=None)
 
         return resp.json()
 
@@ -76,7 +76,7 @@ class SolicRecMethods:  # pylint: disable=E1101
         url = f'{self.get_base_url()}/solicrec/{id_solic_rec}'
 
         resp = self.session.get(url, headers=headers)
-        resp.raise_for_status()
+        self._handle_error_response(resp, error_class=None)
 
         return resp.json()
 
@@ -107,6 +107,6 @@ class SolicRecMethods:  # pylint: disable=E1101
         url = f'{self.get_base_url()}/solicrec/{id_solic_rec}'
 
         resp = self.session.patch(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp, error_class=None)
 
         return resp.json()

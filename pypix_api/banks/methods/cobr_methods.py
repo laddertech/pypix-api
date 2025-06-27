@@ -34,7 +34,7 @@ class CobRMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/cobr/{txid}'
         resp = self.session.put(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp, error_class=None)
         return resp.json()
 
     def revisar_cobr(self, txid: str, body: dict[str, Any]) -> dict[str, Any]:
@@ -42,7 +42,7 @@ class CobRMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/cobr/{txid}'
         resp = self.session.patch(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp, error_class=None)
         return resp.json()
 
     def consultar_cobr(self, txid: str) -> dict[str, Any]:
@@ -50,7 +50,7 @@ class CobRMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/cobr/{txid}'
         resp = self.session.get(url, headers=headers)
-        resp.raise_for_status()
+        self._handle_error_response(resp, error_class=None)
         return resp.json()
 
     def criar_cobr(self, body: dict[str, Any]) -> dict[str, Any]:
@@ -58,7 +58,7 @@ class CobRMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/cobr'
         resp = self.session.post(url, headers=headers, json=body)
-        resp.raise_for_status()
+        self._handle_error_response(resp, error_class=None)
         return resp.json()
 
     def consultar_lista_cobr(
@@ -71,16 +71,13 @@ class CobRMethods:  # pylint: disable=E1101
         status: str | None = None,
         convenio: str | None = None,
         pagina_atual: int | None = None,
-        itens_por_pagina: int | None = None
+        itens_por_pagina: int | None = None,
     ) -> dict[str, Any]:
         """Consultar lista de cobranças recorrentes através de parâmetros."""
         headers = self._create_headers()
         url = f'{self.get_base_url()}/cobr'
 
-        params = {
-            'inicio': inicio,
-            'fim': fim
-        }
+        params = {'inicio': inicio, 'fim': fim}
 
         # Adicionar parâmetros opcionais se fornecidos
         if id_rec is not None:
@@ -99,7 +96,7 @@ class CobRMethods:  # pylint: disable=E1101
             params['itensPorPagina'] = itens_por_pagina
 
         resp = self.session.get(url, headers=headers, params=params)
-        resp.raise_for_status()
+        self._handle_error_response(resp, error_class=None)
         return resp.json()
 
     def solicitar_retentativa_cobr(self, txid: str, data: date) -> dict[str, Any]:
@@ -108,5 +105,5 @@ class CobRMethods:  # pylint: disable=E1101
         data_str = data.strftime('%Y-%m-%d')
         url = f'{self.get_base_url()}/cobr/{txid}/retentativa/{data_str}'
         resp = self.session.post(url, headers=headers)
-        resp.raise_for_status()
+        self._handle_error_response(resp, error_class=None)
         return resp.json()
