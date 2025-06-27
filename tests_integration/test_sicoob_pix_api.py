@@ -24,11 +24,28 @@ def sicoob_pix_api():
     )
     return api
 
+@pytest.fixture(scope="module")
+def cob_criada(sicoob_pix_api):
+    """
+    Cria uma cobrança via criar_cob_auto_txid e retorna o resultado.
+    """
+    body = {
+        "calendario": {"expiracao": 3600},
+        "devedor": {
+            "cpf": "12345678909",
+            "nome": "Cliente Teste"
+        },
+        "valor": {"original": "1.00"},
+        "chave": "testechavepix@teste.com.br",
+        "solicitacaoPagador": "Teste integração Sicoob"
+    }
+    resultado = sicoob_pix_api.criar_cob_auto_txid(body)
+    return resultado
+
 def test_consultar_cobs(sicoob_pix_api):
     """
     Testa a consulta de cobranças no sandbox do Sicoob.
     """
-    # Parâmetros mínimos para consulta (ajuste conforme necessário)
     params = {
         "inicio": "2024-01-01T00:00:00Z",
         "fim": "2024-12-31T23:59:59Z",
@@ -37,3 +54,34 @@ def test_consultar_cobs(sicoob_pix_api):
     }
     resultado = sicoob_pix_api.consultar_cobs(**params)
     assert "cobs" in resultado
+
+def test_criar_cob_auto_txid(cob_criada):
+    """
+    Testa a criação de cobrança automática (txid gerado pela API).
+    """
+    assert "txid" in cob_criada
+    assert "loc" in cob_criada
+
+def test_revisar_cob(sicoob_pix_api, cob_criada):
+    """
+    Testa a revisão de uma cobrança criada.
+    """
+    txid = cob_criada["txid"]
+    body = {
+        "valor": {"original": "2.00"},
+        "solicitacaoPagador": "Cobrança revisada"
+    }
+    resultado = sicoob_pix_api.revisar_cob(txid, body)
+    assert "valor" in resultado
+    assert "solicitacaoPagador" in resultado
+
+def test_consultar_cob(sicoob_pix_api, cob_criada):
+    """
+    Testa a consulta de uma cobrança criada.
+    """
+    txid = cob_criada["txid"]
+    resultado = sicoob_pix_api.consultar_cob(txid)
+    assert "valor" in resultado
+    assert "txid" in resultado
+    assert "location" in resultado
+
