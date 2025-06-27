@@ -60,6 +60,7 @@ class BankPixAPIBase(CobVMethods, CobMethods, RecMethods, SolicRecMethods, ABC):
         return {
             'Authorization': f'Bearer {token}',
             'Content-Type': 'application/json',
+            'User-Agent': 'PyPixAPIClient/0.1',
             'client_id': self.client_id or '',
         }
 
