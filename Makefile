@@ -5,6 +5,10 @@ help:
 
 ## @ Gerenciamento de Pacote Python
 
+sync: ## Sincronizar dependências do projeto
+	uv sync
+	uv pip install -e ".[dev]"
+
 build: ## Build do pacote
 	python -m build
 
