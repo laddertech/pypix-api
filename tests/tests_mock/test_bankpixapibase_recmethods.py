@@ -126,3 +126,64 @@ def test_listar_recorrencias_cpf_cnpj_error(dummy_bank_pix_api) -> None:  # noqa
         dummy_bank_pix_api.listar_recorrencias(
             '2024-01-01T00:00:00Z', '2024-01-31T23:59:59Z', cpf='123', cnpj='456'
         )
+
+def test_solicitar_retentativa_cobranca(dummy_bank_pix_api) -> None:  # noqa: ANN001
+    dummy_bank_pix_api.session.post.return_value = MagicMock(
+        json=lambda: {
+            'idRec': 'RR123456782024061999000566354',
+            'txid': '7f733863543b4a16b516d839bd4bc34e',
+            'status': 'ATIVA',
+            'valor': {'original': '50.33'}
+        },
+        raise_for_status=lambda: None
+    )
+    txid = '7f733863543b4a16b516d839bd4bc34e'
+    data = '2024-06-22'
+
+    result = dummy_bank_pix_api.solicitar_retentativa_cobranca(txid, data)
+
+    assert result['idRec'] == 'RR123456782024061999000566354'
+    assert result['txid'] == txid
+    assert result['status'] == 'ATIVA'
+    dummy_bank_pix_api.session.post.assert_called_once()
+
+    args, kwargs = dummy_bank_pix_api.session.post.call_args
+    expected_url = f'https://dummy/rec/{txid}/{data}'
+    assert args[0] == expected_url
+    assert 'headers' in kwargs
+    assert 'json' not in kwargs  # POST sem body JSON
+
+
+def test_solicitar_retentativa_cobranca_url_format(dummy_bank_pix_api) -> None:  # noqa: ANN001
+    dummy_bank_pix_api.session.post.return_value = MagicMock(
+        json=lambda: {'result': 'ok'},
+        raise_for_status=lambda: None
+    )
+    txid = 'abc123def456ghi789'
+    data = '2024-12-25'
+
+    dummy_bank_pix_api.solicitar_retentativa_cobranca(txid, data)
+
+    args, _ = dummy_bank_pix_api.session.post.call_args
+    assert txid in args[0]
+    assert data in args[0]
+    assert args[0].endswith(f'/rec/{txid}/{data}')
+
+
+def test_solicitar_retentativa_cobranca_headers(dummy_bank_pix_api) -> None:  # noqa: ANN001
+    dummy_bank_pix_api.session.post.return_value = MagicMock(
+        json=lambda: {'result': 'ok'},
+        raise_for_status=lambda: None
+    )
+    txid = 'test_txid_123'
+    data = '2024-01-15'
+
+    dummy_bank_pix_api.solicitar_retentativa_cobranca(txid, data)
+
+    args, kwargs = dummy_bank_pix_api.session.post.call_args
+    expected_headers = {
+        'Authorization': 'Bearer dummy',
+        'Content-Type': 'application/json',
+        'client_id': 'id',
+    }
+    assert kwargs['headers'] == expected_headers

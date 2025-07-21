@@ -97,3 +97,25 @@ class RecMethods:  # pylint: disable=E1101
         resp = self.session.get(url, headers=headers, params=params)
         self._handle_error_response(resp)
         return resp.json()
+
+    def solicitar_retentativa_cobranca(self, txid: str, data: str) -> dict[str, Any]:
+        """
+        Solicitar retentativa de cobrança recorrente.
+
+        Args:
+            txid (str): Id da transação
+            data (str): Data prevista para liquidação da ordem de pagamento
+                    no formato YYYY-MM-DD segundo ISO 8601
+
+        Returns:
+            dict[str, Any]: Dados completos da cobrança recorrente
+
+        Raises:
+            ValueError: Se a data não estiver no formato correto
+            HTTPError: Para códigos de erro HTTP (400, 403, 404, 503)
+        """
+        headers = self._create_headers()
+        url = f'{self.get_base_url()}/rec/{txid}/{data}'
+        resp = self.session.post(url, headers=headers)
+        self._handle_error_response(resp, error_class=None)
+        return resp.json()
