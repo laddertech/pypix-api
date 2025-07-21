@@ -7,11 +7,11 @@ def sicoob_pix_api():
     """
     Instancia o cliente SicoobPixAPI em modo sandbox usando variáveis de ambiente.
     """
-    client_id = os.environ.get("SICOOB_CLIENT_ID")
-    cert = os.environ.get("SICOOB_CERT_PATH")
-    pvk = os.environ.get("SICOOB_PVK_PATH")
-    cert_pfx = os.environ.get("SICOOB_CERT_PFX_PATH")
-    pwd_pfx = os.environ.get("SICOOB_PFX_PASSWORD")
+    client_id = os.environ.get("CLIENT_ID")
+    cert = os.environ.get("CERT")
+    pvk = os.environ.get("PVK")
+    cert_pfx = os.environ.get("CERT_PFX")
+    pwd_pfx = os.environ.get("PWD_PFX")
 
     # O usuário pode fornecer cert/pvk OU cert_pfx/pwd_pfx
     api = SicoobPixAPI(
