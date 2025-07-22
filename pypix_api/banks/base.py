@@ -2,9 +2,6 @@ from abc import ABC
 from typing import Any
 
 import requests
-from banks.methods.webhook_cobr_methods import WebHookCobrMethods
-from banks.methods.webhook_methods import WebHookMethods
-from banks.methods.webhook_rec_methods import WebHookRecMethods
 
 from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.banks.exceptions import (
@@ -18,6 +15,9 @@ from pypix_api.banks.methods.cob_methods import CobMethods
 from pypix_api.banks.methods.cobv_methods import CobVMethods
 from pypix_api.banks.methods.rec_methods import RecMethods
 from pypix_api.banks.methods.solic_rec_methods import SolicRecMethods
+from pypix_api.banks.methods.webhook_cobr_methods import WebHookCobrMethods
+from pypix_api.banks.methods.webhook_methods import WebHookMethods
+from pypix_api.banks.methods.webhook_rec_methods import WebHookRecMethods
 
 
 class BankPixAPIBase(
