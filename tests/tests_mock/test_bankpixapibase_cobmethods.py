@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.banks.base import BankPixAPIBase
 
 
@@ -11,9 +12,9 @@ class DummyBankPixAPIBase(BankPixAPIBase):
     TOKEN_URL = 'https://dummy/token'  # noqa: S105
     SCOPES: ClassVar[list[str]] = ['dummy.scope']
 
-    def __init__(self) -> None:
-        # Não chama o __init__ original para evitar dependências reais
-        pass
+    def __init__(self, oauth: OAuth2Client) -> None:
+        super().__init__(oauth)
+        # Mantém o mock da sessão nos testes
 
     def _create_headers(self) -> dict[str, str]:
         return {
@@ -28,8 +29,9 @@ class DummyBankPixAPIBase(BankPixAPIBase):
 
 @pytest.fixture
 def dummy_bank_pix_api() -> DummyBankPixAPIBase:
-    api = DummyBankPixAPIBase()
-    api.session = MagicMock()
+    mock_oauth = MagicMock()
+    mock_oauth.session = MagicMock()
+    api = DummyBankPixAPIBase(oauth=mock_oauth)
     return api
 
 
