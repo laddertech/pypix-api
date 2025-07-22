@@ -46,12 +46,17 @@ pip install -e .
 ```python
 from pypix_api.banks.bb import BancoDoBrasil
 
-# Instanciação do banco (OAuth2 é inicializado internamente)
-bb = BancoDoBrasil(
+from pypix_api.auth.oauth2 import OAuth2Client
+
+# Primeiro crie o cliente OAuth2
+oauth = OAuth2Client(
     client_id="SEU_CLIENT_ID",
-    cert_path="caminho/do/certificado.pem",
-    key_path="caminho/da/chave.key"
+    cert="caminho/do/certificado.pem",
+    pvk="caminho/da/chave.key"
 )
+
+# Depois instancie o banco passando o OAuth2Client
+bb = BancoDoBrasil(oauth=oauth)
 
 # Exemplo: Cobrança com Vencimento
 payload = {
@@ -105,11 +110,7 @@ print(cobv)
 from pypix_api.banks.sicoob import Sicoob
 
 # Instanciação do Sicoob
-sicoob = Sicoob(
-    client_id="SEU_CLIENT_ID",
-    cert_path="caminho/do/certificado.pem",
-    key_path="caminho/da/chave.key"
-)
+sicoob = Sicoob(oauth=oauth)  # Reutilizando o mesmo OAuth2Client
 
 # Exemplo: Cobrança imediata
 payload_cob = {
@@ -150,11 +151,21 @@ Makefile            # Comandos úteis para desenvolvimento
 
 ### Parâmetros de Inicialização
 
-Para todos os bancos suportados:
+1. Primeiro crie uma instância de OAuth2Client:
+```python
+from pypix_api.auth.oauth2 import OAuth2Client
 
-- `client_id`: ID do cliente fornecido pelo banco
-- `cert_path`: Caminho para o certificado digital (.pem)
-- `key_path`: Caminho para a chave privada (.key)
+oauth = OAuth2Client(
+    client_id="SEU_CLIENT_ID",       # ID do cliente fornecido pelo banco
+    cert="caminho/do/certificado.pem",  # Certificado digital (.pem)
+    pvk="caminho/da/chave.key"       # Chave privada (.key)
+)
+```
+
+2. Depois instancie o banco passando o OAuth2Client:
+```python
+banco = BancoDoBrasil(oauth=oauth)  # Ou Sicoob(oauth=oauth)
+```
 
 ### URLs das APIs
 

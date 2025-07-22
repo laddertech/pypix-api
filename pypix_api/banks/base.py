@@ -18,7 +18,13 @@ from pypix_api.banks.methods.solic_rec_methods import SolicRecMethods
 
 
 class BankPixAPIBase(CobVMethods, CobMethods, RecMethods, SolicRecMethods, ABC):
-    """Classe base abstrata para clientes Pix de bancos."""
+    """Classe base abstrata para clientes Pix de bancos.
+
+    Attributes:
+        BASE_URL (str): URL base da API do banco (deve ser definido na subclasse)
+        TOKEN_URL (str): URL para obtenção de token OAuth2 (deve ser definido na subclasse)
+        SCOPES (list): Lista de scopes OAuth2 necessários (deve ser definido na subclasse)
+    """
 
     BASE_URL = None
     TOKEN_URL = None
@@ -29,6 +35,15 @@ class BankPixAPIBase(CobVMethods, CobMethods, RecMethods, SolicRecMethods, ABC):
         oauth: OAuth2Client,
         sandbox_mode: bool = False,
     ) -> None:
+        """Inicializa o cliente Pix do banco.
+
+        Args:
+            oauth: Instância configurada de OAuth2Client para autenticação
+            sandbox_mode: Se True, usa modo sandbox com token fixo (default: False)
+
+        Raises:
+            ValueError: Se BASE_URL, TOKEN_URL ou SCOPES não forem definidos na subclasse
+        """
         if not self.BASE_URL or not self.TOKEN_URL or not self.SCOPES:
             raise ValueError(
                 'BASE_URL, TOKEN_URL e SCOPES devem ser definidos na subclasse.'
