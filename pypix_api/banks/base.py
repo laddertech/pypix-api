@@ -2,6 +2,9 @@ from abc import ABC
 from typing import Any
 
 import requests
+from banks.methods.webhook_cobr_methods import WebHookCobrMethods
+from banks.methods.webhook_methods import WebHookMethods
+from banks.methods.webhook_rec_methods import WebHookRecMethods
 
 from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.banks.exceptions import (
@@ -17,7 +20,16 @@ from pypix_api.banks.methods.rec_methods import RecMethods
 from pypix_api.banks.methods.solic_rec_methods import SolicRecMethods
 
 
-class BankPixAPIBase(CobVMethods, CobMethods, RecMethods, SolicRecMethods, ABC):
+class BankPixAPIBase(
+    CobVMethods,
+    CobMethods,
+    RecMethods,
+    SolicRecMethods,
+    WebHookMethods,
+    WebHookRecMethods,
+    WebHookCobrMethods,
+    ABC,
+):
     """Classe base abstrata para clientes Pix de bancos.
 
     Attributes:
@@ -46,7 +58,7 @@ class BankPixAPIBase(CobVMethods, CobMethods, RecMethods, SolicRecMethods, ABC):
         """
         if not self.BASE_URL or not self.TOKEN_URL or not self.SCOPES:
             raise ValueError(
-                'BASE_URL, TOKEN_URL e SCOPES devem ser definidos na subclasse.'
+                "BASE_URL, TOKEN_URL e SCOPES devem ser definidos na subclasse."
             )
         self.sandbox_mode = sandbox_mode
         self.oauth = oauth
@@ -61,17 +73,18 @@ class BankPixAPIBase(CobVMethods, CobMethods, RecMethods, SolicRecMethods, ABC):
             import os
 
             from dotenv import load_dotenv
+
             load_dotenv()
 
-            token = os.getenv('SANDBOX_TOKEN', 'sandbox-token')
+            token = os.getenv("SANDBOX_TOKEN", "sandbox-token")
         else:
             token = self.oauth.get_token()
 
         return {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json',
-            'User-Agent': 'PyPixAPIClient/0.1',
-            'client_id': self.client_id or '',
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+            "User-Agent": "PyPixAPIClient/0.1",
+            "client_id": self.client_id or "",
         }
 
     def _handle_error_response(
@@ -92,17 +105,17 @@ class BankPixAPIBase(CobVMethods, CobMethods, RecMethods, SolicRecMethods, ABC):
             except ValueError:
                 error_data = {}
 
-            type_ = error_data.get('type', '')
-            title = error_data.get('title', '')
-            status = error_data.get('status', response.status_code)
-            detail = error_data.get('detail', '')
+            type_ = error_data.get("type", "")
+            title = error_data.get("title", "")
+            status = error_data.get("status", response.status_code)
+            detail = error_data.get("detail", "")
 
             # Mapeamento para exceções específicas
-            if status == 403 or 'AcessoNegado' in type_:
+            if status == 403 or "AcessoNegado" in type_:
                 raise PixAcessoNegadoException(type_, title, status, detail)
-            elif status == 404 or 'RecursoNaoEncontrado' in type_:
+            elif status == 404 or "RecursoNaoEncontrado" in type_:
                 raise PixRecursoNaoEncontradoException(type_, title, status, detail)
-            elif status == 400 or 'ErroValidacao' in type_:
+            elif status == 400 or "ErroValidacao" in type_:
                 raise PixErroValidacaoException(type_, title, status, detail)
             elif status == 503:
                 raise PixErroServicoIndisponivelException(type_, title, status, detail)
