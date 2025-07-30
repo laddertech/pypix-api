@@ -93,7 +93,7 @@ class WebHookMethods:  # pylint: disable=E1101
         self._handle_error_response(resp)
         return resp.json()
 
-    def excluir_webhook(self, chave: str) -> dict[str, Any]:
+    def excluir_webhook(self, chave: str) -> bool:
         """
         Cancelar o Webhook Pix.
 
@@ -105,7 +105,7 @@ class WebHookMethods:  # pylint: disable=E1101
             chave: Chave Pix para cancelamento do webhook
 
         Returns:
-            dict contendo a confirmação do cancelamento (se aplicável)
+            bool: True se o webhook foi excluído com sucesso (status 204), False caso contrário
 
         Raises:
             HTTPError: Para erros 403, 404, 503
@@ -114,7 +114,7 @@ class WebHookMethods:  # pylint: disable=E1101
         url = f'{self.get_base_url()}/webhook/{chave}'
         resp = self.session.delete(url, headers=headers)
         self._handle_error_response(resp)
-        return resp.json()
+        return resp.status_code == 204
 
     def consultar_webhook(self, chave: str) -> dict[str, Any]:
         """

@@ -75,11 +75,14 @@ class WebHookCobrMethods:  # pylint: disable=E1101
         self._handle_error_response(resp)
         return resp.json()
 
-    def excluir_webhook_cobr(self) -> None:
+    def excluir_webhook_cobr(self) -> bool:
         """
         Cancelar o Webhook de Cobrança Recorrente.
 
         Endpoint para cancelamento do webhook. Não é a única forma pela qual um webhook pode ser removido.
+
+        Returns:
+            bool: True se o webhook foi excluído com sucesso (status 204), False caso contrário
 
         Raises:
             HTTPError: Para erros 403, 404, 503
@@ -88,4 +91,4 @@ class WebHookCobrMethods:  # pylint: disable=E1101
         url = f'{self.get_base_url()}/webhookcobr'
         resp = self.session.delete(url, headers=headers)
         self._handle_error_response(resp)
-        return None
+        return resp.status_code == 204
