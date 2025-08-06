@@ -18,7 +18,7 @@ class SicoobPixAPI(BankPixAPIBase):
     BASE_URL = 'https://api.sicoob.com.br/pix/api/v2'
     SANDBOX_BASE_URL = 'https://sandbox.sicoob.com.br/sicoob/sandbox/pix/api/v2'
     TOKEN_URL = (
-        'https://auth.sicoob.com.br/auth/realms/sicoob/protocol/openid-connect/token'  # noqa: S105
+        'https://auth.sicoob.com.br/auth/realms/cooperado/protocol/openid-connect/token'  # noqa: S105
     )
     SCOPES = 'cob.read cob.write pix.read pix.write'
 
