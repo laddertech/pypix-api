@@ -18,7 +18,9 @@ class BBPixAPI(BankPixAPIBase):
     BASE_URL = 'https://api.bb.com.br/pix/v1'
     SANDBOX_BASE_URL = 'https://api.sandbox.bb.com.br/pix/v1'
     TOKEN_URL = 'https://oauth.bb.com.br/oauth/token'  # noqa: S105
-    SCOPES = 'pix.read pix.write'
+
+    def get_bank_code(self) -> str:
+        return "001"
 
     def get_base_url(self) -> str:
         """Obtém a URL base da API de acordo com o modo de operação.

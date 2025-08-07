@@ -19,6 +19,8 @@ from pypix_api.banks.methods.webhook_cobr_methods import WebHookCobrMethods
 from pypix_api.banks.methods.webhook_methods import WebHookMethods
 from pypix_api.banks.methods.webhook_rec_methods import WebHookRecMethods
 
+from pypix_api.scopes import get_pix_scopes
+
 
 class BankPixAPIBase(
     CobVMethods,
@@ -40,7 +42,6 @@ class BankPixAPIBase(
 
     BASE_URL = None
     TOKEN_URL = None
-    SCOPES = None
 
     def __init__(
         self,
@@ -56,7 +57,7 @@ class BankPixAPIBase(
         Raises:
             ValueError: Se BASE_URL, TOKEN_URL ou SCOPES não forem definidos na subclasse
         """
-        if not self.BASE_URL or not self.TOKEN_URL or not self.SCOPES:
+        if not self.BASE_URL or not self.TOKEN_URL:
             raise ValueError(
                 "BASE_URL, TOKEN_URL e SCOPES devem ser definidos na subclasse."
             )
@@ -78,7 +79,8 @@ class BankPixAPIBase(
 
             token = os.getenv("SANDBOX_TOKEN", "sandbox-token")
         else:
-            token = self.oauth.get_token()
+            pix_scopes = get_pix_scopes(self.get_bank_code())
+            token = self.oauth.get_token(pix_scopes)
 
         return {
             "Authorization": f"Bearer {token}",
@@ -86,6 +88,9 @@ class BankPixAPIBase(
             "User-Agent": "PyPixAPIClient/0.1",
             "client_id": self.client_id or "",
         }
+
+    def get_bank_code(self) -> str:
+        raise NotImplementedError("get_bank_code not implemented")
 
     def _handle_error_response(
         self, response: requests.Response, **kwargs: Any

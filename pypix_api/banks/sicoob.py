@@ -20,7 +20,9 @@ class SicoobPixAPI(BankPixAPIBase):
     TOKEN_URL = (
         'https://auth.sicoob.com.br/auth/realms/cooperado/protocol/openid-connect/token'  # noqa: S105
     )
-    SCOPES = 'cob.read cob.write pix.read pix.write'
+
+    def get_bank_code(self) -> str:
+        return "756"
 
     def get_base_url(self) -> str:
         """Obtém a URL base da API de acordo com o modo de operação.
