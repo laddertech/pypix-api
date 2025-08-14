@@ -10,6 +10,7 @@ Principais funcionalidades:
 - Consulta de PIX recebidos por período e filtros
 - Consulta de PIX individual por e2eid
 - Solicitação de devolução de PIX
+- Consulta de devolução de PIX
 
 Esta classe é herdada por implementações específicas de bancos (ex: Banco do Brasil, Sicoob).
 
@@ -25,6 +26,7 @@ Exemplo de uso:
     resposta = banco.consultar_pix(inicio="2023-01-01T00:00:00Z", fim="2023-01-31T23:59:59Z")
     pix_individual = banco.consultar_pix_por_e2eid("E12345678202301011200abcdef123456")
     devolucao = banco.solicitar_devolucao_pix("E12345678202301011200abcdef123456", "devolucao123", {"valor": "100.00"})
+    consulta_devolucao = banco.consultar_devolucao_pix("E12345678202301011200abcdef123456", "devolucao123")
 
 """
 
@@ -153,5 +155,28 @@ class PixMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/pix/{e2eid}/devolucao/{id_devolucao}'
         resp = self.session.put(url, headers=headers, json=body)
+        self._handle_error_response(resp)
+        return resp.json()
+
+    def consultar_devolucao_pix(self, e2eid: str, id_devolucao: str) -> dict[str, Any]:
+        """
+        Consultar devolução de PIX.
+
+        Endpoint para consultar uma devolução através de um End To End ID do PIX
+        e do ID da devolução.
+
+        Args:
+            e2eid: Identificador end-to-end da transação PIX
+            id_devolucao: Identificador único da devolução
+
+        Returns:
+            dict contendo os dados da devolução
+
+        Raises:
+            HTTPError: Para erros 403, 404, 503
+        """
+        headers = self._create_headers()
+        url = f'{self.get_base_url()}/pix/{e2eid}/devolucao/{id_devolucao}'
+        resp = self.session.get(url, headers=headers)
         self._handle_error_response(resp)
         return resp.json()
