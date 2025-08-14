@@ -27,3 +27,7 @@ class PixErroServicoIndisponivelException(PixAPIException):
 
 class PixErroDesconhecidoException(PixAPIException):
     """Erro desconhecido da API Pix."""
+
+
+class PixRespostaInvalidaError(PixAPIException):
+    """Erro quando a resposta da API não está no formato esperado"""

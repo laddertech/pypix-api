@@ -1,6 +1,14 @@
+"""
+Teste de integração com a API do Sicoob em modo Sandbox
+"""
+
 import os
+
 import pytest
+
+from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.banks.sicoob import SicoobPixAPI
+
 
 @pytest.fixture(scope="module")
 def sicoob_pix_api():
@@ -13,13 +21,20 @@ def sicoob_pix_api():
     cert_pfx = os.environ.get("CERT_PFX")
     pwd_pfx = os.environ.get("PWD_PFX")
 
-    # O usuário pode fornecer cert/pvk OU cert_pfx/pwd_pfx
-    api = SicoobPixAPI(
+    # Primeiro, cria o cliente OAuth2
+    oauth_client = OAuth2Client(
+        token_url=SicoobPixAPI.TOKEN_URL,
         client_id=client_id,
         cert=cert,
         pvk=pvk,
         cert_pfx=cert_pfx,
         pwd_pfx=pwd_pfx,
+        sandbox_mode=True,
+    )
+
+    # Depois, cria a API com o cliente OAuth2
+    api = SicoobPixAPI(
+        oauth=oauth_client,
         sandbox_mode=True,
     )
     return api

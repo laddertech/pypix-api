@@ -5,14 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Pytest",
+            "name": "Pytest Mock",
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
             "args": [
-                // "tests/test_boleto_integracao.py::test_emitir_boleto_integracao_real",
-                // "tests/test_conta_corrente_integracao.py::test_extrato_conta_corrente_integracao_real",
-                "tests_integration/test_sicoob_pix_api.py",
+                "tests/tests_mock",
+                "-v"
+            ]
+        },
+        {
+            "name": "Pytest Integration",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "tests/tests_integration",
                 "-v"
             ]
         }

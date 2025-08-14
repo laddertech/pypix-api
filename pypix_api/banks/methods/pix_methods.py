@@ -86,9 +86,9 @@ class PixMethods:  # pylint: disable=E1101
         if txid:
             params['txid'] = txid
         if txid_presente is not None:
-            params['txIdPresente'] = txid_presente
+            params['txIdPresente'] = str(txid_presente).lower()
         if devolucao_presente is not None:
-            params['devolucaoPresente'] = devolucao_presente
+            params['devolucaoPresente'] = str(devolucao_presente).lower()
         if cpf:
             params['cpf'] = cpf
         if cnpj:
@@ -135,7 +135,7 @@ class PixMethods:  # pylint: disable=E1101
             e2eid: Identificador end-to-end da transação PIX
             id_devolucao: Identificador único da devolução
             body: Dados para pedido de devolução contendo:
-                - valor (str): Valor solicitado para devolução (formato: \d{1,10}\.\d{2})
+                - valor (str): Valor solicitado para devolução (formato: \\d{1,10}\\.\\d{2})
                 - natureza (str, opcional): Natureza da devolução ("ORIGINAL" ou "RETIRADA")
                 - descricao (str, opcional): Mensagem ao pagador (máx. 140 caracteres)
 
