@@ -8,6 +8,7 @@ A classe `PixMethods` é utilizada como base para integração com APIs bancári
 
 Principais funcionalidades:
 - Consulta de PIX recebidos por período e filtros
+- Consulta de PIX individual por e2eid
 
 Esta classe é herdada por implementações específicas de bancos (ex: Banco do Brasil, Sicoob).
 
@@ -21,6 +22,7 @@ Exemplo de uso:
 
     banco = MeuBanco()
     resposta = banco.consultar_pix(inicio="2023-01-01T00:00:00Z", fim="2023-01-31T23:59:59Z")
+    pix_individual = banco.consultar_pix_por_e2eid("E12345678202301011200abcdef123456")
 
 """
 
@@ -93,5 +95,26 @@ class PixMethods:  # pylint: disable=E1101
             params['paginacao.itensPorPagina'] = itens_por_pagina
 
         resp = self.session.get(url, headers=headers, params=params)
+        self._handle_error_response(resp)
+        return resp.json()
+
+    def consultar_pix_por_e2eid(self, e2eid: str) -> dict[str, Any]:
+        """
+        Consultar PIX individual.
+
+        Endpoint para consultar um PIX através de um e2eid específico.
+
+        Args:
+            e2eid: Identificador end-to-end da transação PIX
+
+        Returns:
+            dict contendo os dados do PIX
+
+        Raises:
+            HTTPError: Para erros 403, 404, 503
+        """
+        headers = self._create_headers()
+        url = f'{self.get_base_url()}/pix/{e2eid}'
+        resp = self.session.get(url, headers=headers)
         self._handle_error_response(resp)
         return resp.json()
