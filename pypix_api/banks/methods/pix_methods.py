@@ -9,6 +9,7 @@ A classe `PixMethods` é utilizada como base para integração com APIs bancári
 Principais funcionalidades:
 - Consulta de PIX recebidos por período e filtros
 - Consulta de PIX individual por e2eid
+- Solicitação de devolução de PIX
 
 Esta classe é herdada por implementações específicas de bancos (ex: Banco do Brasil, Sicoob).
 
@@ -23,6 +24,7 @@ Exemplo de uso:
     banco = MeuBanco()
     resposta = banco.consultar_pix(inicio="2023-01-01T00:00:00Z", fim="2023-01-31T23:59:59Z")
     pix_individual = banco.consultar_pix_por_e2eid("E12345678202301011200abcdef123456")
+    devolucao = banco.solicitar_devolucao_pix("E12345678202301011200abcdef123456", "devolucao123", {"valor": "100.00"})
 
 """
 
@@ -116,5 +118,40 @@ class PixMethods:  # pylint: disable=E1101
         headers = self._create_headers()
         url = f'{self.get_base_url()}/pix/{e2eid}'
         resp = self.session.get(url, headers=headers)
+        self._handle_error_response(resp)
+        return resp.json()
+
+    def solicitar_devolucao_pix(self, e2eid: str, id_devolucao: str, body: dict[str, Any]) -> dict[str, Any]:
+        """
+        Solicitar devolução de PIX.
+
+        Endpoint para solicitar uma devolução através de um e2eid do PIX e do ID da devolução.
+        O motivo que será atribuído à PACS.004 será "MD06" ou "SL02" de acordo com a natureza
+        da devolução.
+
+        Args:
+            e2eid: Identificador end-to-end da transação PIX
+            id_devolucao: Identificador único da devolução
+            body: Dados para pedido de devolução contendo:
+                - valor (str): Valor solicitado para devolução (formato: \d{1,10}\.\d{2})
+                - natureza (str, opcional): Natureza da devolução ("ORIGINAL" ou "RETIRADA")
+                - descricao (str, opcional): Mensagem ao pagador (máx. 140 caracteres)
+
+        Returns:
+            dict contendo os dados da devolução solicitada
+
+        Raises:
+            HTTPError: Para erros 400, 403, 404, 503
+
+        Note:
+            Naturezas da devolução:
+            - ORIGINAL: devolução de PIX comum ou valor da compra em PIX Troco (MD06)
+            - RETIRADA: devolução de PIX Saque ou valor do troco em PIX Troco (SL02)
+
+            A soma dos valores de todas as devoluções não pode ultrapassar o valor total do PIX.
+        """
+        headers = self._create_headers()
+        url = f'{self.get_base_url()}/pix/{e2eid}/devolucao/{id_devolucao}'
+        resp = self.session.put(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
