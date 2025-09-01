@@ -1,0 +1,125 @@
+name: ✨ Feature Request
+description: Sugira uma nova funcionalidade para o pypix-api
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+projects: ["laddertech/1"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por sugerir uma nova funcionalidade! ✨
+
+        Por favor, preencha as informações abaixo para nos ajudar a entender sua necessidade.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema que resolve
+      description: Sua solicitação de recurso está relacionada a um problema? Por favor, descreva.
+      placeholder: Ex. Fico frustrado quando... / Seria útil se...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solução desejada
+      description: Descreva a solução que você gostaria de ver implementada
+      placeholder: Ex. Gostaria que houvesse um método para...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Categoria
+      description: Que tipo de funcionalidade você está solicitando?
+      options:
+        - 🏦 Suporte a novo banco
+        - 🔐 Melhoria na autenticação
+        - 💰 Nova operação PIX
+        - 🔄 Funcionalidade de recorrência
+        - 🪝 Webhooks
+        - 📊 Relatórios/Consultas
+        - 🛠️ Ferramentas de desenvolvimento
+        - 📚 Documentação
+        - 🧪 Testes
+        - 🔧 Outra melhoria
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioridade
+      description: Quão importante é esta funcionalidade para você?
+      options:
+        - 🔥 Crítica - Bloqueia meu projeto
+        - ⚡ Alta - Muito importante
+        - 📋 Média - Seria útil ter
+        - 💭 Baixa - Apenas uma ideia
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+      description: Descreva qualquer solução alternativa ou recursos que você considerou
+      placeholder: Ex. Tentei usar... mas não funcionou porque...
+
+  - type: textarea
+    id: bank-specific
+    attributes:
+      label: Específico do banco
+      description: Esta funcionalidade é específica para algum banco?
+      placeholder: Ex. Banco do Brasil tem uma API para... / Todos os bancos deveriam suportar...
+
+  - type: textarea
+    id: api-example
+    attributes:
+      label: Exemplo de uso da API
+      description: Como você gostaria que a API funcionasse?
+      placeholder: |
+        ```python
+        # Exemplo de como você gostaria de usar
+        api = BBPixAPI(oauth=oauth)
+        result = api.nova_funcionalidade(parametros)
+        ```
+      render: python
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Referências
+      description: |
+        Forneça links ou referências que possam ajudar:
+        - Documentação oficial do banco
+        - Especificações PIX do Banco Central
+        - Outros projetos que implementam funcionalidade similar
+      placeholder: |
+        - https://...
+        - Seção X da documentação Y
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto adicional
+      description: Adicione qualquer outro contexto, capturas de tela ou informações sobre a solicitação de recurso aqui
+      placeholder: Qualquer informação adicional...
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: "Por favor, confirme que você:"
+      options:
+        - label: Procurei por funcionalidades similares existentes
+          required: true
+        - label: Verifiquei se não existe issue similar
+          required: true
+        - label: Li a documentação para ver se a funcionalidade já existe
+          required: true
+        - label: Esta funcionalidade beneficiaria outros usuários, não apenas meu caso específico
+          required: true

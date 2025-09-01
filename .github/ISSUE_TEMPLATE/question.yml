@@ -1,0 +1,144 @@
+name: ❓ Pergunta
+description: Faça uma pergunta sobre o pypix-api
+title: "[Question]: "
+labels: ["question", "needs-triage"]
+projects: ["laddertech/1"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tem uma pergunta sobre o pypix-api? ❓
+
+        Estamos aqui para ajudar! Por favor, forneça o máximo de contexto possível.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Sua pergunta
+      description: Faça sua pergunta de forma clara e detalhada
+      placeholder: Ex. Como posso configurar webhooks para receber notificações PIX?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Categoria
+      description: Sobre que aspecto do pypix-api é sua pergunta?
+      options:
+        - 🔧 Configuração inicial/Setup
+        - 🔐 Autenticação (OAuth2, certificados)
+        - 🏦 Integração com bancos específicos
+        - 💰 Operações PIX (cobranças, consultas)
+        - 🪝 Webhooks
+        - 🔄 Pagamentos recorrentes
+        - 🐛 Troubleshooting/Debug
+        - 📊 Monitoramento/Logs
+        - 🚀 Deploy/Produção
+        - 🧪 Testes
+        - 📚 Como usar uma funcionalidade específica
+        - 🤔 Conceitos gerais PIX
+        - 💡 Melhores práticas
+        - 🔄 Migração/Atualização
+        - 🌐 Outra
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bank
+    attributes:
+      label: Banco (se aplicável)
+      description: Sua pergunta é específica para algum banco?
+      options:
+        - N/A - Pergunta geral
+        - Banco do Brasil
+        - Sicoob
+        - Ambos
+        - Outro banco
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto
+      description: |
+        Forneça contexto sobre sua situação:
+        - O que você está tentando fazer?
+        - Qual é seu caso de uso?
+        - Você já tentou alguma abordagem?
+      placeholder: |
+        Ex. Estou desenvolvendo um e-commerce e preciso...
+        Ex. Já tentei seguir o exemplo do README mas...
+    validations:
+      required: true
+
+  - type: textarea
+    id: attempted
+    attributes:
+      label: O que você já tentou?
+      description: Descreva o que você já tentou fazer para resolver sua dúvida
+      placeholder: |
+        Ex. Li a documentação X, tentei o código Y...
+        Ex. Procurei no Google e encontrei Z, mas não funcionou porque...
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Código relevante (se aplicável)
+      description: Se sua pergunta envolve código, compartilhe aqui (remova informações sensíveis!)
+      placeholder: |
+        ```python
+        # Seu código aqui (sem senhas, tokens ou dados reais!)
+        oauth = OAuth2Client(client_id="...", ...)
+        api = BBPixAPI(oauth=oauth)
+        # ...
+        ```
+      render: python
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Mensagens de erro (se houver)
+      description: Se você está recebendo algum erro, compartilhe a mensagem completa
+      placeholder: |
+        Traceback (most recent call last):
+        ...
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: Versão do pypix-api
+      description: Qual versão você está usando?
+      placeholder: Ex. 0.5.0
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Versão do Python
+      description: Qual versão do Python você está usando?
+      placeholder: Ex. 3.11.2
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Informações adicionais
+      description: Qualquer outra informação que possa ser relevante
+      placeholder: Ex. Estou trabalhando em ambiente Docker, usando proxy corporativo, etc.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: "Por favor, confirme que você:"
+      options:
+        - label: Procurei na documentação existente
+          required: true
+        - label: Procurei por perguntas similares nas issues
+          required: true
+        - label: Removi informações sensíveis do código (senhas, tokens, etc.)
+          required: true

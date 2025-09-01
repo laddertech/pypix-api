@@ -1,0 +1,75 @@
+version: 2
+updates:
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "fabio-thomaz"
+    assignees:
+      - "fabio-thomaz"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "python"
+    # Group updates to reduce PR noise
+    groups:
+      production-dependencies:
+        patterns:
+          - "requests*"
+          - "python-dotenv*"
+          - "requests-pkcs12*"
+          - "ruff*"
+      development-dependencies:
+        patterns:
+          - "pytest*"
+          - "mypy*"
+          - "bandit*"
+          - "pre-commit*"
+          - "build*"
+          - "twine*"
+      documentation-dependencies:
+        patterns:
+          - "sphinx*"
+          - "myst-parser*"
+          - "linkify-it-py*"
+    # Ignore major version updates for these packages
+    ignore:
+      - dependency-name: "requests"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "python-dotenv"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:30"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "fabio-thomaz"
+    assignees:
+      - "fabio-thomaz"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "ci"
+    # Group all GitHub Actions updates
+    groups:
+      github-actions:
+        patterns:
+          - "*"

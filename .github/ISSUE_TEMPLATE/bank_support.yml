@@ -1,0 +1,130 @@
+name: 🏦 Suporte a Novo Banco
+description: Solicite suporte para um novo banco
+title: "[Bank]: Suporte para "
+labels: ["enhancement", "bank-support", "needs-triage"]
+projects: ["laddertech/1"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por solicitar suporte a um novo banco! 🏦
+
+        Isso nos ajuda a priorizar quais bancos implementar primeiro.
+
+  - type: input
+    id: bank-name
+    attributes:
+      label: Nome do Banco
+      description: Qual banco você gostaria que fosse suportado?
+      placeholder: Ex. Banco Caixa, Banco Itaú, Banco Santander
+    validations:
+      required: true
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Urgência
+      description: Quão urgente é este suporte para você?
+      options:
+        - 🔥 Crítica - Meu projeto depende disso
+        - ⚡ Alta - Muito importante para meu negócio
+        - 📋 Média - Seria muito útil ter
+        - 💭 Baixa - Apenas interesse futuro
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Caso de uso
+      description: Como você planeja usar este banco? Que operações precisa realizar?
+      placeholder: |
+        Ex. Preciso criar cobranças PIX para meu e-commerce...
+        Ex. Quero integrar pagamentos recorrentes...
+    validations:
+      required: true
+
+  - type: textarea
+    id: api-info
+    attributes:
+      label: Informações da API do banco
+      description: |
+        Você tem acesso à documentação da API PIX deste banco?
+        Se sim, por favor compartilhe links ou informações relevantes.
+      placeholder: |
+        Ex. Link para documentação developer: https://...
+        Ex. Tenho acesso ao sandbox e posso ajudar a testar
+        Ex. Não tenho informações da API
+
+  - type: checkboxes
+    id: help-offer
+    attributes:
+      label: Como você pode ajudar?
+      description: Selecione todas as opções que se aplicam
+      options:
+        - label: Posso fornecer documentação da API
+        - label: Tenho acesso ao ambiente de sandbox/testes
+        - label: Posso testar a implementação
+        - label: Posso fornecer certificados de teste
+        - label: Tenho conhecimento técnico da API deste banco
+        - label: Posso contribuir com código
+        - label: Não posso ajudar diretamente, mas preciso desta funcionalidade
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: Detalhes técnicos conhecidos
+      description: |
+        Compartilhe qualquer informação técnica que você conhece sobre a API deste banco:
+        - URL da API
+        - Método de autenticação
+        - Diferenças em relação ao padrão PIX
+        - Peculiaridades conhecidas
+      placeholder: |
+        Ex. Usa OAuth2 com mTLS como BB e Sicoob
+        Ex. Tem endpoint específico para webhooks
+        Ex. Requer headers especiais
+
+  - type: textarea
+    id: documentation
+    attributes:
+      label: Documentação disponível
+      description: |
+        Se você tem acesso a documentação, manuais ou especificações,
+        por favor compartilhe links ou descreva como obtê-los.
+      placeholder: |
+        Ex. Portal do desenvolvedor em https://...
+        Ex. Documentação disponível após cadastro em...
+        Ex. Especificação técnica anexada
+
+  - type: textarea
+    id: timeline
+    attributes:
+      label: Timeline desejado
+      description: Existe algum prazo específico que você precisa ter este suporte?
+      placeholder: Ex. Preciso para go-live em março/2025
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto adicional
+      description: |
+        Qualquer informação adicional que possa ser útil:
+        - Volume de transações esperado
+        - Tipo de negócio
+        - Outros bancos que você já usa
+      placeholder: Qualquer informação adicional...
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: "Por favor, confirme que você:"
+      options:
+        - label: Verifiquei que este banco não é suportado atualmente
+          required: true
+        - label: Procurei por solicitações similares existentes
+          required: true
+        - label: Entendo que implementações de novos bancos podem levar tempo
+          required: true

@@ -1,0 +1,138 @@
+name: 🐛 Bug Report
+description: Reporte um bug para nos ajudar a melhorar o pypix-api
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+projects: ["laddertech/1"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar este bug! 🐛
+
+        Por favor, preencha as informações abaixo para nos ajudar a entender e reproduzir o problema.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: O que aconteceu?
+      description: Descreva o bug de forma clara e concisa
+      placeholder: Ex. Quando tento criar uma cobrança PIX, recebo um erro 500...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Como reproduzir
+      description: Passos para reproduzir o comportamento
+      placeholder: |
+        1. Configure OAuth2 com...
+        2. Chame o método...
+        3. Veja o erro...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento esperado
+      description: O que você esperava que acontecesse?
+      placeholder: Descreva o comportamento esperado...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamento atual
+      description: O que realmente aconteceu?
+      placeholder: Descreva o que realmente aconteceu...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs/Stack trace
+      description: |
+        Se aplicável, adicione logs, stack traces ou mensagens de erro.
+        **Dica:** Você pode anexar imagens ou arquivos de log arrastando e soltando!
+      render: shell
+
+  - type: dropdown
+    id: bank
+    attributes:
+      label: Banco
+      description: Qual banco você estava usando?
+      options:
+        - Banco do Brasil
+        - Sicoob
+        - Ambos
+        - N/A
+    validations:
+      required: true
+
+  - type: dropdown
+    id: version
+    attributes:
+      label: Versão do pypix-api
+      description: Qual versão você está usando?
+      options:
+        - 0.5.0 (latest)
+        - 0.4.x
+        - 0.3.x
+        - Outra (especifique nos detalhes)
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Versão do Python
+      description: Qual versão do Python você está usando?
+      placeholder: Ex. 3.11.2
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Sistema Operacional
+      description: Em qual sistema você está rodando?
+      options:
+        - Ubuntu/Debian
+        - CentOS/RHEL
+        - macOS
+        - Windows
+        - Docker
+        - Outro (especifique nos detalhes)
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto adicional
+      description: |
+        Adicione qualquer outro contexto sobre o problema aqui.
+
+        - Você consegue reproduzir consistentemente?
+        - Isso funcionava antes? Quando parou de funcionar?
+        - Você fez alguma mudança recente na configuração?
+      placeholder: Qualquer informação adicional que possa nos ajudar...
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: "Por favor, confirme que você:"
+      options:
+        - label: Procurei por issues similares
+          required: true
+        - label: Testei com a versão mais recente
+          required: true
+        - label: Li a documentação relevante
+          required: true
+        - label: Removi informações sensíveis (senhas, tokens, etc.)
+          required: true

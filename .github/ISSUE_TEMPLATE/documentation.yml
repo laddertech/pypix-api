@@ -1,0 +1,139 @@
+name: 📚 Documentação
+description: Reporte problemas na documentação ou sugira melhorias
+title: "[Docs]: "
+labels: ["documentation", "needs-triage"]
+projects: ["laddertech/1"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por nos ajudar a melhorar nossa documentação! 📚
+
+        Documentação clara é essencial para uma boa experiência de desenvolvedor.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Tipo de issue
+      description: Que tipo de problema/sugestão de documentação é esta?
+      options:
+        - 🐛 Erro na documentação
+        - 📝 Documentação faltando
+        - ✨ Melhoria na documentação existente
+        - 🔍 Documentação difícil de encontrar
+        - 💡 Novo guia/tutorial necessário
+        - 🌐 Tradução
+        - 🔗 Links quebrados
+    validations:
+      required: true
+
+  - type: dropdown
+    id: location
+    attributes:
+      label: Onde está o problema?
+      description: Em qual parte da documentação você encontrou o problema?
+      options:
+        - README.md
+        - Guia de Contribuição (CONTRIBUTING.md)
+        - Política de Segurança (SECURITY.md)
+        - Changelog (CHANGELOG.md)
+        - Documentação Sphinx (docs/)
+        - Exemplos de código
+        - Comentários no código
+        - GitHub templates
+        - Outra (especifique abaixo)
+    validations:
+      required: true
+
+  - type: input
+    id: page-url
+    attributes:
+      label: URL/Arquivo específico
+      description: Se aplicável, forneça o link ou nome do arquivo
+      placeholder: Ex. docs/examples/bb_basic.rst, linha 50
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema encontrado
+      description: Descreva o problema ou o que está faltando na documentação
+      placeholder: |
+        Ex. O exemplo de código na seção X não funciona porque...
+        Ex. Não há documentação sobre como configurar...
+        Ex. A explicação do parâmetro Y não está clara...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: O que deveria estar documentado
+      description: Descreva o que você esperava encontrar ou como deveria ser documentado
+      placeholder: |
+        Ex. Deveria ter um exemplo completo de...
+        Ex. Precisa explicar melhor como...
+        Ex. Falta documentar o comportamento quando...
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Sugestão de melhoria
+      description: Se você tem uma sugestão específica, compartilhe aqui
+      placeholder: |
+        Ex. Adicionar um exemplo de código que mostra...
+        Ex. Criar uma seção FAQ que cubra...
+        Ex. Melhorar a explicação do conceito X...
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Audiência
+      description: Para quem esta documentação seria mais útil?
+      options:
+        - 👨‍💻 Desenvolvedores iniciantes com pypix-api
+        - 🧑‍💼 Desenvolvedores experientes
+        - 🏢 Equipes de integração bancária
+        - 🔧 Contribuidores do projeto
+        - 📖 Todos os usuários
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto
+      description: |
+        Adicione contexto sobre quando você encontrou este problema:
+        - O que você estava tentando fazer?
+        - Em que situação isso causou confusão?
+        - Qual era sua experiência prévia com PIX/APIs bancárias?
+      placeholder: Ex. Estava tentando implementar minha primeira cobrança PIX e...
+
+  - type: textarea
+    id: code-example
+    attributes:
+      label: Exemplo de código (se aplicável)
+      description: Se você tem um exemplo de código que deveria ser documentado
+      placeholder: |
+        ```python
+        # Código que deveria estar na documentação
+        api = BBPixAPI(oauth=oauth)
+        # ...
+        ```
+      render: python
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: "Por favor, confirme que você:"
+      options:
+        - label: Procurei na documentação existente
+          required: true
+        - label: Verifiquei se não existe issue similar sobre esta documentação
+          required: true
+        - label: Li o guia de contribuição se pretendo contribuir com a correção
+          required: false

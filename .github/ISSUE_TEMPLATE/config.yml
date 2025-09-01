@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/laddertech/pypix-api/discussions
+    about: Para discussões gerais, ideias e perguntas da comunidade
+  - name: 🔒 Relatório de Segurança
+    url: https://github.com/laddertech/pypix-api/security
+    about: Para reportar vulnerabilidades de segurança (não use issues públicos)
+  - name: 📚 Documentação
+    url: https://github.com/laddertech/pypix-api#documentação
+    about: Consulte nossa documentação completa antes de abrir uma issue
+  - name: 📧 Contato Direto
+    url: mailto:fabio@ladder.dev.br
+    about: Para questões comerciais ou parcerias

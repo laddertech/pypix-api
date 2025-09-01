@@ -1,0 +1,88 @@
+name: Mark Stale Issues and PRs
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # Daily at 8 AM UTC (5 AM Brazil time)
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    name: Mark Stale
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark stale issues and PRs
+        uses: actions/stale@v9
+        with:
+          # Issues configuration
+          days-before-issue-stale: 60
+          days-before-issue-close: 14
+          stale-issue-label: "stale"
+          stale-issue-message: |
+            Esta issue foi marcada como stale porque não houve atividade por 60 dias.
+
+            Se esta issue ainda é relevante, por favor:
+            - Adicione um comentário explicando a situação atual
+            - Forneça informações adicionais se solicitadas
+            - Atualize o caso de uso se necessário
+
+            Esta issue será fechada automaticamente em 14 dias se não houver mais atividade.
+
+            Para evitar que isso aconteça novamente, considere:
+            - Responder rapidamente a perguntas dos mantenedores
+            - Fornecer exemplos reproduzíveis
+            - Manter a issue atualizada com novas informações
+
+          close-issue-message: |
+            Esta issue foi fechada automaticamente por inatividade.
+
+            Se você acredita que esta issue ainda é relevante:
+            - Abra uma nova issue referenciando esta
+            - Forneça informações atualizadas
+            - Inclua passos claros para reproduzir (se for um bug)
+
+            Obrigado por contribuir com o pypix-api! 🚀
+
+          # Pull Requests configuration
+          days-before-pr-stale: 30
+          days-before-pr-close: 7
+          stale-pr-label: "stale"
+          stale-pr-message: |
+            Este Pull Request foi marcado como stale porque não houve atividade por 30 dias.
+
+            Para manter este PR ativo:
+            - Responda aos comentários de review
+            - Faça as alterações solicitadas
+            - Rebase com a branch principal se necessário
+            - Adicione um comentário explicando o status atual
+
+            Este PR será fechado automaticamente em 7 dias se não houver mais atividade.
+
+          close-pr-message: |
+            Este Pull Request foi fechado automaticamente por inatividade.
+
+            Se você ainda deseja mergear estas alterações:
+            - Abra um novo PR com as alterações atualizadas
+            - Certifique-se de que está baseado na versão mais recente da main
+            - Responda aos comentários de review pendentes
+
+            Obrigado por sua contribuição! 🚀
+
+          # Labels to exempt from stale marking
+          exempt-issue-labels: "pinned,security,enhancement,good-first-issue,help-wanted"
+          exempt-pr-labels: "pinned,security,breaking-change,wip"
+
+          # Draft PRs are automatically exempt
+          exempt-draft-pr: true
+
+          # Don't mark as stale if there are recent comments from collaborators
+          exempt-all-assignees: true
+
+          # Operations per run (to avoid rate limiting)
+          operations-per-run: 100
+
+          # Enable debug logging
+          debug-only: false

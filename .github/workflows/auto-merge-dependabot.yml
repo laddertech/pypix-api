@@ -1,0 +1,85 @@
+name: Auto-merge Dependabot PRs
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+jobs:
+  auto-merge:
+    name: Auto-merge Dependabot PRs
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Get PR info
+        id: pr-info
+        run: |
+          echo "title=${{ github.event.pull_request.title }}" >> $GITHUB_OUTPUT
+          echo "labels=$(echo '${{ toJson(github.event.pull_request.labels.*.name) }}' | jq -r 'join(",")')" >> $GITHUB_OUTPUT
+
+      - name: Wait for CI checks
+        uses: fountainhead/action-wait-for-check@v1.2.0
+        id: wait-for-checks
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: "CI Success"
+          ref: ${{ github.event.pull_request.head.sha }}
+          timeoutSeconds: 1800 # 30 minutes
+          intervalSeconds: 30
+
+      - name: Auto-approve PR
+        if: steps.wait-for-checks.outputs.conclusion == 'success'
+        run: |
+          # Only auto-approve patch and minor updates, not major
+          if [[ "${{ steps.pr-info.outputs.title }}" =~ (patch|minor) ]]; then
+            echo "Auto-approving patch/minor update"
+            gh pr review --approve "${{ github.event.pull_request.number }}"
+          else
+            echo "Major update detected, manual review required"
+            exit 0
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+      - name: Auto-merge PR
+        if: |
+          steps.wait-for-checks.outputs.conclusion == 'success' &&
+          contains(github.event.pull_request.labels.*.name, 'dependencies') &&
+          (
+            contains(steps.pr-info.outputs.title, 'patch') ||
+            contains(steps.pr-info.outputs.title, 'minor')
+          )
+        run: |
+          echo "Auto-merging dependency update PR"
+          gh pr merge --squash --auto "${{ github.event.pull_request.number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+      - name: Add comment for major updates
+        if: |
+          steps.wait-for-checks.outputs.conclusion == 'success' &&
+          contains(github.event.pull_request.labels.*.name, 'dependencies') &&
+          contains(steps.pr-info.outputs.title, 'major')
+        run: |
+          gh pr comment "${{ github.event.pull_request.number }}" --body "
+          🚨 **Major dependency update detected!**
+
+          This PR contains major version updates that may include breaking changes.
+          Please review carefully before merging:
+
+          1. Check the changelog/release notes for breaking changes
+          2. Run tests locally if possible
+          3. Consider the impact on existing functionality
+          4. Update any affected code if necessary
+
+          Manual approval and merge required for major updates.
+          "
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
