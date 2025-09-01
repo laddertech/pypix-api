@@ -48,16 +48,33 @@ publish: build ## Publicar no PyPI (requer TWINE_USERNAME e TWINE_PASSWORD)
 clean: ## Limpar builds anteriores
 	rm -rf dist/ build/ *.egg-info/
 
-## @ Atualiza versão do pacote
+## @ Releases e versionamento
 
-bump-patch: ## Incrementar versão (patch)
-	python scripts/bump_version.py patch
+version: ## Mostrar versão atual
+	python scripts/release.py --current
 
-bump-minor: ## Incrementar versão (minor)
-	python scripts/bump_version.py minor
+release-patch: ## Preparar release patch (0.5.0 -> 0.5.1)
+	python scripts/release.py patch
 
-bump-major: ## Incrementar versão (major)
-	python scripts/bump_version.py major
+release-minor: ## Preparar release minor (0.5.0 -> 0.6.0)
+	python scripts/release.py minor
+
+release-major: ## Preparar release major (0.5.0 -> 1.0.0)
+	python scripts/release.py major
+
+release-prerelease: ## Preparar pre-release (ex: 0.5.1-alpha)
+	@read -p "Tipo de bump (patch/minor/major): " bump_type; \
+	read -p "Sufixo do pre-release (alpha/beta/rc1): " suffix; \
+	python scripts/release.py $$bump_type --pre $$suffix
+
+release-dry-run: ## Simular release sem fazer mudanças
+	@read -p "Tipo de bump (patch/minor/major): " bump_type; \
+	python scripts/release.py $$bump_type --dry-run
+
+# Legacy aliases for backward compatibility
+bump-patch: release-patch
+bump-minor: release-minor
+bump-major: release-major
 
 ## @ Verifica e formata código
 
@@ -130,3 +147,51 @@ docs-watch: ## Construir documentação em modo watch (requer sphinx-autobuild)
 
 docs-linkcheck: ## Verificar links na documentação
 	cd docs && sphinx-build -b linkcheck . _build/linkcheck
+
+docs-api: ## Gerar documentação da API automaticamente
+	cd docs && sphinx-apidoc -o api/ ../pypix_api/ --force --module-first
+
+docs-full: docs-api docs ## Construir documentação completa (API + manual)
+
+docs-github: docs-full ## Preparar documentação para GitHub Pages
+	@echo "📚 Documentação preparada para GitHub Pages em: docs/_build/html/"
+	@echo "🌐 URL local para testar: file://$(PWD)/docs/_build/html/index.html"
+
+## @ Testes multi-ambiente e benchmarks
+
+tox: ## Executar testes em múltiplas versões do Python
+	tox
+
+tox-clean: ## Limpar ambientes tox
+	tox -e clean
+	rm -rf .tox/
+
+tox-py310: ## Executar testes apenas no Python 3.10
+	tox -e py310
+
+tox-py311: ## Executar testes apenas no Python 3.11
+	tox -e py311
+
+tox-py312: ## Executar testes apenas no Python 3.12
+	tox -e py312
+
+tox-integration: ## Executar testes de integração em múltiplos ambientes
+	tox -e py310-integration,py311-integration,py312-integration
+
+tox-security: ## Executar scan de segurança via tox
+	tox -e security
+
+tox-docs: ## Construir documentação via tox
+	tox -e docs
+
+benchmark: ## Executar benchmarks de performance
+	tox -e benchmark
+
+benchmark-local: ## Executar benchmarks localmente
+	.venv/bin/pytest tests/benchmarks -v --benchmark-only
+
+benchmark-compare: ## Executar benchmarks e salvar para comparação
+	.venv/bin/pytest tests/benchmarks --benchmark-autosave --benchmark-only
+
+benchmark-report: ## Gerar relatório de benchmark
+	.venv/bin/pytest tests/benchmarks --benchmark-only --benchmark-json=benchmark-report.json

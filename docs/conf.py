@@ -47,7 +47,7 @@ master_doc = 'index'
 # HTML output
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
-    'canonical_url': '',
+    'canonical_url': 'https://laddertech.github.io/pypix-api/',
     'analytics_id': '',
     'logo_only': False,
     'display_version': True,

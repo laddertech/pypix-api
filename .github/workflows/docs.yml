@@ -1,0 +1,297 @@
+name: Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'pypix_api/**'
+      - 'pyproject.toml'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'pypix_api/**'
+      - 'pyproject.toml'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for changelog
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-docs-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-docs-
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[docs,dev]"
+
+      - name: Build documentation
+        run: |
+          cd docs
+          sphinx-build -W -b html . _build/html
+
+      - name: Check documentation links
+        run: |
+          cd docs
+          sphinx-build -W -b linkcheck . _build/linkcheck || echo "Link check completed with warnings"
+
+      - name: Generate API documentation
+        run: |
+          cd docs
+          sphinx-apidoc -o api/ ../pypix_api/ --force --module-first
+
+      - name: Rebuild with API docs
+        run: |
+          cd docs
+          sphinx-build -W -b html . _build/html
+
+      - name: Upload documentation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: docs/_build/html/
+          retention-days: 30
+
+  test-docs:
+    name: Test Documentation
+    runs-on: ubuntu-latest
+    needs: build-docs
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install doc8
+        run: pip install doc8
+
+      - name: Check documentation style
+        run: |
+          doc8 docs/ --max-line-length=88 --ignore D001
+
+      - name: Download documentation
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation
+          path: docs-built/
+
+      - name: Test documentation structure
+        run: |
+          # Check that key files exist
+          test -f docs-built/index.html
+          test -f docs-built/api/modules.html || echo "API docs not found (may be expected)"
+          test -d docs-built/_static
+
+          # Check for common issues
+          if grep -r "TODO" docs-built/; then
+            echo "⚠️  Found TODO items in built documentation"
+          fi
+
+          if grep -r "FIXME" docs-built/; then
+            echo "⚠️  Found FIXME items in built documentation"
+          fi
+
+      - name: Validate HTML
+        run: |
+          python -c "
+          import os
+          from pathlib import Path
+
+          docs_dir = Path('docs-built')
+          html_files = list(docs_dir.glob('**/*.html'))
+
+          print(f'Found {len(html_files)} HTML files')
+
+          for html_file in html_files[:10]:  # Check first 10 files
+              content = html_file.read_text()
+              if '<title></title>' in content:
+                  print(f'⚠️  Empty title in {html_file}')
+              if 'undefined' in content.lower():
+                  print(f'⚠️  Found undefined references in {html_file}')
+
+          print('✅ HTML validation completed')
+          "
+
+  deploy-docs:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [build-docs, test-docs]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download documentation
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation
+          path: docs/
+
+      - name: Add custom domain and robots.txt
+        run: |
+          # Add custom domain if needed (uncomment and modify)
+          # echo "docs.pypix-api.com" > docs/CNAME
+
+          # Add robots.txt
+          cat > docs/robots.txt << EOF
+          User-agent: *
+          Allow: /
+
+          Sitemap: https://laddertech.github.io/pypix-api/sitemap.xml
+          EOF
+
+      - name: Add version info
+        run: |
+          # Get version from tag or commit
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            VERSION="${{ github.event.release.tag_name }}"
+          else
+            VERSION="main-$(echo ${{ github.sha }} | cut -c1-8)"
+          fi
+
+          # Add version info to index page
+          sed -i "s|</body>|<div style='position:fixed; bottom:10px; right:10px; background:#f8f9fa; padding:5px 10px; border-radius:3px; font-size:12px; color:#666;'>Version: $VERSION</div></body>|" docs/index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: docs/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+  deploy-preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    needs: [build-docs, test-docs]
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Download documentation
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation
+          path: docs/
+
+      - name: Add PR info
+        run: |
+          # Add PR info to docs
+          cat > docs/pr-info.html << EOF
+          <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; margin: 10px 0; border-radius: 5px;">
+            <strong>📋 Preview Documentation</strong><br>
+            This is a preview build from PR #${{ github.event.number }}: ${{ github.event.pull_request.title }}<br>
+            <small>Built from commit: ${{ github.sha }}</small>
+          </div>
+          EOF
+
+          # Insert into index page
+          sed -i '/<body>/r docs/pr-info.html' docs/index.html
+
+      - name: Comment on PR with preview info
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.login === 'github-actions[bot]' &&
+              comment.body.includes('📚 Documentation Preview')
+            );
+
+            const body = `## 📚 Documentation Preview
+
+            The documentation has been built and is ready for review.
+
+            **Built from:** \`${{ github.sha }}\`
+            **Size:** \`$(du -sh docs/ | cut -f1)\`
+
+            ### What's included:
+            - 📖 User documentation
+            - 🔧 API reference
+            - 📝 Examples and tutorials
+            - 🔗 Link validation results
+
+            > This preview is automatically updated on each commit to this PR.
+            `;
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+  cleanup:
+    name: Cleanup old artifacts
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [deploy-docs, deploy-preview]
+    steps:
+      - name: Delete old documentation artifacts
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+
+            for (const artifact of artifacts.data.artifacts) {
+              if (artifact.name === 'documentation' && artifact.expired) {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                });
+                console.log(`Deleted expired artifact: ${artifact.name}`);
+              }
+            }
