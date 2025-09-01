@@ -80,7 +80,7 @@ Criando uma Cobrança Imediata
             return None
 
 Exemplo Completo
----------------
+----------------
 
 .. code-block:: python
 
@@ -129,7 +129,7 @@ Exemplo Completo
         main()
 
 Variáveis de Ambiente
---------------------
+---------------------
 
 Crie um arquivo ``.env`` na raiz do seu projeto:
 

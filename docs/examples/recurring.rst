@@ -1,9 +1,9 @@
-CobranÁas com Vencimento
+Cobran√ßas com Vencimento
 ========================
 
-Este guia mostra como criar e gerenciar cobranÁas PIX com data de vencimento.
+Este guia mostra como criar e gerenciar cobran√ßas PIX com data de vencimento.
 
-CobranÁa com Vencimento Simples
+Cobran√ßa com Vencimento Simples
 -------------------------------
 
 .. code-block:: python
@@ -24,7 +24,7 @@ CobranÁa com Vencimento Simples
     api = BBPixAPI(oauth=oauth)
 
     def criar_cobranca_com_vencimento():
-        """Cria cobranÁa PIX com data de vencimento."""
+        """Cria cobran√ßa PIX com data de vencimento."""
 
         txid = str(uuid.uuid4())
         vencimento = datetime.now() + timedelta(days=7)
@@ -46,22 +46,22 @@ CobranÁa com Vencimento Simples
         }
 
         resultado = api.criar_cobv(txid, cobranca)
-        print(f"=≈ CobranÁa criada: {resultado['txid']}")
+        print(f"‚úÖ Cobran√ßa criada: {resultado['txid']}")
         return resultado
 
-CobranÁa Recorrente Mensal
+Cobran√ßa Recorrente Mensal
 --------------------------
 
 .. code-block:: python
 
     class CobrancaRecorrente:
-        """Gerenciador de cobranÁas recorrentes."""
+        """Gerenciador de cobran√ßas recorrentes."""
 
         def __init__(self, api):
             self.api = api
 
         def criar_cobranca_mensal(self, cliente_dados, valor, referencia):
-            """Cria cobranÁa mensal para um cliente."""
+            """Cria cobran√ßa mensal para um cliente."""
 
             hoje = datetime.now()
             vencimento = hoje + timedelta(days=30)  # Vence em 30 dias
@@ -83,10 +83,10 @@ CobranÁa Recorrente Mensal
 
             try:
                 resultado = self.api.criar_cobv(txid, cobranca)
-                print(f" Mensalidade criada: {cliente_dados['nome']}")
+                print(f"‚úÖ Mensalidade criada: {cliente_dados['nome']}")
                 return resultado
             except Exception as e:
-                print(f"L Erro: {e}")
+                print(f"‚ùå Erro: {e}")
                 return None
 
 Exemplo de Uso
@@ -95,12 +95,12 @@ Exemplo de Uso
 .. code-block:: python
 
     def exemplo_cobrancas_mensais():
-        """Exemplo completo de cobranÁas mensais."""
+        """Exemplo completo de cobran√ßas mensais."""
 
         clientes = [
             {
                 'cpf': '12345678901',
-                'nome': 'Jo„o Silva'
+                'nome': 'Jo√£o Silva'
             },
             {
                 'cpf': '98765432100',
@@ -117,13 +117,13 @@ Exemplo de Uso
                 'Janeiro/2025'
             )
 
-Monitoramento de CobranÁas
+Monitoramento de Cobran√ßas
 --------------------------
 
 .. code-block:: python
 
     def monitorar_cobrancas():
-        """Monitora status das cobranÁas."""
+        """Monitora status das cobran√ßas."""
 
         inicio = datetime.now() - timedelta(days=30)
         fim = datetime.now()
@@ -138,9 +138,9 @@ Monitoramento de CobranÁas
             valor = cob['valor']['original']
 
             if status == 'ATIVA':
-                print(f"Û Pendente: R$ {valor}")
+                print(f"‚è≥ Pendente: R$ {valor}")
             elif status == 'CONCLUIDA':
-                print(f" Paga: R$ {valor}")
+                print(f"‚úÖ Paga: R$ {valor}")
 
 Script Completo
 ---------------
@@ -148,7 +148,7 @@ Script Completo
 .. code-block:: python
 
     #!/usr/bin/env python3
-    """Sistema de cobranÁas recorrentes."""
+    """Sistema de cobran√ßas recorrentes."""
 
     import os
     from datetime import datetime
@@ -167,7 +167,7 @@ Script Completo
         api = BBPixAPI(oauth=oauth)
         gerenciador = CobrancaRecorrente(api)
 
-        # Processar cobranÁas
+        # Processar cobran√ßas
         clientes = [{'cpf': '12345678901', 'nome': 'Cliente Teste'}]
 
         for cliente in clientes:

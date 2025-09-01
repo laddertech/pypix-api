@@ -110,7 +110,7 @@ Exemplo Completo
         main()
 
 Variáveis de Ambiente
---------------------
+---------------------
 
 .. code-block:: bash
 

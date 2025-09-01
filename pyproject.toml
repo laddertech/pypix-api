@@ -215,3 +215,8 @@ skip_covered = false
 [tool.coverage.html]
 directory = "coverage_html"
 title = "pypix-api Coverage Report"
+
+[dependency-groups]
+dev = [
+    "doc8>=2.0.0",
+]
