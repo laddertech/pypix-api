@@ -73,8 +73,14 @@ select = [
     "RUF", # Ruff-specific rules
 ]
 ignore = [
-    "E501", # Line too long (handled by black)
-    "S101", # Use of print (handled by black)
+    "E501", # Line too long (handled by formatter)
+    "S101", # Use of assert (common in tests)
+    "ANN001", # Missing type annotation for function argument
+    "ANN201", # Missing return type annotation for public function
+    "ANN202", # Missing return type annotation for private function
+    "ANN204", # Missing return type annotation for special method
+    "ANN401", # Dynamically typed expressions (typing.Any) are disallowed
+    "RUF012", # Mutable class attributes should be annotated with typing.ClassVar
 ]
 
 # Configurações específicas

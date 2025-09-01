@@ -1,5 +1,13 @@
 # pypix-api
 
+[![CI Pipeline](https://github.com/laddertech/pypix-api/workflows/CI%20Pipeline/badge.svg)](https://github.com/laddertech/pypix-api/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/laddertech/pypix-api/branch/main/graph/badge.svg)](https://codecov.io/gh/laddertech/pypix-api)
+[![PyPI version](https://badge.fury.io/py/pypix-api.svg)](https://badge.fury.io/py/pypix-api)
+[![Python versions](https://img.shields.io/pypi/pyversions/pypix-api.svg)](https://pypi.org/project/pypix-api/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Type checking: MyPy](https://img.shields.io/badge/type%20checking-mypy-blue)](https://mypy-lang.org/)
+
 Biblioteca em Python para comunicação com APIs bancárias, focada na integração com o PIX.
 
 ## Sumário

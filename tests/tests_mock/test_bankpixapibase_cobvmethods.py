@@ -13,7 +13,7 @@ from pypix_api.banks.base import BankPixAPIBase
 class DummyBankPixAPIBase(BankPixAPIBase):
     BASE_URL = 'https://dummy'
     TOKEN_URL = 'https://dummy/token'  # noqa: S105
-    SCOPES = ['dummy.scope']  # noqa: RUF012
+    SCOPES = ['dummy.scope']
 
     def __init__(self, oauth: OAuth2Client) -> None:
         super().__init__(oauth)
@@ -38,7 +38,7 @@ def dummy_bank_pix_api() -> DummyBankPixAPIBase:
     return api
 
 
-def test_criar_cobv(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_criar_cobv(dummy_bank_pix_api) -> None:
     dummy_bank_pix_api.session.put.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
@@ -52,7 +52,7 @@ def test_criar_cobv(dummy_bank_pix_api) -> None:  # noqa: ANN001
     assert kwargs['json'] == body
 
 
-def test_revisar_cobv(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_revisar_cobv(dummy_bank_pix_api) -> None:
     dummy_bank_pix_api.session.patch.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
@@ -66,7 +66,7 @@ def test_revisar_cobv(dummy_bank_pix_api) -> None:  # noqa: ANN001
     assert kwargs['json'] == body
 
 
-def test_consultar_cobv(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_consultar_cobv(dummy_bank_pix_api) -> None:
     dummy_bank_pix_api.session.get.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
@@ -78,7 +78,7 @@ def test_consultar_cobv(dummy_bank_pix_api) -> None:  # noqa: ANN001
     assert txid in args[0]
 
 
-def test_listar_cobv(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_listar_cobv(dummy_bank_pix_api) -> None:
     dummy_bank_pix_api.session.get.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )

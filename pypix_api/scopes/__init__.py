@@ -14,9 +14,9 @@ ScopeRegistry.register('banco_do_brasil', BBScopes)
 
 # Exportar funções principais
 __all__ = [
+    'BBScopes',
     'ScopeRegistry',
+    'SicoobScopes',
     'get_bank_scopes',
     'get_pix_scopes',
-    'SicoobScopes',
-    'BBScopes',
 ]

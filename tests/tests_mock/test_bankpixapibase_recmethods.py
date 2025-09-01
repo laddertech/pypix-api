@@ -15,7 +15,7 @@ class DummyBankPixAPIBase(BankPixAPIBase):
 
     BASE_URL = 'https://dummy'
     TOKEN_URL = 'https://dummy/token'  # noqa: S105
-    SCOPES = ['dummy.scope']  # noqa: RUF012
+    SCOPES = ['dummy.scope']
 
     def __init__(self, oauth: OAuth2Client) -> None:
         super().__init__(oauth)
@@ -40,7 +40,7 @@ def dummy_bank_pix_api() -> DummyBankPixAPIBase:
     return api
 
 
-def test_criar_recorrencia(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_criar_recorrencia(dummy_bank_pix_api) -> None:
     dummy_bank_pix_api.session.put.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
@@ -54,7 +54,7 @@ def test_criar_recorrencia(dummy_bank_pix_api) -> None:  # noqa: ANN001
     assert kwargs['json'] == body
 
 
-def test_revisar_recorrencia(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_revisar_recorrencia(dummy_bank_pix_api) -> None:
     dummy_bank_pix_api.session.patch.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
@@ -68,7 +68,7 @@ def test_revisar_recorrencia(dummy_bank_pix_api) -> None:  # noqa: ANN001
     assert kwargs['json'] == body
 
 
-def test_consultar_recorrencia(dummy_bank_pix_api):  # noqa: ANN001, ANN201
+def test_consultar_recorrencia(dummy_bank_pix_api):
     dummy_bank_pix_api.session.get.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
@@ -82,7 +82,7 @@ def test_consultar_recorrencia(dummy_bank_pix_api):  # noqa: ANN001, ANN201
     assert kwargs['params'] == {}
 
 
-def test_consultar_recorrencia_com_txid(dummy_bank_pix_api):  # noqa: ANN001, ANN201
+def test_consultar_recorrencia_com_txid(dummy_bank_pix_api):
     dummy_bank_pix_api.session.get.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
@@ -96,7 +96,7 @@ def test_consultar_recorrencia_com_txid(dummy_bank_pix_api):  # noqa: ANN001, AN
     assert kwargs['params']['txid'] == txid
 
 
-def test_listar_recorrencias(dummy_bank_pix_api):  # noqa: ANN001, ANN201
+def test_listar_recorrencias(dummy_bank_pix_api):
     dummy_bank_pix_api.session.get.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
@@ -123,14 +123,14 @@ def test_listar_recorrencias(dummy_bank_pix_api):  # noqa: ANN001, ANN201
     assert params['itensPorPagina'] == 10
 
 
-def test_listar_recorrencias_cpf_cnpj_error(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_listar_recorrencias_cpf_cnpj_error(dummy_bank_pix_api) -> None:
     with pytest.raises(ValueError):
         dummy_bank_pix_api.listar_recorrencias(
             '2024-01-01T00:00:00Z', '2024-01-31T23:59:59Z', cpf='123', cnpj='456'
         )
 
 
-def test_solicitar_retentativa_cobranca(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_solicitar_retentativa_cobranca(dummy_bank_pix_api) -> None:
     dummy_bank_pix_api.session.post.return_value = MagicMock(
         json=lambda: {
             'idRec': 'RR123456782024061999000566354',
@@ -157,7 +157,7 @@ def test_solicitar_retentativa_cobranca(dummy_bank_pix_api) -> None:  # noqa: AN
     assert 'json' not in kwargs  # POST sem body JSON
 
 
-def test_solicitar_retentativa_cobranca_url_format(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_solicitar_retentativa_cobranca_url_format(dummy_bank_pix_api) -> None:
     dummy_bank_pix_api.session.post.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
@@ -172,7 +172,7 @@ def test_solicitar_retentativa_cobranca_url_format(dummy_bank_pix_api) -> None: 
     assert args[0].endswith(f'/rec/{txid}/{data}')
 
 
-def test_solicitar_retentativa_cobranca_headers(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_solicitar_retentativa_cobranca_headers(dummy_bank_pix_api) -> None:
     dummy_bank_pix_api.session.post.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )

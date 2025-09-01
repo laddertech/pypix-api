@@ -11,7 +11,7 @@ class DummyBankPixAPIBaseSolicRec(BankPixAPIBase):
 
     BASE_URL = 'https://dummy'
     TOKEN_URL = 'https://dummy/token'  # noqa: S105
-    SCOPES = ['dummy.scope']  # noqa: RUF012
+    SCOPES = ['dummy.scope']
 
     def __init__(self, oauth: OAuth2Client) -> None:
         super().__init__(oauth)
@@ -36,7 +36,7 @@ def dummy_bank_pix_api() -> DummyBankPixAPIBaseSolicRec:
     return api
 
 
-def test_criar_solicrec(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_criar_solicrec(dummy_bank_pix_api) -> None:
     """Test criar_solicrec method."""
     dummy_bank_pix_api.session.post.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
@@ -54,7 +54,7 @@ def test_criar_solicrec(dummy_bank_pix_api) -> None:  # noqa: ANN001
     assert 'headers' in kwargs
 
 
-def test_consultar_solicrec(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_consultar_solicrec(dummy_bank_pix_api) -> None:
     """Test consultar_solicrec method."""
     dummy_bank_pix_api.session.get.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
@@ -68,7 +68,7 @@ def test_consultar_solicrec(dummy_bank_pix_api) -> None:  # noqa: ANN001
     assert 'headers' in kwargs
 
 
-def test_revisar_solicrec(dummy_bank_pix_api) -> None:  # noqa: ANN001
+def test_revisar_solicrec(dummy_bank_pix_api) -> None:
     """Test revisar_solicrec method."""
     dummy_bank_pix_api.session.patch.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
