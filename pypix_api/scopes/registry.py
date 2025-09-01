@@ -35,8 +35,7 @@ class ScopeRegistry:
         if bank_code not in cls._banks:
             available = ', '.join(cls._banks.keys())
             raise ValueError(
-                f"Banco '{bank_code}' não encontrado. "
-                f'Bancos disponíveis: {available}'
+                f"Banco '{bank_code}' não encontrado. Bancos disponíveis: {available}"
             )
         return cls._banks[bank_code]
 

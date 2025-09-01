@@ -336,12 +336,12 @@ class MetricsCollector:
         try:
             summary = self.get_summary()
             print('\n=== pypix-api Metrics Summary ===')
-            print(f"Uptime: {summary['uptime_seconds']:.1f}s")
+            print(f'Uptime: {summary["uptime_seconds"]:.1f}s')
             print(
-                f"API Calls: {summary['total_api_calls']} (Success: {summary['successful_api_calls']})"
+                f'API Calls: {summary["total_api_calls"]} (Success: {summary["successful_api_calls"]})'
             )
-            print(f"Error Rate: {summary['error_rate']:.2%}")
-            print(f"Avg Response Time: {summary['average_response_time']:.3f}s")
+            print(f'Error Rate: {summary["error_rate"]:.2%}')
+            print(f'Avg Response Time: {summary["average_response_time"]:.3f}s')
             print('================================\n')
             return True
         except Exception:

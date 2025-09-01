@@ -90,13 +90,13 @@ class ReleaseManager:
         self, cmd: list[str], check: bool = True
     ) -> subprocess.CompletedProcess:
         """Run a shell command."""
-        print(f"🔄 Running: {' '.join(cmd)}")
+        print(f'🔄 Running: {" ".join(cmd)}')
         result = subprocess.run(
             cmd, cwd=self.project_root, capture_output=True, text=True
         )
 
         if check and result.returncode != 0:
-            print(f"❌ Command failed: {' '.join(cmd)}")
+            print(f'❌ Command failed: {" ".join(cmd)}')
             print(f'stdout: {result.stdout}')
             print(f'stderr: {result.stderr}')
             sys.exit(1)

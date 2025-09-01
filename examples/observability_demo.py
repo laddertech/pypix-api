@@ -114,12 +114,12 @@ def main():
     print('\n2️⃣ Verificando status do sistema...')
     status = get_observability_status()
     print(
-        f"Status geral: {status['status']} ({'✅' if status['status'] == 'healthy' else '❌'})"
+        f'Status geral: {status["status"]} ({"✅" if status["status"] == "healthy" else "❌"})'
     )
 
     for check, result in status['checks'].items():
         emoji = '✅' if result['healthy'] else '❌'
-        print(f"  {emoji} {check}: {result.get('note', 'OK')}")
+        print(f'  {emoji} {check}: {result.get("note", "OK")}')
 
     # 3. Criar instancia da API com observabilidade
     print('\n3️⃣ Inicializando API com observabilidade...')
@@ -147,32 +147,32 @@ def main():
 
         dados_cobranca = {
             'calendario': {'expiracao': 3600},
-            'devedor': {'cpf': '12345678901', 'nome': f'Cliente Demo {i+1}'},
-            'valor': {'original': f'{(i+1)*10}.50'},
+            'devedor': {'cpf': '12345678901', 'nome': f'Cliente Demo {i + 1}'},
+            'valor': {'original': f'{(i + 1) * 10}.50'},
             'chave': 'demo@empresa.com',
-            'solicitacaoPagador': f'Demo cobranca #{i+1}',
+            'solicitacaoPagador': f'Demo cobranca #{i + 1}',
         }
 
         try:
             resultado = api.criar_cobranca_demo(txid, dados_cobranca)
-            print(f"  ✅ Cobranca {i+1}: {resultado['txid']} - {resultado['status']}")
+            print(f'  ✅ Cobranca {i + 1}: {resultado["txid"]} - {resultado["status"]}')
             sucessos += 1
 
         except ValidationError as e:
-            print(f'  ❌ Cobranca {i+1}: Validacao - {e.message}')
+            print(f'  ❌ Cobranca {i + 1}: Validacao - {e.message}')
             erros += 1
 
         except AuthenticationError as e:
-            print(f'  🔐 Cobranca {i+1}: Autenticacao - {e.message}')
+            print(f'  🔐 Cobranca {i + 1}: Autenticacao - {e.message}')
             erros += 1
 
         except APIError as e:
             status_code = e.details.get('status_code', 'N/A')
-            print(f'  🌐 Cobranca {i+1}: API {status_code} - {e.message}')
+            print(f'  🌐 Cobranca {i + 1}: API {status_code} - {e.message}')
             erros += 1
 
         except Exception as e:
-            print(f'  💥 Cobranca {i+1}: Erro inesperado - {e}')
+            print(f'  💥 Cobranca {i + 1}: Erro inesperado - {e}')
             erros += 1
 
         # Pequena pausa entre operacoes
@@ -203,12 +203,12 @@ def main():
     print('\n6️⃣ Resumo de metricas coletadas...')
     metricas = get_metrics_summary()
 
-    print(f"  📊 Total de metricas: {metricas['total_metrics']}")
-    print(f"  🌐 Chamadas de API: {metricas['total_api_calls']}")
-    print(f"  ✅ Chamadas bem-sucedidas: {metricas['successful_api_calls']}")
-    print(f"  ❌ Taxa de erro: {metricas['error_rate']:.1%}")
-    print(f"  ⚡ Tempo medio de resposta: {metricas['average_response_time']:.3f}s")
-    print(f"  💾 Uso de memoria: ~{metricas['memory_usage']['total_estimated']} bytes")
+    print(f'  📊 Total de metricas: {metricas["total_metrics"]}')
+    print(f'  🌐 Chamadas de API: {metricas["total_api_calls"]}')
+    print(f'  ✅ Chamadas bem-sucedidas: {metricas["successful_api_calls"]}')
+    print(f'  ❌ Taxa de erro: {metricas["error_rate"]:.1%}')
+    print(f'  ⚡ Tempo medio de resposta: {metricas["average_response_time"]:.3f}s')
+    print(f'  💾 Uso de memoria: ~{metricas["memory_usage"]["total_estimated"]} bytes')
 
     # 7. Demonstrar exportacao de metricas
     print('\n7️⃣ Exportando metricas...')
@@ -228,14 +228,14 @@ def main():
     print('\n8️⃣ Status final do sistema...')
     status_final = get_observability_status()
 
-    print(f"Status: {status_final['status']}")
-    print(f"Uptime: {status_final['health']['uptime_seconds']:.1f}s")
+    print(f'Status: {status_final["status"]}')
+    print(f'Uptime: {status_final["health"]["uptime_seconds"]:.1f}s')
 
     if status_final['status'] != 'healthy':
         print('⚠️  Verificacoes que falharam:')
         for check, result in status_final['checks'].items():
             if not result.get('healthy', True):
-                print(f"  - {check}: {result.get('error', 'Unknown error')}")
+                print(f'  - {check}: {result.get("error", "Unknown error")}')
 
     print('\n🎉 Demonstracao concluida!')
     print('\nPara producao, configure:')

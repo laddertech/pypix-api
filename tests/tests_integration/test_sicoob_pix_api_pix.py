@@ -142,7 +142,7 @@ def test_solicitar_devolucao_pix(sicoob_pix_api):
     """
     # Substitua por um e2eid válido do sandbox
     e2eid = 'E12345678202301011200abcdef123456'
-    id_devolucao = f"devolucao_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    id_devolucao = f'devolucao_{datetime.now().strftime("%Y%m%d%H%M%S")}'
 
     body = {
         'valor': '1.00',

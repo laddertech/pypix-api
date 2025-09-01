@@ -380,7 +380,7 @@ def log_authentication(
     logger = PIXLogger('pypix_api.auth')
 
     level = 'info' if success else 'warning'
-    message = f"Authentication {'successful' if success else 'failed'} for {client_id}"
+    message = f'Authentication {"successful" if success else "failed"} for {client_id}'
 
     getattr(logger, level)(
         message, client_id=client_id, scope=scope, success=success, **kwargs
