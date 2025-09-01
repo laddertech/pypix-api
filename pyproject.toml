@@ -31,6 +31,9 @@ Repository = "https://github.com/laddertech/pypix-api"
 dev = [
     "pytest>=7.0.0",
     "pytest-mock>=3.6.1",
+    "pytest-cov>=4.0.0",
+    "pytest-xdist>=3.0.0",
+    "pytest-html>=3.1.0",
     "build>=1.2.2.post1",
     "twine>=6.1.0",
     "pre-commit>=3.7.0",
@@ -139,8 +142,50 @@ addopts = [
     "--strict-markers",
     "--strict-config",
     "-v",
+    "--cov=pypix_api",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+    "--cov-report=xml",
+    "--cov-fail-under=65",
 ]
 markers = [
     "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
-    "mock: marks tests as mock tests",
+    "mock: marks tests as mock tests (default for unit tests)",
+    "unit: marks tests as unit tests",
+    "slow: marks tests as slow running tests",
 ]
+
+[tool.coverage.run]
+source = ["pypix_api"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+    "*/build/*",
+    "*/dist/*",
+    "*/scripts/*",
+]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+show_missing = true
+precision = 2
+skip_covered = false
+
+[tool.coverage.html]
+directory = "coverage_html"
+title = "pypix-api Coverage Report"

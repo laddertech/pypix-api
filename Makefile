@@ -1,4 +1,4 @@
-.PHONY: help build test publish bump-patch bump-minor bump-major pre-commit-install pre-commit-run
+.PHONY: help build test publish bump-patch bump-minor bump-major pre-commit-install pre-commit-run test-cov test-fast test-unit test-integration coverage-report
 
 help:
 	python help.py
@@ -12,8 +12,35 @@ sync: ## Sincronizar dependências do projeto
 build: ## Build do pacote
 	python -m build
 
-test: ## Executar testes
-	pytest tests/tests_mock
+## @ Testes e Cobertura
+
+test: ## Executar testes básicos (mock) sem cobertura
+	.venv/bin/pytest tests/tests_mock -v
+
+test-all: ## Executar todos os testes (mock e integração)
+	.venv/bin/pytest tests/ -v
+
+test-cov: ## Executar testes com cobertura completa
+	.venv/bin/pytest tests/tests_mock --cov=pypix_api --cov-report=html --cov-report=term-missing
+
+test-unit: ## Executar apenas testes unitários/mock
+	.venv/bin/pytest tests/tests_mock -v -m "mock or unit"
+
+test-integration: ## Executar apenas testes de integração
+	.venv/bin/pytest tests/tests_integration -v -m integration
+
+test-fast: ## Executar testes rápidos (paralelo, sem cobertura)
+	.venv/bin/pytest tests/tests_mock -n auto -x --tb=short
+
+coverage-report: ## Gerar relatório de cobertura (HTML)
+	.venv/bin/pytest tests/tests_mock --cov=pypix_api --cov-report=html
+	@echo "Relatório de cobertura disponível em: coverage_html/index.html"
+
+coverage-check: ## Verificar se cobertura atende mínimo (65%)
+	.venv/bin/pytest tests/tests_mock --cov=pypix_api --cov-fail-under=65 --cov-report=term
+
+test-watch: ## Executar testes em modo watch (requer pytest-watch)
+	.venv/bin/ptw tests/tests_mock -- -v
 
 publish: build ## Publicar no PyPI (requer TWINE_USERNAME e TWINE_PASSWORD)
 	twine upload dist/*
@@ -66,3 +93,5 @@ security-check: ## Verificar segurança com bandit
 	bandit -r pypix_api/ -ll
 
 quality: lint type-check security-check ## Executar todas as verificações de qualidade
+
+quality-full: lint type-check security-check test-cov ## Executar verificações completas (com testes e cobertura)
