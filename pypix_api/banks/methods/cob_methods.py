@@ -78,8 +78,6 @@ class CobMethods:  # pylint: disable=E1101
         resp = self.session.post(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
-        self._handle_error_response(resp)
-        return resp.json()
 
     def revisar_cob(self, txid: str, body: dict[str, Any]) -> dict[str, Any]:
         """
