@@ -27,17 +27,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Full history for changelog
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Cache pip dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-docs-${{ hashFiles('**/pyproject.toml') }}
@@ -83,10 +83,10 @@ jobs:
     needs: build-docs
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -98,7 +98,7 @@ jobs:
           doc8 docs/ --max-line-length=88 --ignore D001
 
       - name: Download documentation
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: documentation
           path: docs-built/
@@ -154,7 +154,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Download documentation
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: documentation
           path: docs/
@@ -185,16 +185,16 @@ jobs:
           sed -i "s|</body>|<div style='position:fixed; bottom:10px; right:10px; background:#f8f9fa; padding:5px 10px; border-radius:3px; font-size:12px; color:#666;'>Version: $VERSION</div></body>|" docs/index.html
 
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v5
 
       - name: Upload to GitHub Pages
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v4
         with:
           path: docs/
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
 
   deploy-preview:
     name: Deploy Preview
@@ -203,7 +203,7 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Download documentation
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: documentation
           path: docs/
@@ -223,7 +223,7 @@ jobs:
           sed -i '/<body>/r docs/pr-info.html' docs/index.html
 
       - name: Comment on PR with preview info
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const { data: comments } = await github.rest.issues.listComments({
@@ -276,7 +276,7 @@ jobs:
     needs: [deploy-docs, deploy-preview]
     steps:
       - name: Delete old documentation artifacts
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
