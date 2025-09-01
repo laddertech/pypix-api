@@ -42,8 +42,14 @@ class BankPixAPIBase(
         SCOPES (list): Lista de scopes OAuth2 necessários (deve ser definido na subclasse)
     """
 
-    BASE_URL = None
-    TOKEN_URL = None
+    BASE_URL: str | None = None
+    TOKEN_URL: str | None = None
+
+    # Atributos de instância com type hints
+    sandbox_mode: bool
+    oauth: OAuth2Client
+    session: requests.Session
+    client_id: str | None
 
     def __init__(
         self,
@@ -113,7 +119,7 @@ class BankPixAPIBase(
         content_type = response.headers.get('Content-Type', '')
         if 'application/json' not in content_type:
             raise PixRespostaInvalidaError(
-                None,
+                '',
                 'Resposta Inválida',
                 response.status_code,
                 f'Resposta não é JSON (Content-Type: {content_type})',

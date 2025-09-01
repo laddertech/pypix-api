@@ -1,6 +1,6 @@
 import os
 import time
-from typing import BinaryIO
+from typing import Any, BinaryIO
 
 import requests
 from dotenv import load_dotenv
@@ -24,6 +24,7 @@ class OAuth2Client:
         """Inicializa o cliente OAuth2
 
         Args:
+            token_url: URL de autenticação OAuth2
             client_id: Client ID para autenticação OAuth2
             cert: Path para o certificado PEM (opcional)
             pvk: Path para a chave privada PEM (opcional)
@@ -33,15 +34,15 @@ class OAuth2Client:
         """
         load_dotenv()
 
-        self.client_id = client_id or os.getenv('CLIENT_ID')
-        self.cert = cert or os.getenv('CERT')
-        self.pvk = pvk or os.getenv('PVK')
-        self.cert_pfx = cert_pfx or os.getenv('CERT_PFX')
-        self.pwd_pfx = pwd_pfx or os.getenv('PWD_PFX')
+        self.client_id: str | None = client_id or os.getenv('CLIENT_ID')
+        self.cert: str | None = cert or os.getenv('CERT')
+        self.pvk: str | None = pvk or os.getenv('PVK')
+        self.cert_pfx: str | bytes | BinaryIO | None = cert_pfx or os.getenv('CERT_PFX')
+        self.pwd_pfx: str | None = pwd_pfx or os.getenv('PWD_PFX')
 
-        self.token_url = token_url  # URL de autenticação OAuth2
-        self.token_cache = {}  # Cache de tokens por escopo
-        self.session = requests.Session()
+        self.token_url: str = token_url  # URL de autenticação OAuth2
+        self.token_cache: dict[str, dict[str, Any]] = {}  # Cache de tokens por escopo
+        self.session: requests.Session = requests.Session()
 
         self.sandbox_mode = sandbox_mode
 

@@ -178,13 +178,13 @@ class CobMethods:  # pylint: disable=E1101
         if cnpj:
             params['cnpj'] = cnpj
         if location_presente is not None:
-            params['locationPresente'] = location_presente
+            params['locationPresente'] = str(location_presente).lower()
         if status:
             params['status'] = status
         if pagina_atual is not None:
-            params['paginaAtual'] = pagina_atual
+            params['paginaAtual'] = str(pagina_atual)
         if itens_por_pagina is not None:
-            params['itensPorPagina'] = itens_por_pagina
+            params['itensPorPagina'] = str(itens_por_pagina)
 
         resp = self.session.get(url, headers=headers, params=params)
         self._handle_error_response(resp)

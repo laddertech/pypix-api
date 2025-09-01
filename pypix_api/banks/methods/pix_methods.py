@@ -94,9 +94,9 @@ class PixMethods:  # pylint: disable=E1101
         if cnpj:
             params['cnpj'] = cnpj
         if pagina_atual is not None:
-            params['paginacao.paginaAtual'] = pagina_atual
+            params['paginacao.paginaAtual'] = str(pagina_atual)
         if itens_por_pagina is not None:
-            params['paginacao.itensPorPagina'] = itens_por_pagina
+            params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
         resp = self.session.get(url, headers=headers, params=params)
         self._handle_error_response(resp)
