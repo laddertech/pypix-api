@@ -1,99 +1,106 @@
-Webhook Configuration
-====================
+Configuração de Webhooks
+========================
 
-This example shows how to configure webhooks for PIX notifications.
+Os webhooks permitem receber notificações em tempo real sobre eventos PIX.
 
-Setting up Webhooks
+Configuração Básica
 -------------------
 
 .. code-block:: python
 
-   from pypix_api.auth.oauth2 import OAuth2Client
-   from pypix_api.banks.bb import BBPixAPI
+    from pypix_api.auth.oauth2 import OAuth2Client
+    from pypix_api.banks.bb import BBPixAPI
 
-   # Setup API
-   oauth_client = OAuth2Client(
-       client_id=os.getenv('BB_CLIENT_ID'),
-       client_secret=os.getenv('BB_CLIENT_SECRET'),
-       cert_path=os.getenv('BB_CERT_PATH'),
-       cert_password=os.getenv('BB_CERT_PASSWORD'),
-       scope='webhook.read webhook.write'
-   )
+    oauth = OAuth2Client(
+        client_id='seu_client_id',
+        client_secret='seu_client_secret',
+        cert_path='certificado.p12',
+        cert_password='senha_cert',
+        scope='webhook.read webhook.write'
+    )
 
-   api = BBPixAPI(oauth=oauth_client)
+    api = BBPixAPI(oauth=oauth)
 
-Configure Webhook URL
----------------------
+    def configurar_webhook():
+        webhook_config = {
+            'webhookUrl': 'https://seu-sistema.com/webhook/pix',
+            'chave': 'sua-chave-pix@email.com'
+        }
 
-.. code-block:: python
+        resultado = api.criar_webhook('pix', webhook_config)
+        print(f"✅ Webhook configurado: {resultado['webhookUrl']}")
 
-   webhook_data = {
-       'webhookUrl': 'https://your-domain.com/webhook/pix'
-   }
-
-   try:
-       # Configure webhook for PIX charges
-       result = api.criar_webhook_cob('your-pix-key', webhook_data)
-       print(f"Webhook configured: {result}")
-
-       # Configure webhook for PIX payments
-       result = api.criar_webhook_pix('your-pix-key', webhook_data)
-       print(f"PIX webhook configured: {result}")
-
-   except Exception as e:
-       print(f"Error configuring webhook: {e}")
-
-Webhook Handler Example
-----------------------
-
-Here's a Flask example for handling webhook notifications:
+Servidor Flask para Webhooks
+----------------------------
 
 .. code-block:: python
 
-   from flask import Flask, request, jsonify
-   import json
-   import hmac
-   import hashlib
+    from flask import Flask, request, jsonify
 
-   app = Flask(__name__)
+    app = Flask(__name__)
 
-   @app.route('/webhook/pix', methods=['POST'])
-   def handle_pix_webhook():
-       try:
-           # Get webhook payload
-           payload = request.get_json()
+    @app.route('/webhook/pix', methods=['POST'])
+    def webhook_pix():
+        try:
+            data = request.get_json()
 
-           # Verify webhook signature (if implemented)
-           # signature = request.headers.get('X-Webhook-Signature')
-           # if not verify_signature(request.data, signature):
-           #     return jsonify({'error': 'Invalid signature'}), 401
+            if data.get('tipo') == 'cobranca':
+                processar_cobranca(data.get('cobranca', {}))
+            elif data.get('tipo') == 'pix':
+                processar_pix_recebido(data.get('pix', {}))
 
-           # Process different event types
-           event_type = payload.get('event')
+            return jsonify({'status': 'ok'}), 200
 
-           if event_type == 'pix':
-               handle_pix_received(payload)
-           elif event_type == 'cob':
-               handle_charge_updated(payload)
-           else:
-               print(f"Unknown event type: {event_type}")
+        except Exception as e:
+            return jsonify({'erro': str(e)}), 500
 
-           return jsonify({'status': 'ok'}), 200
+    def processar_cobranca(cobranca):
+        txid = cobranca.get('txid')
+        status = cobranca.get('status')
 
-       except Exception as e:
-           print(f"Webhook error: {e}")
-           return jsonify({'error': str(e)}), 500
+        if status == 'CONCLUIDA':
+            print(f"✅ Pagamento recebido: {txid}")
 
-   def handle_pix_received(payload):
-       pix_data = payload.get('pix', [])
-       for pix in pix_data:
-           print(f"PIX received: R$ {pix.get('valor')} from {pix.get('pagador', {}).get('nome')}")
-           # Process payment (update order, send confirmation, etc.)
+    def processar_pix_recebido(pix):
+        e2e_id = pix.get('endToEndId')
+        valor = pix.get('valor')
+        print(f"💰 PIX recebido: R$ {valor} ({e2e_id})")
 
-   def handle_charge_updated(payload):
-       cob_data = payload.get('cob', {})
-       print(f"Charge {cob_data.get('txid')} status: {cob_data.get('status')}")
-       # Process charge update
+    if __name__ == '__main__':
+        app.run(host='0.0.0.0', port=5000)
 
-   if __name__ == '__main__':
-       app.run(host='0.0.0.0', port=5000)
+Gerenciamento de Webhooks
+-------------------------
+
+.. code-block:: python
+
+    def gerenciar_webhooks():
+        # Listar webhooks existentes
+        webhooks = api.consultar_webhooks('pix')
+        print(f"📋 Webhooks: {len(webhooks.get('webhooks', []))}")
+
+        # Configurar novo webhook
+        resultado = api.criar_webhook('pix', {
+            'webhookUrl': 'https://novo-sistema.com/webhook',
+            'chave': 'chave@email.com'
+        })
+
+        # Atualizar webhook
+        api.atualizar_webhook('pix', 'chave@email.com', {
+            'webhookUrl': 'https://sistema-atualizado.com/webhook'
+        })
+
+Testando Webhooks Localmente
+----------------------------
+
+Use ngrok para expor seu servidor local:
+
+.. code-block:: bash
+
+    # Instalar ngrok
+    npm install -g ngrok
+
+    # Expor servidor local
+    ngrok http 5000
+
+    # Use a URL gerada no webhook
