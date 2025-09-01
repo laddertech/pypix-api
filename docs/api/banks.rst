@@ -8,6 +8,7 @@ Banco do Brasil
    :members:
    :undoc-members:
    :show-inheritance:
+   :exclude-members: BASE_URL, TOKEN_URL, SANDBOX_BASE_URL
 
 Sicoob
 ------
@@ -16,6 +17,7 @@ Sicoob
    :members:
    :undoc-members:
    :show-inheritance:
+   :exclude-members: BASE_URL, TOKEN_URL, SANDBOX_BASE_URL
 
 Base Classes
 ------------

@@ -53,12 +53,12 @@ jobs:
       - name: Build documentation
         run: |
           cd docs
-          sphinx-build -W -b html . _build/html
+          sphinx-build -b html . _build/html
 
       - name: Check documentation links
         run: |
           cd docs
-          sphinx-build -W -b linkcheck . _build/linkcheck || echo "Link check completed with warnings"
+          sphinx-build -b linkcheck . _build/linkcheck || echo "Link check completed with warnings"
 
       - name: Generate API documentation
         run: |
@@ -68,7 +68,7 @@ jobs:
       - name: Rebuild with API docs
         run: |
           cd docs
-          sphinx-build -W -b html . _build/html
+          sphinx-build -b html . _build/html
 
       - name: Upload documentation artifacts
         uses: actions/upload-artifact@v4

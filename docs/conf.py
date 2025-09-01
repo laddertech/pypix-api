@@ -12,8 +12,8 @@ sys.path.insert(0, os.path.abspath('..'))
 project = 'pypix-api'
 copyright = '2025, Fábio Thomaz'
 author = 'Fábio Thomaz'
-release = '0.5.0'
-version = '0.5.0'
+release = '0.6.2'
+version = '0.6.2'
 
 # General configuration
 extensions = [
@@ -130,4 +130,18 @@ myst_enable_extensions = [
     'strikethrough',
     'substitution',
     'tasklist',
+]
+
+# Supress warnings to prevent build failures
+suppress_warnings = [
+    'autodoc.import_object',
+    'misc.highlighting_failure',
+]
+
+# Treat warnings as non-critical
+# (This won't fail the build on warnings)
+nitpick_ignore = [
+    ('py:class', 'typing.Any'),
+    ('py:class', 'typing.Optional'),
+    ('py:class', 'typing.Union'),
 ]

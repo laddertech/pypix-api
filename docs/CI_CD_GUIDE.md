@@ -130,22 +130,14 @@ CODECOV_TOKEN=xxx...
 ## Fluxo de Desenvolvimento
 
 ### Para Pull Requests
-```mermaid
-graph LR
-    A[PR criado] --> B[CI: Quality]
-    B --> C[CI: Test Matrix]
-    C --> D[CI: Build]
-    D --> E[✅ CI Success]
+```
+PR criado → CI: Quality → CI: Test Matrix → CI: Build → ✅ CI Success
 ```
 
 ### Para Releases
-```mermaid
-graph LR
-    A[Create Release] --> B[CD: Pre-deploy]
-    B --> C[CD: Deploy to PyPI]
-    C --> D[CD: Verification]
-    D --> E[CD: Update Notes]
-    E --> F[✅ Deploy Success]
+```
+Create Release → CD: Pre-deploy → CD: Deploy to PyPI →
+CD: Verification → CD: Update Notes → ✅ Deploy Success
 ```
 
 ## Comandos Locais
