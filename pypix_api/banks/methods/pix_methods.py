@@ -123,7 +123,9 @@ class PixMethods:  # pylint: disable=E1101
         self._handle_error_response(resp)
         return resp.json()
 
-    def solicitar_devolucao_pix(self, e2eid: str, id_devolucao: str, body: dict[str, Any]) -> dict[str, Any]:
+    def solicitar_devolucao_pix(
+        self, e2eid: str, id_devolucao: str, body: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Solicitar devolução de PIX.
 

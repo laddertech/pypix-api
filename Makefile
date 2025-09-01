@@ -1,4 +1,4 @@
-.PHONY: help build test publish bump-patch bump-minor bump-major
+.PHONY: help build test publish bump-patch bump-minor bump-major pre-commit-install pre-commit-run
 
 help:
 	python help.py
@@ -41,4 +41,28 @@ format: ## Formatar código
 	ruff format .
 
 fix: ## Corrigir problemas de estilo de código
-	lint format
+	ruff check . --fix
+	ruff format .
+
+## @ Pre-commit hooks
+
+pre-commit-install: ## Instalar pre-commit hooks
+	pre-commit install
+	pre-commit install --hook-type commit-msg
+	@echo "Pre-commit hooks instalados com sucesso!"
+
+pre-commit-run: ## Executar pre-commit em todos os arquivos
+	pre-commit run --all-files
+
+pre-commit-update: ## Atualizar versões dos hooks
+	pre-commit autoupdate
+
+## @ Qualidade de código
+
+type-check: ## Verificar tipos com mypy
+	mypy pypix_api/
+
+security-check: ## Verificar segurança com bandit
+	bandit -r pypix_api/ -ll
+
+quality: lint type-check security-check ## Executar todas as verificações de qualidade

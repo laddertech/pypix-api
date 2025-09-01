@@ -1,0 +1,105 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_language_version:
+  python: python3.10
+
+repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+      - id: end-of-file-fixer
+        name: Fix end of files
+      - id: check-yaml
+        name: Check YAML syntax
+      - id: check-added-large-files
+        name: Check for large files
+        args: ['--maxkb=1000']
+      - id: check-json
+        name: Check JSON syntax
+        exclude: ^(.devcontainer/|.vscode/)
+      - id: check-toml
+        name: Check TOML syntax
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+      - id: check-case-conflict
+        name: Check for case conflicts
+      - id: detect-private-key
+        name: Detect private keys
+      - id: debug-statements
+        name: Check for debug statements
+      - id: check-docstring-first
+        name: Check docstring is first
+
+  # Ruff - Linting and formatting (fast Python linter)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.5
+    hooks:
+      # Run the linter
+      - id: ruff
+        name: Ruff linter
+        args: [--fix, --select, "E,W,F,I,UP", --ignore, "E501"]
+      # Run the formatter
+      - id: ruff-format
+        name: Ruff formatter
+
+  # MyPy - Static type checking (comentado por enquanto - executar manualmente com 'make type-check')
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.9.0
+  #   hooks:
+  #     - id: mypy
+  #       name: Type checking with mypy
+  #       additional_dependencies:
+  #         - types-requests
+  #         - python-dotenv
+  #       args: [--ignore-missing-imports, --disallow-untyped-defs, --no-implicit-optional]
+  #       exclude: ^(tests/|scripts/|build/|dist/)
+
+  # Bandit - Security linting (desabilitado por enquanto - executar manualmente com 'make security-check')
+  # - repo: https://github.com/PyCQA/bandit
+  #   rev: 1.7.8
+  #   hooks:
+  #     - id: bandit
+  #       name: Security check with bandit
+  #       args: [-r, pypix_api/, -ll]
+  #       exclude: ^tests/
+
+  # Check for secrets (desabilitado por enquanto - tem muitos falsos positivos)
+  # - repo: https://github.com/Yelp/detect-secrets
+  #   rev: v1.4.0
+  #   hooks:
+  #     - id: detect-secrets
+  #       name: Detect secrets
+  #       args: ['--baseline', '.secrets.baseline']
+  #       exclude: package-lock.json
+
+  # Import sorting (using Ruff's isort implementation)
+  - repo: local
+    hooks:
+      - id: check-no-print
+        name: Check for print statements
+        entry: "print\\("
+        language: pygrep
+        types: [python]
+        exclude: ^(tests/|scripts/|help.py)
+
+      - id: check-no-env-file
+        name: Check .env not committed
+        entry: "^\\.env$"
+        language: pygrep
+        files: '\.env$'
+        exclude: '\.env\.exemplo$'
+
+# CI configuration
+ci:
+  autoupdate_schedule: monthly
+  skip: [mypy]  # MyPy can be slow in CI
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  submodules: false

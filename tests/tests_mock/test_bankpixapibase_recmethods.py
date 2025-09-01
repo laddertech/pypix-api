@@ -129,15 +129,16 @@ def test_listar_recorrencias_cpf_cnpj_error(dummy_bank_pix_api) -> None:  # noqa
             '2024-01-01T00:00:00Z', '2024-01-31T23:59:59Z', cpf='123', cnpj='456'
         )
 
+
 def test_solicitar_retentativa_cobranca(dummy_bank_pix_api) -> None:  # noqa: ANN001
     dummy_bank_pix_api.session.post.return_value = MagicMock(
         json=lambda: {
             'idRec': 'RR123456782024061999000566354',
             'txid': '7f733863543b4a16b516d839bd4bc34e',
             'status': 'ATIVA',
-            'valor': {'original': '50.33'}
+            'valor': {'original': '50.33'},
         },
-        raise_for_status=lambda: None
+        raise_for_status=lambda: None,
     )
     txid = '7f733863543b4a16b516d839bd4bc34e'
     data = '2024-06-22'
@@ -158,8 +159,7 @@ def test_solicitar_retentativa_cobranca(dummy_bank_pix_api) -> None:  # noqa: AN
 
 def test_solicitar_retentativa_cobranca_url_format(dummy_bank_pix_api) -> None:  # noqa: ANN001
     dummy_bank_pix_api.session.post.return_value = MagicMock(
-        json=lambda: {'result': 'ok'},
-        raise_for_status=lambda: None
+        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
     txid = 'abc123def456ghi789'
     data = '2024-12-25'
@@ -174,8 +174,7 @@ def test_solicitar_retentativa_cobranca_url_format(dummy_bank_pix_api) -> None: 
 
 def test_solicitar_retentativa_cobranca_headers(dummy_bank_pix_api) -> None:  # noqa: ANN001
     dummy_bank_pix_api.session.post.return_value = MagicMock(
-        json=lambda: {'result': 'ok'},
-        raise_for_status=lambda: None
+        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
     txid = 'test_txid_123'
     data = '2024-01-15'

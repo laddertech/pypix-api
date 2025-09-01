@@ -22,7 +22,7 @@ class SicoobPixAPI(BankPixAPIBase):
     )
 
     def get_bank_code(self) -> str:
-        return "756"
+        return '756'
 
     def get_base_url(self) -> str:
         """Obtém a URL base da API de acordo com o modo de operação.

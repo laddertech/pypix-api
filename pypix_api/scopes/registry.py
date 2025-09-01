@@ -1,16 +1,15 @@
 """Registry para gerenciar escopos de diferentes bancos."""
 
-from typing import Dict, Type, Optional, List
 from pypix_api.scopes.base import BankScopesBase, ScopeGroup
 
 
 class ScopeRegistry:
     """Registry centralizado para escopos de bancos."""
 
-    _banks: Dict[str, Type[BankScopesBase]] = {}
+    _banks: dict[str, type[BankScopesBase]] = {}
 
     @classmethod
-    def register(cls, bank_code: str, scope_class: Type[BankScopesBase]) -> None:
+    def register(cls, bank_code: str, scope_class: type[BankScopesBase]) -> None:
         """Registra uma classe de escopos para um código de banco.
 
         Args:
@@ -20,7 +19,7 @@ class ScopeRegistry:
         cls._banks[bank_code.lower()] = scope_class
 
     @classmethod
-    def get_scopes(cls, bank_code: str) -> Type[BankScopesBase]:
+    def get_scopes(cls, bank_code: str) -> type[BankScopesBase]:
         """Obtém a classe de escopos para um código de banco.
 
         Args:
@@ -37,7 +36,7 @@ class ScopeRegistry:
             available = ', '.join(cls._banks.keys())
             raise ValueError(
                 f"Banco '{bank_code}' não encontrado. "
-                f"Bancos disponíveis: {available}"
+                f'Bancos disponíveis: {available}'
             )
         return cls._banks[bank_code]
 
@@ -69,12 +68,12 @@ class ScopeRegistry:
         return scope_class.get_scope_group(group_name)
 
     @classmethod
-    def list_banks(cls) -> List[str]:
+    def list_banks(cls) -> list[str]:
         """Lista todos os bancos registrados."""
         return list(cls._banks.keys())
 
     @classmethod
-    def list_scope_groups(cls, bank_code: str) -> List[str]:
+    def list_scope_groups(cls, bank_code: str) -> list[str]:
         """Lista todos os grupos de escopos disponíveis para um banco.
 
         Args:
@@ -103,7 +102,7 @@ class ScopeRegistry:
 
 
 # Função de conveniência para obter escopos
-def get_bank_scopes(bank_code: str) -> Type[BankScopesBase]:
+def get_bank_scopes(bank_code: str) -> type[BankScopesBase]:
     """Função de conveniência para obter escopos de um banco."""
     return ScopeRegistry.get_scopes(bank_code)
 

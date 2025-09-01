@@ -52,17 +52,13 @@ class WebHookMethods:  # pylint: disable=E1101
         """
         headers = self._create_headers()
         url = f'{self.get_base_url()}/webhook/{chave}'
-        body = {"webhookUrl": webhook_url}
+        body = {'webhookUrl': webhook_url}
         resp = self.session.put(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
 
     def listar_webhooks(
-        self,
-        inicio: str,
-        fim: str,
-        pagina_atual: int = 0,
-        itens_por_pagina: int = 100
+        self, inicio: str, fim: str, pagina_atual: int = 0, itens_por_pagina: int = 100
     ) -> dict[str, Any]:
         """
         Consultar webhooks cadastrados.
@@ -87,7 +83,7 @@ class WebHookMethods:  # pylint: disable=E1101
             'inicio': inicio,
             'fim': fim,
             'paginacao.paginaAtual': pagina_atual,
-            'paginacao.itensPorPagina': itens_por_pagina
+            'paginacao.itensPorPagina': itens_por_pagina,
         }
         resp = self.session.get(url, headers=headers, params=params)
         self._handle_error_response(resp)

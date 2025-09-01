@@ -27,7 +27,7 @@ info:
     A versão `v[x]`que consta no path da URL é o elemento _major_ da versão da API.
     A evolução da versão se dá seguinte forma:
 
-      - Major: alterações incompatíveis, com quebra de contrato (v1.0.0 → v2.0.0) 
+      - Major: alterações incompatíveis, com quebra de contrato (v1.0.0 → v2.0.0)
       - Minor: alterações compatíveis, sem quebra de contrato (v1.1.0 → v1.2.0)
       - Patch: bugfixes, esclarecimentos às especificações, sem alterações funcionais (v1.1.1 → v1.1.2)
       - Release candidate: versões de pré-lançamento de qualquer patch futuro, minor ou major (v1.0.0-rc.1 → v1.0.0-rc.22)
@@ -48,7 +48,7 @@ info:
 
     A API Pix retorna códigos de status HTTP para indicar sucesso ou falhas das
     requisições, são eles:
-    - Códigos `2xx` indicam sucesso; 
+    - Códigos `2xx` indicam sucesso;
     - Códigos `4xx` indicam falhas causadas pelas
     informações enviadas pelo cliente ou pelo estado atual das entidades e;
     - Códigos `5xx` indicam problemas no serviço no lado da API Pix.
@@ -64,9 +64,9 @@ info:
     URL que apresentará uma página web válida, ou um endpoint válido, embora possa, futuramente,
     ser exatamente o caso. O objetivo primário é apenas e tão somente identificar o tipo de erro.
 
-    Convém reforçar que a API Pix contempla uma lista de produtos e respectivas funcionalidades ofertadas pelo PSP recebedor. 
+    Convém reforçar que a API Pix contempla uma lista de produtos e respectivas funcionalidades ofertadas pelo PSP recebedor.
     Cabe à relação contratual com cada usuário recebedor a concessão da totalidade ou de um subconjunto de acessos
-    relacionados aos produtos ofertados. Por exemplo, o usuário recebedor, ao acessar uma funcionalidade não contemplada 
+    relacionados aos produtos ofertados. Por exemplo, o usuário recebedor, ao acessar uma funcionalidade não contemplada
     no seu escopo contratual, receberá o erro geral `AcessoNegado` descrito na próxima seção.
 
     Abaixo estão listados os tipos de erro e possíveis violações da API Pix.
@@ -110,7 +110,7 @@ info:
       * __Significado__: Indica que o serviço demorou além do esperado para retornar.
       * __HTTP Status Code__: [504 Gateway Timeout](https://tools.ietf.org/html/rfc7231#section-6.6.5).
 
-    ## Tag CobPayload 
+    ## Tag CobPayload
 
     Esta seção reúne erros retornados pelos endpoints organizados sob a tag `CobPayload`.
     Estes erros indicam problemas na tentativa de recuperação, via _location_, do Payload JSON que representa a cobrança.
@@ -148,7 +148,7 @@ info:
       não poderá ser paga. A cobrança, neste exemplo, não será considerada válida
       a partir da data 2021-01-05.
 
-    ## Tag RecPayload 
+    ## Tag RecPayload
 
     Esta seção reúne erros retornados pelos endpoints organizados sob a tag `RecPayload`.
     Estes erros indicam problemas na tentativa de recuperação, via _location_, do Payload JSON que representa a recorrência.
@@ -185,7 +185,7 @@ info:
 
     * __Significado__: Recorrência não encontrada para o idRec informado.
     * __HTTP Status Code__: [404](https://tools.ietf.org/html/rfc7231#section-6.5.4).
-    * __endpoints__: `[GET|PATCH] /rec/{idRec}`. 
+    * __endpoints__: `[GET|PATCH] /rec/{idRec}`.
 
     ### `RecOperacaoInvalida`
 
@@ -233,7 +233,7 @@ info:
       - ambos os parâmetros `cpf` e `cnpj` estão preenchidos.
       - o parâmetro `paginacao.paginaAtual` é negativo.
       - o parâmetro `paginacao.itensPorPagina` é negativo.
-    
+
     __Violações__ específicas para o endpoint `GET /rec/{idRec}`:
 
       - o parâmetro `txid` não corresponde a uma cobrança compatível com o campo `ativacao.tipoJornada`. (_Exemplo: `txid` correspondente a uma CobV e `ativação.tipoJornada` igual a JORNADA_3._)
@@ -261,7 +261,7 @@ info:
       - O campo `solicrec.calendario.dataExpiracaoSolicitacao` é anterior à data de criação da solicitação da recorrência.
       - O objeto `solicrec.destinatario` não respeita o _schema_.
       - Existe uma solicitação ativa referente ao mesmo `solicrec.idRec`.
-    
+
     __Violações__ para o endpoint `PATCH /solicrec/{idSolicRec}`:
 
       - Não é possível cancelar uma solicitação de recorrência com o status diferente de CRIADA, ENVIADA ou RECEBIDA.
@@ -1245,7 +1245,7 @@ paths:
       security:
         - OAuth2: [lotecobv.write]
       description: |-
-        Endpoint utilizado para revisar cobranças específicas dentro de um lote de cobranças com vencimento. 
+        Endpoint utilizado para revisar cobranças específicas dentro de um lote de cobranças com vencimento.
 
         A diferença deste endpoint para o endpoint PUT correlato é que este endpoint admite um array
         `cobsv` com menos solicitações de criação ou alteração de cobranças do que o array atribuído na requisição originária do lote.
@@ -3030,7 +3030,7 @@ components:
         infoAdicional: "Serviços de Streamming de Música e Filmes."
         calendario:
           dataDeVencimento: "2024-04-15"
-        valor: 
+        valor:
           original: "106.07"
         ajusteDiaUtil: true
         devedor:
@@ -3083,7 +3083,7 @@ components:
         calendario:
           criacao: "2024-04-01"
           dataDeVencimento: "2024-04-15"
-        valor: 
+        valor:
           original: "106.07"
         status: CRIADA
         politicaRetentativa: PERMITE_3R_7D
@@ -3109,7 +3109,7 @@ components:
         calendario:
           criacao: "2024-05-20"
           dataDeVencimento: "2024-06-20"
-        valor: 
+        valor:
           original: "50.33"
         status: ATIVA
         politicaRetentativa: PERMITE_3R_7D
@@ -3128,7 +3128,7 @@ components:
           - dataLiquidacao: "2024-06-22"
             tipo: AGND
             endToEndId: E12345678202406201221abcdef12345
-            status: EXPIRADA 
+            status: EXPIRADA
           - dataLiquidacao: "2024-06-24"
             tipo: NTAG
             endToEndId: E12345678202406201221abcdef12345
@@ -3146,7 +3146,7 @@ components:
         calendario:
           criacao: "2024-05-20"
           dataDeVencimento: "2024-06-20"
-        valor: 
+        valor:
           original: "210.00"
         status: CANCELADA
         politicaRetentativa: NAO_PERMITE
@@ -3166,7 +3166,7 @@ components:
           - dataLiquidacao: "2024-06-20"
             tipo: AGND
             endToEndId: E12345678202406201221abcdef12345
-            status: CANCELADA 
+            status: CANCELADA
         encerramento:
           cancelamento:
             solicitante: "USUARIO_RECEBEDOR"
@@ -4377,7 +4377,7 @@ components:
             calendario:
               criacao: "2024-05-20"
               dataDeVencimento: "2024-06-20"
-            valor: 
+            valor:
               original: "50.33"
             status: ATIVA
             ajusteDiaUtil: false
@@ -4827,15 +4827,15 @@ components:
 
         Na pacs.008, é referenciado como `TransactionIdentification <txId>` ou `idConciliacaoRecebedor`.
 
-        Em termos de fluxo de funcionamento, o txid é lido pelo aplicativo do PSP do pagador e, 
-        depois de confirmado o pagamento, é enviado para o SPI via pacs.008. 
-        Uma pacs.008 também é enviada ao PSP do recebedor, contendo, além de todas as informações usuais 
+        Em termos de fluxo de funcionamento, o txid é lido pelo aplicativo do PSP do pagador e,
+        depois de confirmado o pagamento, é enviado para o SPI via pacs.008.
+        Uma pacs.008 também é enviada ao PSP do recebedor, contendo, além de todas as informações usuais
         do pagamento, o txid.
-        Ao perceber um recebimento dotado de txid, o PSP do recebedor está apto a se comunicar com o usuário recebedor, 
+        Ao perceber um recebimento dotado de txid, o PSP do recebedor está apto a se comunicar com o usuário recebedor,
         informando que um pagamento específico foi liquidado.
 
         O txid é criado exclusivamente pelo usuário recebedor e está sob sua responsabilidade.
-        O txid, no contexto de representação de uma cobrança, é único por CPF/CNPJ do usuário recebedor. Cabe ao 
+        O txid, no contexto de representação de uma cobrança, é único por CPF/CNPJ do usuário recebedor. Cabe ao
         PSP recebedor validar essa regra na API Pix.
       pattern: "[a-zA-Z0-9]{26,35}"
     EndToEndId:
@@ -4855,7 +4855,7 @@ components:
       title: "Natureza da Devolução Solicitada"
       description: |
         Indica qual é a natureza da devolução solicitada. Uma solicitação de devolução pelo usuário recebedor pode ser relacionada a um Pix
-         comum (com código: `MD06` da pacs.004), ou a um Pix de Saque ou Troco (com códigos possíveis: `MD06` e `SL02` da pacs.004). Na ausência 
+         comum (com código: `MD06` da pacs.004), ou a um Pix de Saque ou Troco (com códigos possíveis: `MD06` e `SL02` da pacs.004). Na ausência
          deste campo a natureza deve ser interpretada como sendo de um Pix comum (`ORIGINAL`).
 
         As naturezas são assim definidas:
@@ -4876,8 +4876,8 @@ components:
       type: "string"
       title: "Natureza da Devolução"
       description: |
-        Indica qual é a natureza da devolução. Uma devolução pode ser relacionada a um Pix comum (com códigos possíveis: `MD06`, `BE08` e `FR01` da pacs.004 e `REFU` da pacs.008), 
-        ou a um Pix de Saque ou Troco (com códigos possíveis:  `MD06` e `SL02` da pacs.004). Na ausência deste campo a natureza deve ser interpretada como 
+        Indica qual é a natureza da devolução. Uma devolução pode ser relacionada a um Pix comum (com códigos possíveis: `MD06`, `BE08` e `FR01` da pacs.004 e `REFU` da pacs.008),
+        ou a um Pix de Saque ou Troco (com códigos possíveis:  `MD06` e `SL02` da pacs.004). Na ausência deste campo a natureza deve ser interpretada como
         sendo de um Pix comum (`ORIGINAL`).
 
         As naturezas são assim definidas:
@@ -4904,7 +4904,7 @@ components:
       type: "string"
       title: "Natureza da Devolução"
       description: |
-        Indica qual é a natureza da devolução. Uma devolução pode ser relacionada a um Pix comum (com códigos possíveis: `MD06` e `FR01` da pacs.004 e `REFU` da pacs.008). Na ausência deste campo a natureza deve ser interpretada como 
+        Indica qual é a natureza da devolução. Uma devolução pode ser relacionada a um Pix comum (com códigos possíveis: `MD06` e `FR01` da pacs.004 e `REFU` da pacs.008). Na ausência deste campo a natureza deve ser interpretada como
         sendo de um Pix comum (`ORIGINAL`).
 
         As naturezas são assim definidas:
@@ -4918,7 +4918,7 @@ components:
       enum:
         - "ORIGINAL"
         - "MED_PIX_AUTOMATICO"
-        - "MED_FRAUDE"        
+        - "MED_FRAUDE"
     PayloadLocationId:
       type: "integer"
       format: "int64"
@@ -5319,8 +5319,8 @@ components:
             em que a cobrança poderá ser paga.
 
             Sempre que a data de vencimento cair em um fim de semana ou em um feriado para o usuário pagador,
-             ela deve ser automaticamente prorrogada para o primeiro dia útil subsequente. Todos os campos 
-             que façam referência a esta data (`validadeAposVencimento`; `desconto`; `juros` e `multa`) devem assumir 
+             ela deve ser automaticamente prorrogada para o primeiro dia útil subsequente. Todos os campos
+             que façam referência a esta data (`validadeAposVencimento`; `desconto`; `juros` e `multa`) devem assumir
              essa prorrogação, quando for o caso.
 
             Para ilustrar o funcionamento, seguem alguns exemplos, onde:
@@ -5338,7 +5338,7 @@ components:
             Tenta-se pagar no dia 2020-10-21, quarta: aceito. (1)
             Tenta-se pagar no dia 2020-10-22, quinta: aceito. (2)
             Tenta-se pagar no dia 2020-10-23, sexta: aceito. (3)
-            Tenta-se pagar no dia 2020-10-24, sábado: aceito. 
+            Tenta-se pagar no dia 2020-10-24, sábado: aceito.
             Tenta-se pagar no dia 2020-10-25, domingo: aceito. (Feriado)
             Tenta-se pagar no dia 2020-10-26, segunda: aceito. (4)
             Tenta-se pagar no dia 2020-10-27, terça: negado.
@@ -5404,7 +5404,7 @@ components:
             Tenta-se pagar no dia 2021-01-02, sábado: aceito.
             Tenta-se pagar no dia 2021-01-03, domingo: aceito.
             Tenta-se pagar no dia 2021-01-04, segunda: aceito. (4)
-            Tenta-se pagar no dia 2021-01-05, terça: negado. 
+            Tenta-se pagar no dia 2021-01-05, terça: negado.
             ```
 
             Exemplo F:
@@ -5419,7 +5419,7 @@ components:
             Tenta-se pagar no dia 2021-08-30, segunda: aceito. (3)
             Tenta-se pagar no dia 2021-08-31, terça: aceito. (4)
             Tenta-se pagar no dia 2021-09-01, quarta: aceito. (5)
-            Tenta-se pagar no dia 2021-09-02, quinta: negado. 
+            Tenta-se pagar no dia 2021-09-02, quinta: negado.
             ```
 
             Exemplo G:
@@ -5429,15 +5429,15 @@ components:
             validadeAposVencimento: 5
 
             Tenta-se pagar no dia 2021-08-28, sábado: aceito. (#)
-            Tenta-se pagar no dia 2021-08-29, domingo: aceito. 
+            Tenta-se pagar no dia 2021-08-29, domingo: aceito.
             Tenta-se pagar no dia 2021-08-30, segunda: aceito. (*)
             Tenta-se pagar no dia 2021-08-31, terça: aceito. (1)
             Tenta-se pagar no dia 2021-09-01, quarta: aceito. (2)
             Tenta-se pagar no dia 2021-09-02, quinta: aceito. (3)
             Tenta-se pagar no dia 2021-09-03, sexta: aceito. (4)
-            Tenta-se pagar no dia 2021-09-04, sabado: aceito. 
-            Tenta-se pagar no dia 2021-09-05, domingo: aceito. 
-            Tenta-se pagar no dia 2021-09-06, segunda: aceito. (5) 
+            Tenta-se pagar no dia 2021-09-04, sabado: aceito.
+            Tenta-se pagar no dia 2021-09-05, domingo: aceito.
+            Tenta-se pagar no dia 2021-09-06, segunda: aceito. (5)
             ```
           default: 30
     CobApresentacao:
@@ -5599,9 +5599,9 @@ components:
           description: "Trata-se de um campo que determina se o valor final do documento pode ser alterado pelo pagador. Na ausência desse campo, assume-se que não se pode alterar o valor do documento de cobrança, ou seja, assume-se o valor 0. Se o campo estiver presente e com valor 1, então está determinado que o valor final da cobrança pode ter seu valor alterado pelo pagador."
         retirada:
           description: |
-            É uma estrutura opcional relacionada ao conceito de recebimento de numerário. Apenas um agrupamento por vez é permitido, quando há `saque` não há `troco` e vice-versa. 
+            É uma estrutura opcional relacionada ao conceito de recebimento de numerário. Apenas um agrupamento por vez é permitido, quando há `saque` não há `troco` e vice-versa.
 
-            Quando uma cobrança imediata tem uma estrutura de `retirada` ela deixa de ser considerada Pix comum e passa à categoria de Pix Saque ou Pix Troco. 
+            Quando uma cobrança imediata tem uma estrutura de `retirada` ela deixa de ser considerada Pix comum e passa à categoria de Pix Saque ou Pix Troco.
 
             Para que o preenchimento do objeto `retirada` seja considerado válido as seguintes regras se aplicam:
             - os campos `modalidadeAgente` e `prestadorDoServicoDeSaque` são de **preenchimento obrigatório**;
@@ -5615,7 +5615,7 @@ components:
             **IMPORTANTE**: Quando usados o `saque` ou `troco` não será permitida a alteração do `valor.original` recebido. Na presença de `saque` ou `troco` o recebimento do campo `valor.modalidadeAlteracao` com valor 1 (um) é considerado erro.
 
             #### Exemplos válidos:
-            Considerando os campos da estrutura `valor` e o predicado 'presente' cujo resultado é verdade quando a estrutura apontada é encontrada temos: 
+            Considerando os campos da estrutura `valor` e o predicado 'presente' cujo resultado é verdade quando a estrutura apontada é encontrada temos:
             - **uma cobrança com valor fixo** (condições: valor.original > 0 && valor.modalidadeAlteração = 0 && !presente(valor.retirada))
               ```
               ...
@@ -5696,7 +5696,7 @@ components:
               ```
             #### Exemplos inválidos:
             Abaixo alguns exemplos que **não são válidos**. Convém observar que esta listagem não tem pretensão de ser completa, sendo tão somente uma referência para alguns erros possíveis.
-            - **saque sem `modalidadeAgente` e `prestadorDoServicoDeSaque`** 
+            - **saque sem `modalidadeAgente` e `prestadorDoServicoDeSaque`**
               ```
               ...
               "valor": {
@@ -5889,9 +5889,9 @@ components:
           description: "Trata-se de um campo que determina se o valor final do documento pode ser alterado pelo pagador. Na ausência desse campo, assume-se que não se pode alterar o valor do documento de cobrança, ou seja, assume-se o valor 0. Se o campo estiver presente e com valor 1, então está determinado que o valor final da cobrança pode ter seu valor alterado pelo pagador."
         retirada:
           description: |
-            É uma estrutura opcional relacionada ao conceito de recebimento de numerário. Apenas um agrupamento por vez é permitido, quando há `saque` não há `troco` e vice-versa. 
+            É uma estrutura opcional relacionada ao conceito de recebimento de numerário. Apenas um agrupamento por vez é permitido, quando há `saque` não há `troco` e vice-versa.
 
-            Quando uma cobrança imediata tem uma estrutura de `retirada` ela deixa de ser considerada Pix comum e passa à categoria de Pix Saque ou Pix Troco. 
+            Quando uma cobrança imediata tem uma estrutura de `retirada` ela deixa de ser considerada Pix comum e passa à categoria de Pix Saque ou Pix Troco.
 
             Para que o preenchimento do objeto `retirada` seja considerado válido as seguintes regras se aplicam:
             - os campos `modalidadeAgente` e `prestadorDoServicoDeSaque` são de **preenchimento obrigatório**;
@@ -5905,7 +5905,7 @@ components:
             **IMPORTANTE**: Quando usados o `saque` ou `troco` não será permitida a alteração do `valor.original` recebido. Na presença de `saque` ou `troco` o recebimento do campo `valor.modalidadeAlteracao` com valor 1 (um) é considerado erro.
 
             #### Exemplos válidos:
-            Considerando os campos da estrutura `valor` e o predicado 'presente' cujo resultado é verdade quando a estrutura apontada é encontrada temos: 
+            Considerando os campos da estrutura `valor` e o predicado 'presente' cujo resultado é verdade quando a estrutura apontada é encontrada temos:
             - **uma cobrança com valor fixo** (condições: valor.original > 0 && valor.modalidadeAlteração = 0 && !presente(valor.retirada))
               ```
               ...
@@ -5986,7 +5986,7 @@ components:
               ```
             #### Exemplos inválidos:
             Abaixo alguns exemplos que **não são válidos**. Convém observar que esta listagem não tem pretensão de ser completa, sendo tão somente uma referência para alguns erros possíveis.
-            - **saque sem `modalidadeAgente` e `prestadorDoServicoDeSaque`** 
+            - **saque sem `modalidadeAgente` e `prestadorDoServicoDeSaque`**
               ```
               ...
               "valor": {
@@ -6204,7 +6204,7 @@ components:
         - type: "object"
           properties:
             idRec:
-              $ref: "#/components/schemas/RecId" 
+              $ref: "#/components/schemas/RecId"
         - $ref: "#/components/schemas/RecBase"
         - type: "object"
           properties:
@@ -6246,10 +6246,10 @@ components:
               title: "Informações do QR Composto."
               description: |
                 ##### Informações relacionadas aos parâmetros `idRec` e `txid` informados na requisição.
-                Ao consultar uma recorrência via endpoint GET `/rec/{idRec}?txid={txid}`, o usuário recebedor pode optar pela consulta sem 
+                Ao consultar uma recorrência via endpoint GET `/rec/{idRec}?txid={txid}`, o usuário recebedor pode optar pela consulta sem
                 o `txid` ou por compor a requisição com um `txid` de uma cobrança imediata, ou cobrança com vencimento, de forma a obter o QR Composto
                 para a jornada de interesse.
-                
+
                 Os `dadosQR` retornados variam de acordo com a jornada desejada, indicada pela presença dos parâmetros de interesse, conforme a tabela abaixo:
                 <table  >
                 <tr><td width="15%">idRec</td><td  width="15%">txid de Cob</td><td  width="15%">txid de CobV</td><td width="100%">Conteúdo esperado</td></tr>
@@ -6685,7 +6685,7 @@ components:
               title: "Identificador do objeto de vínculo"
               description: "Campo de texto livre para informações referentes ao contrato que permitam ao usuário pagador reconhecer o objeto dos pagamentos periódicos por meio do Pix Automático."
               maxLength: 35
-              example: 
+              example:
                 - "Conta de energia Av. Paulista, 1804"
                 - "Serviço de internet banda larga"
                 - "Assinatura anual"
@@ -7142,7 +7142,7 @@ components:
                     type: "string"
                     title: "Descricao da rejeição"
                     description: "Descricao da causa da rejeição"
-                    maxLength: 400          
+                    maxLength: 400
     CobRRevisada:
       type: "object"
       title: "Cobrança Recorrente Revisada"
@@ -8116,20 +8116,20 @@ components:
             O objetivo dessa estrutura é explicar os elementos de composição do valor do Pix, incluindo informações sobre as multas, juros, descontos e abatimentos quando o Pix for relativo a cobranças com vencimento.
 
             Regras da estrutura:
-            - O `valor` do Pix é igual a: 
+            - O `valor` do Pix é igual a:
               - (`original.valor` + `saque.valor` + `troco.valor`) + `multa.valor` + `juros.valor` – `abatimento.valor` – `desconto.valor`
               considerando-se apenas os campos que estiverem presentes para cada tipo de cobrança pago.
-            - As estruturas `saque` e `troco` só serão retornadas quando o Pix for relativo a um Pix Saque ou Pix Troco, respectivamente, e 
+            - As estruturas `saque` e `troco` só serão retornadas quando o Pix for relativo a um Pix Saque ou Pix Troco, respectivamente, e
             as demais estruturas (`juros`, `multa`, `abatimento` e `desconto`) só serão pertinentes aos Pix de pagamentos das cobranças com vencimento.
             - Não pode haver simultaneamente uma subsestrutura do tipo `saque` e outra do tipo `troco`;
             - Não há restrição na ordem das subestruturas.
 
-            Para o caso de um Pix Saque pode-se retornar `original` com valor=0.00 (zero) uma vez que a soma será respeitada, ou pode-se omitir a 
-            subestrutura original. No caso de um Pix Troco ou de um pagamento de cobrança com vencimento a subsestrutura `original` vai sempre estar 
+            Para o caso de um Pix Saque pode-se retornar `original` com valor=0.00 (zero) uma vez que a soma será respeitada, ou pode-se omitir a
+            subestrutura original. No caso de um Pix Troco ou de um pagamento de cobrança com vencimento a subsestrutura `original` vai sempre estar
             presente.
 
             #### Exemplos válidos:
-            Exemplo de preenchimentos válidos. 
+            Exemplo de preenchimentos válidos.
 
             - **Pix para pagamento de cobrança imediata (sem saque ou troco).**
               ```
@@ -8137,7 +8137,7 @@ components:
               "componentesValor": {
                 "original": {
                   "valor": "100.00"
-                } 
+                }
               }
               ...
               ```
@@ -8149,7 +8149,7 @@ components:
                   "valor": "100.00",
                   "modalidadeAgente": "AGPSS",
                   "prestadorDeServicoDeSaque": "12345678"
-                } 
+                }
               }
               ...
               ```
@@ -8164,7 +8164,7 @@ components:
                   "valor": "100.00",
                   "modalidadeAgente": "AGPSS",
                   "prestadorDeServicoDeSaque": "12345678"
-                } 
+                }
               }
               ...
               ```
@@ -8179,7 +8179,7 @@ components:
                   "valor": "20.00",
                   "modalidadeAgente": "AGTEC",
                   "prestadorDeServicoDeSaque": "12345678"
-                } 
+                }
               }
               ...
               ```
@@ -8213,7 +8213,7 @@ components:
                 }
               }
               ...
-              ```            
+              ```
             #### Exemplos inválidos:
             Exemplos, não exaustivos, de preenchimentos inválidos.
             - **`original.valor` maior que 0.00 (zero) e `saque` juntos**
@@ -8227,7 +8227,7 @@ components:
                   "valor": "20.00",
                   "modalidadeAgente": "AGPSS",
                   "prestadorDeServicoDeSaque": "12345678"
-                } 
+                }
               }
               ...
               ```
@@ -8244,7 +8244,7 @@ components:
                   "valor": "10.00",
                   "modalidadeAgente": "AGPSS",
                   "prestadorDeServicoDeSaque": "12345678"
-                } 
+                }
               ]
               ...
               ```
@@ -8264,7 +8264,7 @@ components:
                   "valor": "20.00",
                   "modalidadeAgente": "AGTEC",
                   "prestadorDeServicoDeSaque": "12345678"
-                } 
+                }
               }
               ...
               ```

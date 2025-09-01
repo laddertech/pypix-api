@@ -8,6 +8,7 @@ from typing import Any
 @dataclass(frozen=True)
 class ScopeGroup:
     """Grupo de escopos para uma funcionalidade específica."""
+
     name: str
     scopes: list[str]
     description: str
@@ -24,9 +25,9 @@ class ScopeGroup:
         """Combina dois grupos de escopos."""
         combined_scopes = list(dict.fromkeys(self.scopes + other.scopes))
         return ScopeGroup(
-            name=f"{self.name}_{other.name}",
+            name=f'{self.name}_{other.name}',
             scopes=combined_scopes,
-            description=f"{self.description} + {other.description}"
+            description=f'{self.description} + {other.description}',
         )
 
 
@@ -34,8 +35,8 @@ class BankScopesBase(ABC):
     """Classe base para definição de escopos bancários."""
 
     # Informações do banco (devem ser definidas pelas subclasses)
-    BANK_NAME: str = ""
-    BANK_CODE: str = ""
+    BANK_NAME: str = ''
+    BANK_CODE: str = ''
     BANK_CODES: list[str] = []  # Códigos alternativos (ex: ['001', 'bb'])
 
     @classmethod
@@ -52,7 +53,8 @@ class BankScopesBase(ABC):
     def list_available_groups(cls) -> list[str]:
         """Lista todos os grupos de escopos disponíveis."""
         return [
-            attr for attr in dir(cls)
+            attr
+            for attr in dir(cls)
             if not attr.startswith('_') and isinstance(getattr(cls, attr), ScopeGroup)
         ]
 
@@ -72,5 +74,5 @@ class BankScopesBase(ABC):
             'name': cls.BANK_NAME,
             'code': cls.BANK_CODE,
             'alternative_codes': cls.BANK_CODES,
-            'available_groups': cls.list_available_groups()
+            'available_groups': cls.list_available_groups(),
         }

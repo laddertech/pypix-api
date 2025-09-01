@@ -61,7 +61,7 @@ class BankPixAPIBase(
         """
         if not self.BASE_URL or not self.TOKEN_URL:
             raise ValueError(
-                "BASE_URL, TOKEN_URL e SCOPES devem ser definidos na subclasse."
+                'BASE_URL, TOKEN_URL e SCOPES devem ser definidos na subclasse.'
             )
         self.sandbox_mode = sandbox_mode
         self.oauth = oauth
@@ -79,20 +79,20 @@ class BankPixAPIBase(
 
             load_dotenv()
 
-            token = os.getenv("SANDBOX_TOKEN", "sandbox-token")
+            token = os.getenv('SANDBOX_TOKEN', 'sandbox-token')
         else:
             pix_scopes = get_pix_scopes(self.get_bank_code())
             token = self.oauth.get_token(pix_scopes)
 
         return {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-            "User-Agent": "PyPixAPIClient/0.1",
-            "client_id": self.client_id or "",
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json',
+            'User-Agent': 'PyPixAPIClient/0.1',
+            'client_id': self.client_id or '',
         }
 
     def get_bank_code(self) -> str:
-        raise NotImplementedError("get_bank_code not implemented")
+        raise NotImplementedError('get_bank_code not implemented')
 
     def _handle_error_response(
         self, response: requests.Response, **kwargs: Any
@@ -107,16 +107,16 @@ class BankPixAPIBase(
             Exceção personalizada baseada no erro retornado pela API Pix
         """
         # Skip content-type validation for Mock objects during testing
-        if hasattr(response, "_mock_return_value"):  # Checking for Mock object
+        if hasattr(response, '_mock_return_value'):  # Checking for Mock object
             return response.json()
 
-        content_type = response.headers.get("Content-Type", "")
-        if "application/json" not in content_type:
+        content_type = response.headers.get('Content-Type', '')
+        if 'application/json' not in content_type:
             raise PixRespostaInvalidaError(
                 None,
-                "Resposta Inválida",
+                'Resposta Inválida',
                 response.status_code,
-                f"Resposta não é JSON (Content-Type: {content_type})",
+                f'Resposta não é JSON (Content-Type: {content_type})',
             )
 
         if response.status_code in (400, 403, 404, 503):
@@ -125,17 +125,17 @@ class BankPixAPIBase(
             except ValueError:
                 error_data = {}
 
-            type_ = error_data.get("type", "")
-            title = error_data.get("title", "")
-            status = error_data.get("status", response.status_code)
-            detail = error_data.get("detail", "")
+            type_ = error_data.get('type', '')
+            title = error_data.get('title', '')
+            status = error_data.get('status', response.status_code)
+            detail = error_data.get('detail', '')
 
             # Mapeamento para exceções específicas
-            if status == 403 or "AcessoNegado" in type_:
+            if status == 403 or 'AcessoNegado' in type_:
                 raise PixAcessoNegadoException(type_, title, status, detail)
-            elif status == 404 or "RecursoNaoEncontrado" in type_:
+            elif status == 404 or 'RecursoNaoEncontrado' in type_:
                 raise PixRecursoNaoEncontradoException(type_, title, status, detail)
-            elif status == 400 or "ErroValidacao" in type_:
+            elif status == 400 or 'ErroValidacao' in type_:
                 raise PixErroValidacaoException(type_, title, status, detail)
             elif status == 503:
                 raise PixErroServicoIndisponivelException(type_, title, status, detail)

@@ -52,7 +52,7 @@ class WebHookCobrMethods:  # pylint: disable=E1101
         """
         headers = self._create_headers()
         url = f'{self.get_base_url()}/webhookcobr'
-        body = {"webhookUrl": webhook_url}
+        body = {'webhookUrl': webhook_url}
         resp = self.session.put(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()

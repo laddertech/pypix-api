@@ -20,7 +20,7 @@ class BBPixAPI(BankPixAPIBase):
     TOKEN_URL = 'https://oauth.bb.com.br/oauth/token'  # noqa: S105
 
     def get_bank_code(self) -> str:
-        return "001"
+        return '001'
 
     def get_base_url(self) -> str:
         """Obtém a URL base da API de acordo com o modo de operação.
