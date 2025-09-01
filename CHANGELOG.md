@@ -7,17 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-01-09
+
 ### Added
-- Complete CI/CD pipeline with GitHub Actions
-- Pre-commit hooks for code quality automation
-- Type checking with MyPy
-- Test coverage with pytest-cov (65.54% coverage)
-- Comprehensive documentation guides
+- 🎯 **Sistema de Observabilidade Completo**
+  - Logging estruturado com suporte a JSON e sanitização de dados sensíveis
+  - Sistema de métricas com counters, gauges e histogramas
+  - Coleta automática de métricas de API calls
+  - Tratamento avançado de erros com classificação automática
+  - Health checks e monitoramento do sistema
+  - Context managers para tracking de operações
+  - Decoradores para observabilidade transparente
+  - ObservabilityMixin para integração fácil
+
+- 📚 **Melhorias na Documentação**
+  - Exemplos práticos de uso do BB e Sicoob
+  - Guia completo de error handling
+  - Documentação de webhooks e recorrência
+  - Exemplos de observabilidade e métricas
+
+- 🔧 **Infraestrutura de Desenvolvimento**
+  - Complete CI/CD pipeline with GitHub Actions
+  - Pre-commit hooks for code quality automation
+  - Type checking with MyPy
+  - Test coverage with pytest-cov (65.54% coverage)
+  - Security scanning with Bandit and Safety
+  - Automated dependency updates
+  - Tox configuration for multi-version testing
 
 ### Changed
 - Improved project structure with better organization
 - Enhanced testing infrastructure with fixtures
 - Updated development workflow with quality gates
+- All `__init__.py` files now have proper `__all__` exports
+- Modernized Python packaging with pyproject.toml
+
+### Fixed
+- Removed duplicate code in cob_methods.py
+- Fixed UTF-8 encoding issues in docstrings
+- Corrected pre-commit hook configurations
 
 ## [0.5.0] - 2024-09-01
 
