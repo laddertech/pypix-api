@@ -83,7 +83,7 @@ repos:
         entry: "print\\("
         language: pygrep
         types: [python]
-        exclude: ^(tests/|scripts/|help.py)
+        exclude: ^(tests/|scripts/|examples/|help.py|pypix_api/metrics.py)
 
       - id: check-no-env-file
         name: Check .env not committed

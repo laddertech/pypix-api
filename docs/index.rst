@@ -131,6 +131,7 @@ Examples
    examples/sicoob_basic
    examples/webhooks
    examples/recurring
+   examples/error_handling
 
 Contributing
 ------------
