@@ -1,0 +1,201 @@
+name: Security Scans
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run security scans weekly on Monday at 6 AM (Brazil time: 3 AM)
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  # Vulnerability scanning with multiple tools
+  vulnerability-scan:
+    name: Vulnerability Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: |
+          uv sync
+          uv pip install -e ".[dev]"
+
+      # Safety - Python package vulnerability scanner
+      - name: Run Safety vulnerability scan
+        run: |
+          uv pip install safety
+          uv run safety check --json --output safety-report.json || true
+        continue-on-error: true
+
+      # pip-audit - Official PyPA vulnerability scanner
+      - name: Run pip-audit vulnerability scan
+        run: |
+          uv pip install pip-audit
+          uv run pip-audit --desc --format=json --output=pip-audit-report.json || true
+        continue-on-error: true
+
+      # Bandit - Python security linter (already configured)
+      - name: Run Bandit security scan
+        run: |
+          uv run bandit -r pypix_api/ -f json -o bandit-report.json || true
+        continue-on-error: true
+
+      # Semgrep - Static analysis security scanner
+      - name: Run Semgrep security scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/secrets
+            p/python
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        continue-on-error: true
+
+      # Upload security scan results
+      - name: Upload Security Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            safety-report.json
+            pip-audit-report.json
+            bandit-report.json
+          retention-days: 30
+
+      - name: Security Summary
+        if: always()
+        run: |
+          echo "## 🔒 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Safety results
+          if [ -f "safety-report.json" ]; then
+            SAFETY_VULNS=$(jq '.vulnerabilities | length // 0' safety-report.json 2>/dev/null || echo "0")
+            echo "- **Safety**: $SAFETY_VULNS vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # pip-audit results
+          if [ -f "pip-audit-report.json" ]; then
+            AUDIT_VULNS=$(jq '.vulnerabilities | length // 0' pip-audit-report.json 2>/dev/null || echo "0")
+            echo "- **pip-audit**: $AUDIT_VULNS vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Bandit results
+          if [ -f "bandit-report.json" ]; then
+            BANDIT_HIGH=$(jq '.results | map(select(.issue_severity == "HIGH")) | length // 0' bandit-report.json 2>/dev/null || echo "0")
+            BANDIT_MED=$(jq '.results | map(select(.issue_severity == "MEDIUM")) | length // 0' bandit-report.json 2>/dev/null || echo "0")
+            echo "- **Bandit**: $BANDIT_HIGH high, $BANDIT_MED medium severity issues" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 Detailed reports available in workflow artifacts" >> $GITHUB_STEP_SUMMARY
+
+  # Secret scanning
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for better detection
+
+      # TruffleHog - Secret scanner
+      - name: Run TruffleHog secret scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      # GitLeaks - Another secret scanner
+      - name: Run GitLeaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # License compliance check
+  license-scan:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: |
+          uv sync
+          uv pip install pip-licenses
+
+      - name: Check license compliance
+        run: |
+          uv run pip-licenses --format=json --output-file=licenses.json
+
+          # Check for non-approved licenses
+          uv run pip-licenses --format=plain --fail-on="GPL;LGPL;AGPL;MPL-1.1;CPL;EPL" || {
+            echo "❌ Found non-approved licenses!"
+            echo "Approved licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, MPL-2.0"
+            exit 1
+          }
+
+      - name: Upload license report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: license-report
+          path: licenses.json
+          retention-days: 30
+
+  # SAST with CodeQL
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          queries: security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:python"

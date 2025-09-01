@@ -129,12 +129,24 @@ celerybeat.pid
 
 # Environments
 .env
+.env.local
+.env.*.local
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Security-sensitive files
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+secrets/
+credentials/
 
 # Spyder project settings
 .spyderproject
@@ -198,3 +210,11 @@ coverage_html/
 .coverage
 coverage.xml
 htmlcov/
+
+# Security reports
+*-report.json
+bandit-report.json
+safety-report.json
+pip-audit-report.json
+semgrep-report.json
+bandit-ci-report.json

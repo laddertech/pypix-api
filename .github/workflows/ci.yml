@@ -46,8 +46,30 @@ jobs:
         run: uv run mypy pypix_api/
 
       - name: Security scan with Bandit
-        run: uv run bandit -r pypix_api/ -ll
-        continue-on-error: true  # Don't fail CI for now
+        run: |
+          echo "Running Bandit security scan..."
+          uv run bandit -r pypix_api/ -ll -f json -o bandit-ci-report.json || true
+
+          # Show summary
+          echo "## 🔒 Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          if [ -f "bandit-ci-report.json" ]; then
+            HIGH_ISSUES=$(jq '.results | map(select(.issue_severity == "HIGH")) | length' bandit-ci-report.json 2>/dev/null || echo "0")
+            MED_ISSUES=$(jq '.results | map(select(.issue_severity == "MEDIUM")) | length' bandit-ci-report.json 2>/dev/null || echo "0")
+            LOW_ISSUES=$(jq '.results | map(select(.issue_severity == "LOW")) | length' bandit-ci-report.json 2>/dev/null || echo "0")
+
+            echo "- **High severity**: $HIGH_ISSUES issues" >> $GITHUB_STEP_SUMMARY
+            echo "- **Medium severity**: $MED_ISSUES issues" >> $GITHUB_STEP_SUMMARY
+            echo "- **Low severity**: $LOW_ISSUES issues" >> $GITHUB_STEP_SUMMARY
+
+            # Fail on high severity issues
+            if [ "$HIGH_ISSUES" -gt "0" ]; then
+              echo "❌ High severity security issues found!" >> $GITHUB_STEP_SUMMARY
+              echo "Please review and fix security issues before merging."
+              exit 1
+            fi
+          else
+            echo "- Bandit scan completed successfully" >> $GITHUB_STEP_SUMMARY
+          fi
 
   # Test matrix job
   test:

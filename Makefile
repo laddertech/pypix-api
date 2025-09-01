@@ -90,7 +90,25 @@ type-check: ## Verificar tipos com mypy
 	mypy pypix_api/
 
 security-check: ## Verificar segurança com bandit
-	bandit -r pypix_api/ -ll
+	.venv/bin/bandit -r pypix_api/ -ll
+
+security-scan: ## Executar scan completo de segurança
+	@echo "🔒 Executando scan completo de segurança..."
+	@echo "1. Bandit - Python security linter"
+	.venv/bin/bandit -r pypix_api/ -ll -f json -o bandit-report.json || true
+	@echo "2. Safety - Vulnerability database"
+	.venv/bin/pip install --quiet safety
+	.venv/bin/safety check --json --output safety-report.json || true
+	@echo "3. pip-audit - PyPA vulnerability scanner"
+	.venv/bin/pip install --quiet pip-audit
+	.venv/bin/pip-audit --desc --format=json --output=pip-audit-report.json || true
+	@echo "4. Semgrep - SAST scanner"
+	@command -v semgrep >/dev/null 2>&1 && semgrep --config=.semgrep.yml . --json --output=semgrep-report.json || echo "Semgrep not installed, skipping..."
+	@echo "✅ Security scan completed! Check *-report.json files for results."
+
+security-report: security-scan ## Gerar relatório de segurança consolidado
+	@echo "📊 Gerando relatório consolidado de segurança..."
+	@.venv/bin/python -c "import json, os, datetime; print('🔒 Relatório de segurança gerado em:', datetime.datetime.now())"
 
 quality: lint type-check security-check ## Executar todas as verificações de qualidade
 

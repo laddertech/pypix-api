@@ -1,0 +1,115 @@
+# Semgrep configuration for pypix-api
+# Static Application Security Testing (SAST) rules
+
+rules:
+  # Detect hardcoded secrets
+  - id: hardcoded-secret-detection
+    patterns:
+      - pattern: |
+          $SECRET = "$VALUE"
+      - metavariable-regex:
+          metavariable: $SECRET
+          regex: (?i)(password|secret|token|key|api_key|client_secret)
+      - metavariable-regex:
+          metavariable: $VALUE
+          regex: .{8,}
+    message: Potential hardcoded secret detected
+    severity: WARNING
+    languages: [python]
+
+  # Detect SQL injection vulnerabilities
+  - id: sql-injection-risk
+    patterns:
+      - pattern: |
+          cursor.execute($QUERY + $VAR)
+      - pattern: |
+          cursor.execute($QUERY % $VAR)
+      - pattern: |
+          cursor.execute(f"$QUERY{$VAR}")
+    message: Potential SQL injection vulnerability
+    severity: ERROR
+    languages: [python]
+
+  # Detect unsafe HTTP requests
+  - id: insecure-http-requests
+    patterns:
+      - pattern: requests.get("http://...")
+      - pattern: requests.post("http://...")
+      - pattern: requests.put("http://...")
+      - pattern: requests.delete("http://...")
+    message: HTTP request without TLS encryption
+    severity: WARNING
+    languages: [python]
+
+  # Detect eval() usage
+  - id: dangerous-eval-usage
+    patterns:
+      - pattern: eval($ARG)
+      - pattern: exec($ARG)
+    message: Dangerous use of eval() or exec()
+    severity: ERROR
+    languages: [python]
+
+  # Detect shell injection
+  - id: shell-injection-risk
+    patterns:
+      - pattern: os.system($CMD)
+      - pattern: subprocess.call($CMD, shell=True)
+      - pattern: subprocess.run($CMD, shell=True)
+    message: Potential shell injection vulnerability
+    severity: ERROR
+    languages: [python]
+
+  # Detect weak SSL/TLS configuration
+  - id: weak-ssl-configuration
+    patterns:
+      - pattern: ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+      - pattern-inside: |
+          $CTX.check_hostname = False
+      - pattern: |
+          ssl._create_unverified_context()
+    message: Weak SSL/TLS configuration detected
+    severity: WARNING
+    languages: [python]
+
+  # PIX API specific rules
+  - id: pix-credential-exposure
+    patterns:
+      - pattern: |
+          $VAR = "$CLIENT_ID"
+      - metavariable-regex:
+          metavariable: $CLIENT_ID
+          regex: ^[a-f0-9]{32}$
+    message: PIX client ID potentially hardcoded
+    severity: WARNING
+    languages: [python]
+
+  # Logging sensitive data
+  - id: sensitive-data-logging
+    patterns:
+      - pattern: |
+          logger.$METHOD($MSG)
+      - metavariable-regex:
+          metavariable: $MSG
+          regex: .*(password|token|secret|key|credential).*
+    message: Potential logging of sensitive data
+    severity: WARNING
+    languages: [python]
+
+# Paths to exclude from scanning
+exclude:
+  - "tests/"
+  - ".venv/"
+  - "build/"
+  - "dist/"
+  - "docs/"
+  - "__pycache__/"
+
+# Include only Python files
+include:
+  - "*.py"
+
+# Semgrep rule sets to use
+extends:
+  - security
+  - secrets

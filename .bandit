@@ -1,0 +1,34 @@
+[bandit]
+# Bandit configuration for pypix-api
+# Security analysis for Python code
+
+# Exclude test directories and files
+exclude_dirs = ["tests", "scripts", ".venv", "build", "dist", "docs"]
+
+# Test IDs to skip (customize based on project needs)
+skips = [
+    # B101: assert_used - We use asserts in tests intentionally
+    "B101",
+    # B603: subprocess_without_shell_equals_true - We may need subprocess
+    "B603"
+]
+
+# Confidence level: HIGH, MEDIUM, LOW
+# Only report issues with MEDIUM or HIGH confidence to reduce false positives
+confidence = "MEDIUM"
+
+# Severity level: HIGH, MEDIUM, LOW
+# Report all severity levels for comprehensive coverage
+severity = "LOW"
+
+# Test IDs to include (empty means include all)
+tests = []
+
+# Format for output (txt, json, csv, xml, html, yaml)
+format = "txt"
+
+# Message template
+msg_template = "{abspath}:{line}: {test_id}[bandit]: {severity}: {msg}"
+
+# Exclude specific files if needed
+# exclude = ["*/migrations/*", "*/settings/*"]
