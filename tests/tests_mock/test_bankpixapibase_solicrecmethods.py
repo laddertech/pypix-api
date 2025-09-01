@@ -10,7 +10,7 @@ class DummyBankPixAPIBaseSolicRec(BankPixAPIBase):
     """Dummy implementation of BankPixAPIBase for testing SolicRec methods."""
 
     BASE_URL = 'https://dummy'
-    TOKEN_URL = 'https://dummy/token'  # noqa: S105
+    TOKEN_URL = 'https://dummy/token'
     SCOPES = ['dummy.scope']
 
     def __init__(self, oauth: OAuth2Client) -> None:

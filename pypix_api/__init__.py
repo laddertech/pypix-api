@@ -60,15 +60,15 @@ if importlib.util.find_spec('pypix_api.error_handling') is not None:
     # Adicionar exports de observabilidade
     __all__.extend(
         [
-            'PIXLogger',
-            'setup_logging',
-            'MetricsCollector',
-            'get_metrics_summary',
-            'PIXError',
-            'AuthenticationError',
-            'ValidationError',
             'APIError',
+            'AuthenticationError',
+            'MetricsCollector',
+            'PIXError',
+            'PIXLogger',
+            'ValidationError',
             'configure_observability',
+            'get_metrics_summary',
             'get_observability_status',
+            'setup_logging',
         ]
     )

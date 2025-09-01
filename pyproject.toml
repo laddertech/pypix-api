@@ -1,6 +1,6 @@
 [project]
 name = "pypix-api"
-version = "0.5.0"
+version = "0.6.2"
 description = "Biblioteca em Python para comunicação com APIs bancárias focada na integração com o PIX"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -96,6 +96,12 @@ ignore = [
     "RUF012", # Mutable class attributes should be annotated with typing.ClassVar
 ]
 
+# Per-directory ignore patterns
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S105", "S106", "S108", "S311", "ANN002", "ANN003"]
+"examples/*" = ["S105", "S106", "S108", "S311", "C901", "ANN002", "ANN003"]
+"scripts/*" = ["S105", "S106", "S108", "S311", "S603", "ANN002", "ANN003"]
+
 # Configurações específicas
 [tool.ruff.lint.isort]
 known-first-party = ["pypix_api"]
@@ -172,6 +178,7 @@ markers = [
     "mock: marks tests as mock tests (default for unit tests)",
     "unit: marks tests as unit tests",
     "slow: marks tests as slow running tests",
+    "benchmark: marks tests as benchmark performance tests",
 ]
 
 [tool.coverage.run]

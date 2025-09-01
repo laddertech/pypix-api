@@ -269,7 +269,7 @@ def log_performance(logger: PIXLogger | None = None, threshold: float = 1.0):
 
     def decorator(func):
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any):
             _logger = logger or PIXLogger(f'pypix_api.{func.__module__}')
 
             start_time = time.time()
@@ -301,7 +301,7 @@ def log_performance(logger: PIXLogger | None = None, threshold: float = 1.0):
             except Exception as e:
                 execution_time = time.time() - start_time
                 _logger.error(
-                    f'Failed {func.__name__} after {execution_time:.3f}s: {str(e)}',
+                    f'Failed {func.__name__} after {execution_time:.3f}s: {e!s}',
                     function=func.__name__,
                     function_id=function_id,
                     execution_time=execution_time,
@@ -389,12 +389,12 @@ def log_authentication(
 
 # Export main classes and functions
 __all__ = [
-    'PIXLogger',
     'APICallLogger',
+    'PIXLogger',
     'StructuredFormatter',
-    'log_performance',
-    'setup_logging',
-    'log_bank_operation',
-    'log_pix_transaction',
     'log_authentication',
+    'log_bank_operation',
+    'log_performance',
+    'log_pix_transaction',
+    'setup_logging',
 ]

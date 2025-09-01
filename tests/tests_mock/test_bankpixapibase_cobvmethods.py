@@ -12,7 +12,7 @@ from pypix_api.banks.base import BankPixAPIBase
 
 class DummyBankPixAPIBase(BankPixAPIBase):
     BASE_URL = 'https://dummy'
-    TOKEN_URL = 'https://dummy/token'  # noqa: S105
+    TOKEN_URL = 'https://dummy/token'
     SCOPES = ['dummy.scope']
 
     def __init__(self, oauth: OAuth2Client) -> None:

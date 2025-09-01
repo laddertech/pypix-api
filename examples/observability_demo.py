@@ -8,6 +8,7 @@ incluindo logging estruturado, metricas e tratamento avancado de erros.
 
 import time
 import uuid
+from typing import Any
 
 # Imports da pypix-api com observabilidade
 from pypix_api import (
@@ -30,7 +31,7 @@ from pypix_api.observability import ObservabilityMixin
 class DemoBBAPI(BBPixAPI, ObservabilityMixin):
     """Exemplo de API do BB com observabilidade completa."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize with full observability."""
         super().__init__(*args, **kwargs)
         self.bank_name = 'BB'  # Para metricas

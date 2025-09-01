@@ -18,7 +18,7 @@ from pypix_api.metrics import MetricsCollector, PerformanceTracker
 class ObservabilityMixin:
     """Mixin para adicionar observabilidade a classes da API."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         """Initialize observability components."""
         super().__init__(*args, **kwargs)
 
@@ -41,7 +41,7 @@ class ObservabilityMixin:
         )
 
     @contextmanager
-    def observe_operation(self, operation: str, **context):
+    def observe_operation(self, operation: str, **context: Any):
         """Context manager for observing operations with full telemetry."""
         operation_id = f'{operation}_{int(time.time() * 1000)}'
 
@@ -69,9 +69,9 @@ class ObservabilityMixin:
                 self.logger.error(f'Failed {operation}', **error_context)
                 self.metrics.increment(f'{operation}.failure', tags=error_context)
 
-                raise pix_error
+                raise pix_error from e
 
-    def observe_api_call(self, method: str, url: str, **kwargs):
+    def observe_api_call(self, method: str, url: str, **kwargs: Any):
         """Decorator/context for observing API calls."""
 
         @contextmanager
@@ -124,7 +124,7 @@ def observable_method(
         name = operation_name or f'{func.__module__}.{func.__name__}'
 
         @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):
+        def wrapper(self, *args: Any, **kwargs: Any):
             # Check if instance has observability
             if not hasattr(self, 'logger'):
                 return func(self, *args, **kwargs)
@@ -353,11 +353,11 @@ def create_observability_report() -> dict[str, Any]:
 
 # Export main classes and functions
 __all__ = [
-    'ObservabilityMixin',
-    'ObservabilityConfig',
     'HealthCheck',
-    'observable_method',
+    'ObservabilityConfig',
+    'ObservabilityMixin',
     'configure_observability',
-    'get_observability_status',
     'create_observability_report',
+    'get_observability_status',
+    'observable_method',
 ]

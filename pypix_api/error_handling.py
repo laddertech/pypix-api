@@ -62,7 +62,7 @@ class PIXError(Exception):
             parts.append(f'Details: {json.dumps(self.details, indent=2)}')
 
         if self.cause:
-            parts.append(f'Caused by: {str(self.cause)}')
+            parts.append(f'Caused by: {self.cause!s}')
 
         return '\n'.join(parts)
 
@@ -70,14 +70,14 @@ class PIXError(Exception):
 class AuthenticationError(PIXError):
     """Raised when authentication fails."""
 
-    def __init__(self, message: str = 'Authentication failed', **kwargs):
+    def __init__(self, message: str = 'Authentication failed', **kwargs: Any):
         super().__init__(message, error_code='AUTH_ERROR', **kwargs)
 
 
 class AuthorizationError(PIXError):
     """Raised when authorization/permission fails."""
 
-    def __init__(self, message: str = 'Authorization failed', **kwargs):
+    def __init__(self, message: str = 'Authorization failed', **kwargs: Any):
         super().__init__(message, error_code='AUTHZ_ERROR', **kwargs)
 
 
@@ -85,7 +85,10 @@ class ValidationError(PIXError):
     """Raised when data validation fails."""
 
     def __init__(
-        self, message: str = 'Validation failed', field: str | None = None, **kwargs
+        self,
+        message: str = 'Validation failed',
+        field: str | None = None,
+        **kwargs: Any,
     ):
         details = kwargs.get('details', {})
         if field:
@@ -102,7 +105,7 @@ class APIError(PIXError):
         message: str,
         status_code: int | None = None,
         response_body: dict | None = None,
-        **kwargs,
+        **kwargs: Any,
     ):
         details = kwargs.get('details', {})
         if status_code:
@@ -116,21 +119,21 @@ class APIError(PIXError):
 class NetworkError(PIXError):
     """Raised when network communication fails."""
 
-    def __init__(self, message: str = 'Network communication failed', **kwargs):
+    def __init__(self, message: str = 'Network communication failed', **kwargs: Any):
         super().__init__(message, error_code='NETWORK_ERROR', **kwargs)
 
 
 class ConfigurationError(PIXError):
     """Raised when configuration is invalid."""
 
-    def __init__(self, message: str = 'Configuration error', **kwargs):
+    def __init__(self, message: str = 'Configuration error', **kwargs: Any):
         super().__init__(message, error_code='CONFIG_ERROR', **kwargs)
 
 
 class CertificateError(PIXError):
     """Raised when certificate handling fails."""
 
-    def __init__(self, message: str = 'Certificate error', **kwargs):
+    def __init__(self, message: str = 'Certificate error', **kwargs: Any):
         super().__init__(message, error_code='CERT_ERROR', **kwargs)
 
 
@@ -141,7 +144,7 @@ class RateLimitError(PIXError):
         self,
         message: str = 'Rate limit exceeded',
         retry_after: int | None = None,
-        **kwargs,
+        **kwargs: Any,
     ):
         details = kwargs.get('details', {})
         if retry_after:
@@ -158,7 +161,7 @@ class BankSpecificError(PIXError):
         message: str,
         bank_code: str | None = None,
         bank_error_code: str | None = None,
-        **kwargs,
+        **kwargs: Any,
     ):
         details = kwargs.get('details', {})
         if bank_code:
@@ -177,7 +180,7 @@ class PIXTransactionError(PIXError):
         message: str,
         txid: str | None = None,
         operation: str | None = None,
-        **kwargs,
+        **kwargs: Any,
     ):
         details = kwargs.get('details', {})
         if txid:
@@ -322,7 +325,7 @@ def handle_errors(
 
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any):
             handler = ErrorHandler(logger)
             func_context = {
                 'function': func.__name__,
@@ -365,7 +368,7 @@ class ErrorRecovery:
         max_retries: int = 3,
         base_delay: float = 1.0,
         logger: PIXLogger | None = None,
-    ):
+    ) -> Any:
         """Retry function with exponential backoff."""
         _logger = logger or PIXLogger('pypix_api.retry')
 
@@ -423,20 +426,20 @@ def create_error_report(
 
 # Export main classes and functions
 __all__ = [
-    'PIXError',
+    'APIError',
     'AuthenticationError',
     'AuthorizationError',
-    'ValidationError',
-    'APIError',
-    'NetworkError',
-    'ConfigurationError',
-    'CertificateError',
-    'RateLimitError',
     'BankSpecificError',
-    'PIXTransactionError',
-    'ErrorHandler',
+    'CertificateError',
+    'ConfigurationError',
     'ErrorContext',
+    'ErrorHandler',
     'ErrorRecovery',
-    'handle_errors',
+    'NetworkError',
+    'PIXError',
+    'PIXTransactionError',
+    'RateLimitError',
+    'ValidationError',
     'create_error_report',
+    'handle_errors',
 ]

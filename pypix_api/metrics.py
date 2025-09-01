@@ -361,7 +361,7 @@ def timed_function(metric_name: str | None = None, tags: dict[str, str] | None =
     """Decorator to automatically time function execution."""
 
     def decorator(func: Callable) -> Callable:
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any):
             start_time = time.time()
             name = metric_name or f'function.{func.__name__}'
 
@@ -464,14 +464,14 @@ def clear_metrics() -> None:
 
 # Export main classes and functions
 __all__ = [
-    'MetricsCollector',
-    'MetricEntry',
     'APICallMetric',
+    'MetricEntry',
+    'MetricsCollector',
     'PerformanceTracker',
-    'timed_function',
-    'track_bank_operation',
-    'track_api_call',
-    'get_metrics_summary',
-    'export_metrics',
     'clear_metrics',
+    'export_metrics',
+    'get_metrics_summary',
+    'timed_function',
+    'track_api_call',
+    'track_bank_operation',
 ]

@@ -37,7 +37,7 @@ class ReleaseManager:
         major, minor, patch = map(int, version_part.split('.'))
         return major, minor, patch, suffix
 
-    def bump_version(self, bump_type: str, prerelease: str = None) -> str:
+    def bump_version(self, bump_type: str, prerelease: str | None = None) -> str:
         """Bump version according to semantic versioning."""
         current = self.get_current_version()
         major, minor, patch, suffix = self.parse_version(current)
@@ -144,7 +144,7 @@ class ReleaseManager:
         print(f'✅ Tag {tag} created')
 
     def prepare_release(
-        self, bump_type: str, prerelease: str = None, skip_tests: bool = False
+        self, bump_type: str, prerelease: str | None = None, skip_tests: bool = False
     ) -> str:
         """Prepare a new release."""
         print('🚀 Preparing release...')
