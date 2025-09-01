@@ -7,11 +7,10 @@ requires-python = ">=3.10"
 authors = [
     { name = "Fábio Thomaz", email = "fabio@ladder.dev.br" }
 ]
-license.file = "LICENSE"
+license = "MIT"
 keywords = ["pix", "api", "banco", "pagamento", "brasil"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules"
@@ -41,10 +40,21 @@ dev = [
     "bandit[toml]>=1.7.8",
     "types-requests>=2.31.0",
 ]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=2.0.0",
+    "sphinx-autodoc-typehints>=1.25.0",
+    "myst-parser>=2.0.0",
+    "sphinx-copybutton>=0.5.2",
+    "linkify-it-py>=2.0.0",
+]
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+exclude = ["coverage_html*", "htmlcov*", "tests*", "scripts*", "docs*"]
 
 [tool.ruff]
 # Configurações base do Ruff

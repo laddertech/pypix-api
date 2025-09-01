@@ -16,6 +16,7 @@ Biblioteca em Python para comunicação com APIs bancárias, focada na integraç
   - [Sumário](#sumário)
   - [Visão Geral](#visão-geral)
   - [Instalação](#instalação)
+  - [Documentação](#documentação)
   - [Exemplo de Uso](#exemplo-de-uso)
     - [Banco do Brasil](#banco-do-brasil)
     - [Sicoob](#sicoob)
@@ -25,6 +26,7 @@ Biblioteca em Python para comunicação com APIs bancárias, focada na integraç
     - [URLs das APIs](#urls-das-apis)
   - [Testes](#testes)
   - [Contribuição](#contribuição)
+  - [Segurança](#segurança)
   - [Licença](#licença)
 
 ## Visão Geral
@@ -33,18 +35,52 @@ O `pypix-api` facilita a integração de sistemas Python com APIs bancárias bra
 
 ## Instalação
 
-Recomenda-se o uso de ambiente virtual.
-
 ```bash
-pip install .
+pip install pypix-api
 ```
 
 Ou, para desenvolvimento:
 
 ```bash
-git clone https://github.com/seu-usuario/pypix-api.git
+git clone https://github.com/laddertech/pypix-api.git
 cd pypix-api
-pip install -e .
+pip install -e ".[dev]"
+```
+
+## Documentação
+
+📚 **Documentação Completa**: [Sphinx Docs](docs/_build/html/index.html) (local) | [GitHub Pages](https://laddertech.github.io/pypix-api/) (em breve)
+
+### Guias Específicos
+
+- 📋 **[Guia de Contribuição](CONTRIBUTING.md)** - Como contribuir para o projeto
+- 🔒 **[Política de Segurança](SECURITY.md)** - Relatório de vulnerabilidades e boas práticas
+- 📝 **[Histórico de Mudanças](CHANGELOG.md)** - Todas as versões e alterações
+- 🔧 **Guias de Desenvolvimento**:
+  - [CI/CD Pipeline](docs/CI_CD_GUIDE.md) - Configuração do pipeline
+  - [Pre-commit Hooks](docs/PRE_COMMIT_GUIDE.md) - Hooks de qualidade
+  - [Cobertura de Testes](docs/TESTING_COVERAGE_GUIDE.md) - Estratégia de testes
+  - [Type Checking](docs/TYPE_CHECKING_GUIDE.md) - Verificação de tipos
+
+### Referência da API
+
+- 🏦 **[Bancos](docs/api/banks.rst)** - Banco do Brasil, Sicoob
+- 🔐 **[Autenticação](docs/api/auth.rst)** - OAuth2, mTLS
+- 📊 **[Modelos](docs/api/models.rst)** - Estruturas de dados PIX
+- 🎯 **[Scopes](docs/api/scopes.rst)** - Gerenciamento de escopos OAuth2
+
+### Exemplos
+
+- 🏦 **[Banco do Brasil - Básico](docs/examples/bb_basic.rst)**
+- 🏛️ **[Sicoob - Básico](docs/examples/sicoob_basic.rst)**
+- 🪝 **[Configuração de Webhooks](docs/examples/webhooks.rst)**
+- 🔄 **[Pagamentos Recorrentes](docs/examples/recurring.rst)**
+
+Para gerar a documentação localmente:
+
+```bash
+make docs
+make docs-serve  # Servidor local na porta 8000
 ```
 
 ## Exemplo de Uso
@@ -198,13 +234,27 @@ pytest
 
 ## Contribuição
 
-Contribuições são bem-vindas! Siga os passos:
+Contribuições são bem-vindas! Por favor, consulte nosso **[Guia de Contribuição](CONTRIBUTING.md)** para informações detalhadas sobre:
+
+- Como configurar o ambiente de desenvolvimento
+- Padrões de código e commits
+- Processo de Pull Request
+- Executar testes e verificações de qualidade
+
+Passos rápidos:
 
 1. Fork este repositório
 2. Crie uma branch (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas alterações (`git commit -am 'Adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request
+3. Commit suas alterações (`git commit -am 'feat: adiciona nova funcionalidade'`)
+4. Execute os testes (`make quality-full`)
+5. Push para a branch (`git push origin feature/nova-funcionalidade`)
+6. Abra um Pull Request
+
+## Segurança
+
+Para reportar vulnerabilidades de segurança, consulte nossa **[Política de Segurança](SECURITY.md)**.
+
+**NÃO** reporte vulnerabilidades através de issues públicos.
 
 ## Licença
 

@@ -95,3 +95,20 @@ security-check: ## Verificar segurança com bandit
 quality: lint type-check security-check ## Executar todas as verificações de qualidade
 
 quality-full: lint type-check security-check test-cov ## Executar verificações completas (com testes e cobertura)
+
+## @ Documentação
+
+docs: ## Construir documentação com Sphinx
+	cd docs && ../.venv/bin/sphinx-build -b html . _build/html
+
+docs-clean: ## Limpar documentação construída
+	cd docs && rm -rf _build/
+
+docs-serve: docs ## Servir documentação localmente (requer python -m http.server)
+	cd docs/_build/html && python -m http.server 8000
+
+docs-watch: ## Construir documentação em modo watch (requer sphinx-autobuild)
+	cd docs && sphinx-autobuild . _build/html --host 0.0.0.0 --port 8000
+
+docs-linkcheck: ## Verificar links na documentação
+	cd docs && sphinx-build -b linkcheck . _build/linkcheck
