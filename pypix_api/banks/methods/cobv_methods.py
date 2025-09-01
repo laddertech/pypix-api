@@ -89,9 +89,9 @@ class CobVMethods:  # pylint: disable=E1101
         if lote_cob_v_id is not None:
             params['loteCobVId'] = str(lote_cob_v_id)
         if pagina_atual is not None:
-            params['paginaAtual'] = str(pagina_atual)
+            params['paginaAtual'] = pagina_atual
         if itens_por_pagina is not None:
-            params['itensPorPagina'] = str(itens_por_pagina)
+            params['itensPorPagina'] = itens_por_pagina
 
         url = f'{self.get_base_url()}/cobv'
         resp = self.session.get(url, headers=headers, params=params)

@@ -180,9 +180,9 @@ class CobMethods:  # pylint: disable=E1101
         if status:
             params['status'] = status
         if pagina_atual is not None:
-            params['paginaAtual'] = str(pagina_atual)
+            params['paginaAtual'] = pagina_atual
         if itens_por_pagina is not None:
-            params['itensPorPagina'] = str(itens_por_pagina)
+            params['itensPorPagina'] = itens_por_pagina
 
         resp = self.session.get(url, headers=headers, params=params)
         self._handle_error_response(resp)

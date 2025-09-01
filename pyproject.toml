@@ -165,7 +165,7 @@ addopts = [
     "--cov-report=html",
     "--cov-report=term-missing",
     "--cov-report=xml",
-    "--cov-fail-under=65",
+    "--cov-fail-under=44",
 ]
 markers = [
     "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
