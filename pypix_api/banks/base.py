@@ -13,6 +13,7 @@ from pypix_api.banks.exceptions import (
     PixRespostaInvalidaError,
 )
 from pypix_api.banks.methods.cob_methods import CobMethods
+from pypix_api.banks.methods.cobr_methods import CobRMethods
 from pypix_api.banks.methods.cobv_methods import CobVMethods
 from pypix_api.banks.methods.lotecobv_methods import LoteCobVMethods
 from pypix_api.banks.methods.pix_methods import PixMethods
@@ -27,6 +28,7 @@ from pypix_api.scopes import get_pix_scopes
 class BankPixAPIBase(
     CobVMethods,
     CobMethods,
+    CobRMethods,
     LoteCobVMethods,
     PixMethods,
     RecMethods,
