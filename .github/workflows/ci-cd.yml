@@ -24,6 +24,10 @@ jobs:
       run: |
         uv sync
         uv pip install -e ".[dev]"
+    - name: Verify uv installation
+      run: |
+        which uv
+        uv --version
     - name: Run tests
       run: make test
 
