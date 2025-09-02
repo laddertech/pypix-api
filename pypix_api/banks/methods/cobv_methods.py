@@ -76,6 +76,9 @@ class CobVMethods:  # pylint: disable=E1101
         """
         Consulta lista de cobranças com vencimento (CobV).
         """
+        if cpf and cnpj:
+            raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
+
         headers = self._create_headers()
         params = {'inicio': inicio, 'fim': fim}
         if cpf:

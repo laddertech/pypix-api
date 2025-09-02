@@ -88,3 +88,16 @@ def test_listar_cobv(dummy_bank_pix_api) -> None:
     dummy_bank_pix_api.session.get.assert_called_once()
     args, kwargs = dummy_bank_pix_api.session.get.call_args
     assert args[0].endswith('/cobv')
+
+
+def test_listar_cobv_cpf_cnpj_error(dummy_bank_pix_api) -> None:
+    """Testa erro quando CPF e CNPJ são fornecidos simultaneamente."""
+    with pytest.raises(
+        ValueError, match='CPF e CNPJ não podem ser utilizados simultaneamente'
+    ):
+        dummy_bank_pix_api.listar_cobv(
+            '2024-01-01T00:00:00Z',
+            '2024-01-31T23:59:59Z',
+            cpf='12345678901',
+            cnpj='12345678000195',
+        )
