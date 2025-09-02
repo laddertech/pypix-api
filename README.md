@@ -49,7 +49,7 @@ pip install -e ".[dev]"
 
 ## Documentação
 
-📚 **Documentação Completa**: [Sphinx Docs](docs/_build/html/index.html) (local) | [GitHub Pages](https://laddertech.github.io/pypix-api/) (em breve)
+📚 **Documentação Completa**: [Sphinx Docs](docs/_build/html/index.html) (local) | [GitHub Pages](https://laddertech.github.io/pypix-api/)
 
 ### Guias Específicos
 
