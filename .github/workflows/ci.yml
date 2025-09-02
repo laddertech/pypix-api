@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,7 +34,7 @@ jobs:
           python-version: "3.10"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
@@ -97,7 +97,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -105,7 +105,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
@@ -124,7 +124,7 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         if: matrix.python-version == '3.10' && matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           file: ./coverage.xml
           flags: unittests
@@ -148,7 +148,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -156,7 +156,7 @@ jobs:
           python-version: "3.10"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
 
@@ -179,7 +179,7 @@ jobs:
     needs: [quality, test]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -187,7 +187,7 @@ jobs:
           python-version: "3.10"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v6
 
       - name: Install build dependencies
         run: uv pip install build twine

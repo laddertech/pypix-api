@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Full history for changelog
 
@@ -83,7 +83,7 @@ jobs:
     needs: build-docs
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -98,7 +98,7 @@ jobs:
           doc8 docs/ --max-line-length=88 --ignore D001
 
       - name: Download documentation
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: documentation
           path: docs-built/
@@ -154,7 +154,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Download documentation
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: documentation
           path: docs/
@@ -188,7 +188,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Upload to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: docs/
 
@@ -203,7 +203,7 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Download documentation
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: documentation
           path: docs/
