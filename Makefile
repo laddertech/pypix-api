@@ -51,25 +51,25 @@ clean: ## Limpar builds anteriores
 ## @ Releases e versionamento
 
 version: ## Mostrar versão atual
-	python scripts/release.py --current
+	uv run python scripts/release.py --current
 
 release-patch: ## Preparar release patch (0.5.0 -> 0.5.1)
-	python scripts/release.py patch
+	uv run python scripts/release.py patch
 
 release-minor: ## Preparar release minor (0.5.0 -> 0.6.0)
-	python scripts/release.py minor
+	uv run python scripts/release.py minor
 
 release-major: ## Preparar release major (0.5.0 -> 1.0.0)
-	python scripts/release.py major
+	uv run python scripts/release.py major
 
 release-prerelease: ## Preparar pre-release (ex: 0.5.1-alpha)
 	@read -p "Tipo de bump (patch/minor/major): " bump_type; \
 	read -p "Sufixo do pre-release (alpha/beta/rc1): " suffix; \
-	python scripts/release.py $$bump_type --pre $$suffix
+	uv run python scripts/release.py $$bump_type --pre $$suffix
 
 release-dry-run: ## Simular release sem fazer mudanças
 	@read -p "Tipo de bump (patch/minor/major): " bump_type; \
-	python scripts/release.py $$bump_type --dry-run
+	uv run python scripts/release.py $$bump_type --dry-run
 
 # Legacy aliases for backward compatibility
 bump-patch: release-patch
