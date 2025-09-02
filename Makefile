@@ -62,6 +62,9 @@ release-minor: ## Preparar release minor (0.5.0 -> 0.6.0)
 release-major: ## Preparar release major (0.5.0 -> 1.0.0)
 	uv run python scripts/release.py major
 
+release-commit: ## Fazer commit e tag da versão preparada
+	uv run python scripts/release.py commit
+
 release-prerelease: ## Preparar pre-release (ex: 0.5.1-alpha)
 	@read -p "Tipo de bump (patch/minor/major): " bump_type; \
 	read -p "Sufixo do pre-release (alpha/beta/rc1): " suffix; \

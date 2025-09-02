@@ -169,23 +169,44 @@ class ReleaseManager:
         # Build package to verify
         self.build_package()
 
-        # Commit changes
-        commit_msg = f'chore: bump version to {new_version}'
+        print(f'✅ Version updated to {new_version}!')
+        print('📝 Next steps:')
+        print('   1. Review the changes: git diff')
+        print('   2. Commit the release: make release-commit')
+        print('   3. Push to trigger release: git push origin main --tags')
+        print(
+            '   4. Monitor the release workflow at: https://github.com/laddertech/pypix-api/actions'
+        )
+
+    def commit_release(self) -> None:
+        """Commit the version bump and create a tag."""
+        # Get current version from files
+        current_version = self.get_current_version()
+
+        # Check if there are version changes to commit
+        result = self.run_command(['git', 'status', '--porcelain'], check=False)
+        if not result.stdout.strip():
+            print('❌ No changes to commit. Run make release-patch first.')
+            sys.exit(1)
+
+        print(f'🚀 Committing release v{current_version}...')
+
+        # Add version files
         self.run_command(['git', 'add', str(self.pyproject_path), str(self.init_path)])
+
+        # Commit changes (pre-commit will run here)
+        commit_msg = f'chore: bump version to {current_version}'
         self.run_command(['git', 'commit', '-m', commit_msg])
 
         # Create tag
-        self.create_tag(new_version)
+        self.create_tag(current_version)
 
-        print(f'✅ Release {new_version} prepared!')
+        print(f'✅ Release v{current_version} committed and tagged!')
         print('📝 Next steps:')
-        print('   1. Review the changes: git show HEAD')
-        print('   2. Push to trigger release: git push origin main --tags')
+        print('   1. Push to trigger release: git push origin main --tags')
         print(
-            '   3. Monitor the release workflow at: https://github.com/laddertech/pypix-api/actions'
+            '   2. Monitor the release workflow at: https://github.com/laddertech/pypix-api/actions'
         )
-
-        return new_version
 
 
 def main():
@@ -206,8 +227,8 @@ Examples:
     parser.add_argument(
         'bump_type',
         nargs='?',
-        choices=['major', 'minor', 'patch'],
-        help='Type of version bump',
+        choices=['major', 'minor', 'patch', 'commit'],
+        help='Type of version bump or "commit" to commit current changes',
     )
 
     parser.add_argument(
@@ -246,6 +267,11 @@ Examples:
         parser.print_help()
         return
 
+    # Handle commit command separately
+    if args.bump_type == 'commit':
+        manager.commit_release()
+        return
+
     if args.dry_run:
         current = manager.get_current_version()
         new_version = manager.bump_version(args.bump_type, args.prerelease)
@@ -253,10 +279,8 @@ Examples:
         return
 
     try:
-        new_version = manager.prepare_release(
-            args.bump_type, args.prerelease, args.skip_tests
-        )
-        print(f'🎉 Successfully prepared release {new_version}')
+        manager.prepare_release(args.bump_type, args.prerelease, args.skip_tests)
+        print('🎉 Release preparation completed!')
     except Exception as e:
         print(f'❌ Release preparation failed: {e}')
         sys.exit(1)
