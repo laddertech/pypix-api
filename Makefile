@@ -62,6 +62,15 @@ release-minor: ## Preparar release minor (0.5.0 -> 0.6.0)
 release-major: ## Preparar release major (0.5.0 -> 1.0.0)
 	uv run python scripts/release.py major
 
+release-push: ## Criar tag e fazer push da release
+	@VERSION=$$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/'); \
+	echo "🏷️  Creating tag v$$VERSION..."; \
+	git tag -a "v$$VERSION" -m "Release v$$VERSION"; \
+	echo "📤 Pushing to origin..."; \
+	git push origin main --tags; \
+	echo "✅ Release v$$VERSION pushed successfully!"; \
+	echo "🔗 Monitor at: https://github.com/laddertech/pypix-api/actions"
+
 release-prerelease: ## Preparar pre-release (ex: 0.5.1-alpha)
 	@read -p "Tipo de bump (patch/minor/major): " bump_type; \
 	read -p "Sufixo do pre-release (alpha/beta/rc1): " suffix; \

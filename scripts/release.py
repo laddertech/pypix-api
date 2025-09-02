@@ -178,11 +178,10 @@ class ReleaseManager:
         print('📝 Next steps:')
         print('   1. Review the changes: git diff')
         print('   2. Add files: git add pyproject.toml pypix_api/__init__.py')
-        print('   3. Commit: git commit -m "🚀 chore: bump version to {new_version}"')
-        print('   4. Create tag: git tag -a v{new_version} -m "Release v{new_version}"')
-        print('   5. Push: git push origin main --tags')
+        print(f'   3. Commit: git commit -m "🚀 chore: bump version to {new_version}"')
+        print('   4. Create tag and push: make release-push')
         print(
-            '   6. Monitor the release workflow at: https://github.com/laddertech/pypix-api/actions'
+            '   5. Monitor the release workflow at: https://github.com/laddertech/pypix-api/actions'
         )
 
 
