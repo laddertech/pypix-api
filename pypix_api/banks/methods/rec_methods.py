@@ -23,13 +23,25 @@ class RecMethods:  # pylint: disable=E1101
     consulta, revisão e listagem de recorrências com diversos filtros disponíveis.
     """
 
-    def criar_recorrencia(self, id_rec: str, body: dict[str, Any]) -> dict[str, Any]:
+    def criar_recorrencia(self, body: dict[str, Any]) -> dict[str, Any]:
         """
         Criar uma nova recorrência.
+
+        Endpoint para criar uma recorrência via POST /rec.
+        O idRec deve ser informado no corpo da requisição.
+
+        Args:
+            body: Dados da recorrência contendo obrigatoriamente o idRec
+
+        Returns:
+            dict contendo os dados da recorrência criada
+
+        Raises:
+            HTTPError: Para erros 400, 403, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/rec/{id_rec}'
-        resp = self.session.put(url, headers=headers, json=body)
+        url = f'{self.get_base_url()}/rec'
+        resp = self.session.post(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
 
@@ -89,33 +101,11 @@ class RecMethods:  # pylint: disable=E1101
         if convenio:
             params['convenio'] = convenio
         if pagina_atual is not None:
-            params['paginaAtual'] = str(pagina_atual)
+            params['paginacao.paginaAtual'] = str(pagina_atual)
         if itens_por_pagina is not None:
-            params['itensPorPagina'] = str(itens_por_pagina)
+            params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
         url = f'{self.get_base_url()}/rec'
         resp = self.session.get(url, headers=headers, params=params)
         self._handle_error_response(resp)
-        return resp.json()
-
-    def solicitar_retentativa_cobranca(self, txid: str, data: str) -> dict[str, Any]:
-        """
-        Solicitar retentativa de cobrança recorrente.
-
-        Args:
-            txid (str): Id da transação
-            data (str): Data prevista para liquidação da ordem de pagamento
-                    no formato YYYY-MM-DD segundo ISO 8601
-
-        Returns:
-            dict[str, Any]: Dados completos da cobrança recorrente
-
-        Raises:
-            ValueError: Se a data não estiver no formato correto
-            HTTPError: Para códigos de erro HTTP (400, 403, 404, 503)
-        """
-        headers = self._create_headers()
-        url = f'{self.get_base_url()}/rec/{txid}/{data}'
-        resp = self.session.post(url, headers=headers)
-        self._handle_error_response(resp, error_class=None)
         return resp.json()

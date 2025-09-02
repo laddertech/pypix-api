@@ -41,16 +41,15 @@ def dummy_bank_pix_api() -> DummyBankPixAPIBase:
 
 
 def test_criar_recorrencia(dummy_bank_pix_api) -> None:
-    dummy_bank_pix_api.session.put.return_value = MagicMock(
+    dummy_bank_pix_api.session.post.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
-    id_rec = 'rec123'
-    body = {'valor': 500}
-    result = dummy_bank_pix_api.criar_recorrencia(id_rec, body)
+    body = {'idRec': 'rec123', 'valor': 500}
+    result = dummy_bank_pix_api.criar_recorrencia(body)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.put.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.put.call_args
-    assert id_rec in args[0]
+    dummy_bank_pix_api.session.post.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.post.call_args
+    assert args[0].endswith('/rec')
     assert kwargs['json'] == body
 
 
@@ -119,8 +118,8 @@ def test_listar_recorrencias(dummy_bank_pix_api):
     assert params['fim'] == fim
     assert params['cpf'] == '12345678901'
     assert params['status'] == 'ATIVA'
-    assert params['paginaAtual'] == '1'
-    assert params['itensPorPagina'] == '10'
+    assert params['paginacao.paginaAtual'] == '1'
+    assert params['paginacao.itensPorPagina'] == '10'
 
 
 def test_listar_recorrencias_cpf_cnpj_error(dummy_bank_pix_api) -> None:
@@ -128,63 +127,3 @@ def test_listar_recorrencias_cpf_cnpj_error(dummy_bank_pix_api) -> None:
         dummy_bank_pix_api.listar_recorrencias(
             '2024-01-01T00:00:00Z', '2024-01-31T23:59:59Z', cpf='123', cnpj='456'
         )
-
-
-def test_solicitar_retentativa_cobranca(dummy_bank_pix_api) -> None:
-    dummy_bank_pix_api.session.post.return_value = MagicMock(
-        json=lambda: {
-            'idRec': 'RR123456782024061999000566354',
-            'txid': '7f733863543b4a16b516d839bd4bc34e',
-            'status': 'ATIVA',
-            'valor': {'original': '50.33'},
-        },
-        raise_for_status=lambda: None,
-    )
-    txid = '7f733863543b4a16b516d839bd4bc34e'
-    data = '2024-06-22'
-
-    result = dummy_bank_pix_api.solicitar_retentativa_cobranca(txid, data)
-
-    assert result['idRec'] == 'RR123456782024061999000566354'
-    assert result['txid'] == txid
-    assert result['status'] == 'ATIVA'
-    dummy_bank_pix_api.session.post.assert_called_once()
-
-    args, kwargs = dummy_bank_pix_api.session.post.call_args
-    expected_url = f'https://dummy/rec/{txid}/{data}'
-    assert args[0] == expected_url
-    assert 'headers' in kwargs
-    assert 'json' not in kwargs  # POST sem body JSON
-
-
-def test_solicitar_retentativa_cobranca_url_format(dummy_bank_pix_api) -> None:
-    dummy_bank_pix_api.session.post.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
-    )
-    txid = 'abc123def456ghi789'
-    data = '2024-12-25'
-
-    dummy_bank_pix_api.solicitar_retentativa_cobranca(txid, data)
-
-    args, _ = dummy_bank_pix_api.session.post.call_args
-    assert txid in args[0]
-    assert data in args[0]
-    assert args[0].endswith(f'/rec/{txid}/{data}')
-
-
-def test_solicitar_retentativa_cobranca_headers(dummy_bank_pix_api) -> None:
-    dummy_bank_pix_api.session.post.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
-    )
-    txid = 'test_txid_123'
-    data = '2024-01-15'
-
-    dummy_bank_pix_api.solicitar_retentativa_cobranca(txid, data)
-
-    args, kwargs = dummy_bank_pix_api.session.post.call_args
-    expected_headers = {
-        'Authorization': 'Bearer dummy',
-        'Content-Type': 'application/json',
-        'client_id': 'id',
-    }
-    assert kwargs['headers'] == expected_headers
