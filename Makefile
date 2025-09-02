@@ -10,7 +10,7 @@ sync: ## Sincronizar dependências do projeto
 	uv pip install -e ".[dev]"
 
 build: ## Build do pacote
-	python -m build
+	uv run python -m build
 
 ## @ Testes e Cobertura
 
@@ -43,7 +43,7 @@ test-watch: ## Executar testes em modo watch (requer pytest-watch)
 	uv run ptw tests/tests_mock -- -v
 
 publish: build ## Publicar no PyPI (requer TWINE_USERNAME e TWINE_PASSWORD)
-	twine upload dist/*
+	uv run twine upload dist/*
 
 clean: ## Limpar builds anteriores
 	rm -rf dist/ build/ *.egg-info/
