@@ -45,17 +45,17 @@ repos:
       - id: ruff-format
         name: Ruff formatter
 
-  # MyPy - Static type checking (comentado por enquanto - executar manualmente com 'make type-check')
-  # - repo: https://github.com/pre-commit/mirrors-mypy
-  #   rev: v1.9.0
-  #   hooks:
-  #     - id: mypy
-  #       name: Type checking with mypy
-  #       additional_dependencies:
-  #         - types-requests
-  #         - python-dotenv
-  #       args: [--ignore-missing-imports, --disallow-untyped-defs, --no-implicit-optional]
-  #       exclude: ^(tests/|scripts/|build/|dist/)
+  # MyPy - Static type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.9.0
+    hooks:
+      - id: mypy
+        name: Type checking with mypy
+        additional_dependencies:
+          - types-requests
+          - python-dotenv
+        args: [--ignore-missing-imports]
+        exclude: ^(tests/|scripts/|build/|dist/)
 
   # Bandit - Security linting (desabilitado por enquanto - executar manualmente com 'make security-check')
   # - repo: https://github.com/PyCQA/bandit
@@ -91,6 +91,14 @@ repos:
         language: pygrep
         files: '\.env$'
         exclude: '\.env\.exemplo$'
+
+      - id: pytest-check
+        name: Run pytest mock tests
+        entry: uv run pytest tests/tests_mock -v --tb=short
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
 
 # CI configuration
 ci:

@@ -21,7 +21,7 @@ with help_file.open('r', encoding='utf-8') as file:
                 target = target.split(':')[0].strip()
                 groups[-1]['items'].append(f' - [bold]{target}:[/bold] {description}')
 
-    groups = sorted(groups, key=lambda k: k['name'])
+    groups = sorted(groups, key=lambda k: str(k['name']))
 
     for group in groups:
         console.print(f'\n{group["name"]}', style='bold green')
