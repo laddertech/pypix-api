@@ -215,7 +215,11 @@ class HealthCheck:
 
     def check_system_health(self) -> dict[str, Any]:
         """Perform comprehensive system health check."""
-        health_status = {'status': 'healthy', 'timestamp': time.time(), 'checks': {}}
+        health_status: dict[str, Any] = {
+            'status': 'healthy',
+            'timestamp': time.time(),
+            'checks': {},
+        }
 
         try:
             # Check logging system

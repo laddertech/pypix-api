@@ -76,7 +76,7 @@ class PIXLogger:
     """Logger principal para operacoes PIX."""
 
     _instance = None
-    _loggers = {}
+    _loggers: dict[str, logging.Logger] = {}
 
     def __new__(cls, name: str = 'pypix_api'):
         """Singleton pattern para loggers."""
@@ -89,7 +89,7 @@ class PIXLogger:
         if name not in self._loggers:
             self._setup_logger(name)
         self.logger = self._loggers[name]
-        self.context = {}
+        self.context: dict[str, Any] = {}
 
     def _setup_logger(self, name: str) -> None:
         """Setup logger with appropriate handlers."""
@@ -108,7 +108,7 @@ class PIXLogger:
 
         # Use structured format in production, simple in development
         if os.getenv('PYPIX_LOG_FORMAT') == 'json':
-            formatter = StructuredFormatter()
+            formatter: logging.Formatter = StructuredFormatter()
         else:
             formatter = logging.Formatter(
                 '%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s'
@@ -252,7 +252,7 @@ class APICallLogger:
             if key.lower() in sensitive_keys or 'senha' in key.lower():
                 sanitized[key] = '[REDACTED]'
             elif isinstance(value, dict):
-                sanitized[key] = self._sanitize_body(value)
+                sanitized[key] = self._sanitize_body(value)  # type: ignore[assignment]
             else:
                 sanitized[key] = value
 

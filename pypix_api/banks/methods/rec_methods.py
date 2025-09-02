@@ -89,9 +89,9 @@ class RecMethods:  # pylint: disable=E1101
         if convenio:
             params['convenio'] = convenio
         if pagina_atual is not None:
-            params['paginaAtual'] = pagina_atual
+            params['paginaAtual'] = str(pagina_atual)
         if itens_por_pagina is not None:
-            params['itensPorPagina'] = itens_por_pagina
+            params['itensPorPagina'] = str(itens_por_pagina)
 
         url = f'{self.get_base_url()}/rec'
         resp = self.session.get(url, headers=headers, params=params)
