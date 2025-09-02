@@ -103,6 +103,13 @@ jobs:
           version = data['project']['version']
           name = data['project']['name']
           print(f'Package: {name} v{version}')
+          "
+
+          python -c "
+          import tomllib
+          with open('pyproject.toml', 'rb') as f:
+              data = tomllib.load(f)
+          version = data['project']['version']
           print(f'version={version}')
           " >> $GITHUB_OUTPUT
 
