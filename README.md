@@ -245,6 +245,8 @@ Contribuições são bem-vindas! Por favor, consulte nosso **[Guia de Contribui�
 - Processo de Pull Request
 - Executar testes e verificações de qualidade
 
+Para entender nossos templates e automações GitHub, veja **[.github/README.md](.github/README.md)**.
+
 Passos rápidos:
 
 1. Fork este repositório
