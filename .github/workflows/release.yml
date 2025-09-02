@@ -293,24 +293,36 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Create release with assets
-          if [ "${{ needs.validate.outputs.is_prerelease }}" = "true" ]; then
-            PRERELEASE_FLAG="--prerelease"
-          else
-            PRERELEASE_FLAG=""
-          fi
-
           # Find wheel and source files
           WHEEL_FILE=$(find dist/ -name "*-py3-none-any.whl" | head -1)
           SOURCE_FILE=$(find dist/ -name "pypix-api-*.tar.gz" | head -1)
 
-          gh release create \
-            "${{ needs.validate.outputs.version }}" \
-            "$WHEEL_FILE" \
-            "$SOURCE_FILE" \
-            --title "pypix-api ${{ needs.validate.outputs.version }}" \
-            --notes-file release-notes.md \
-            $PRERELEASE_FLAG
+          echo "Found wheel file: $WHEEL_FILE"
+          echo "Found source file: $SOURCE_FILE"
+
+          # Check if files exist
+          if [ -z "$WHEEL_FILE" ] || [ -z "$SOURCE_FILE" ]; then
+            echo "Error: Distribution files not found"
+            ls -la dist/
+            exit 1
+          fi
+
+          if [ "${{ needs.validate.outputs.is_prerelease }}" = "true" ]; then
+            gh release create \
+              "${{ needs.validate.outputs.version }}" \
+              "$WHEEL_FILE" \
+              "$SOURCE_FILE" \
+              --title "pypix-api ${{ needs.validate.outputs.version }}" \
+              --notes-file release-notes.md \
+              --prerelease
+          else
+            gh release create \
+              "${{ needs.validate.outputs.version }}" \
+              "$WHEEL_FILE" \
+              "$SOURCE_FILE" \
+              --title "pypix-api ${{ needs.validate.outputs.version }}" \
+              --notes-file release-notes.md
+          fi
 
           # Set outputs for compatibility
           echo "id=$(gh api repos/${{ github.repository }}/releases/tags/${{ needs.validate.outputs.version }} --jq .id)" >> $GITHUB_OUTPUT
