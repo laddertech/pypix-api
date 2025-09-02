@@ -76,6 +76,15 @@ release-prerelease: ## Preparar pre-release (ex: 0.5.1-alpha)
 	read -p "Sufixo do pre-release (alpha/beta/rc1): " suffix; \
 	uv run python scripts/release.py $$bump_type --pre $$suffix
 
+release-alpha: ## Preparar release alpha (0.5.0 -> 0.5.1-alpha.1)
+	uv run python scripts/release.py patch --pre alpha.1
+
+release-beta: ## Preparar release beta (0.5.0 -> 0.5.1-beta.1)
+	uv run python scripts/release.py patch --pre beta.1
+
+release-rc: ## Preparar release candidate (0.5.0 -> 0.5.1-rc.1)
+	uv run python scripts/release.py patch --pre rc.1
+
 release-dry-run: ## Simular release sem fazer mudanças
 	@read -p "Tipo de bump (patch/minor/major): " bump_type; \
 	uv run python scripts/release.py $$bump_type --dry-run
