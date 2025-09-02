@@ -295,7 +295,7 @@ jobs:
         run: |
           # Find wheel and source files
           WHEEL_FILE=$(find dist/ -name "*-py3-none-any.whl" | head -1)
-          SOURCE_FILE=$(find dist/ -name "pypix-api-*.tar.gz" | head -1)
+          SOURCE_FILE=$(find dist/ -name "pypix_api-*.tar.gz" | head -1)
 
           echo "Found wheel file: $WHEEL_FILE"
           echo "Found source file: $SOURCE_FILE"
