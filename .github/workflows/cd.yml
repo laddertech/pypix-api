@@ -77,18 +77,20 @@ jobs:
         uses: astral-sh/setup-uv@v4
 
       - name: Install build dependencies
-        run: uv pip install build twine
+        run: |
+          uv sync
+          uv pip install build twine
 
       - name: Build package
-        run: python -m build
+        run: uv run python -m build
 
       - name: Check package
-        run: twine check dist/*
+        run: uv run twine check dist/*
 
       - name: Publish to Test PyPI first
         if: github.event_name == 'workflow_dispatch'
         run: |
-          twine upload --repository testpypi dist/*
+          uv run twine upload --repository testpypi dist/*
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
@@ -96,7 +98,7 @@ jobs:
       - name: Publish to PyPI
         if: github.event_name == 'release'
         run: |
-          twine upload dist/*
+          uv run twine upload dist/*
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
