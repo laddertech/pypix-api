@@ -170,6 +170,11 @@ class ReleaseManager:
         self.build_package()
 
         print(f'✅ Version updated to {new_version}!')
+        print()
+        print('📋 Mensagem de commit sugerida (copie e cole):')
+        print('─' * 60)
+        print(f'🚀 chore: bump version to {new_version}')
+        print()
         print('📝 Next steps:')
         print('   1. Review the changes: git diff')
         print('   2. Commit the release: make release-commit')
