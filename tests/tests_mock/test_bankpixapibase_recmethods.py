@@ -119,8 +119,8 @@ def test_listar_recorrencias(dummy_bank_pix_api):
     assert params['fim'] == fim
     assert params['cpf'] == '12345678901'
     assert params['status'] == 'ATIVA'
-    assert params['paginaAtual'] == 1
-    assert params['itensPorPagina'] == 10
+    assert params['paginaAtual'] == '1'
+    assert params['itensPorPagina'] == '10'
 
 
 def test_listar_recorrencias_cpf_cnpj_error(dummy_bank_pix_api) -> None:

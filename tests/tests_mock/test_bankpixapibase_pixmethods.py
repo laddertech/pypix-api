@@ -82,8 +82,8 @@ class TestConsultarPix:
             'txIdPresente': 'true',
             'devolucaoPresente': 'false',
             'cpf': '12345678909',
-            'paginacao.paginaAtual': 1,
-            'paginacao.itensPorPagina': 50,
+            'paginacao.paginaAtual': '1',
+            'paginacao.itensPorPagina': '50',
         }
 
         mock_pix_api.session.get.assert_called_once_with(
