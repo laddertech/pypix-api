@@ -1,3 +1,8 @@
+.. image:: _static/images/logo.png
+   :width: 400px
+   :align: center
+   :alt: PyPix-API Logo
+
 pypix-api Documentation
 =======================
 

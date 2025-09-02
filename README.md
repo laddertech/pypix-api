@@ -1,4 +1,8 @@
-# pypix-api
+<div align="center">
+  <img src="docs/_static/images/logo.png" alt="PyPix-API" width="400"/>
+
+  # pypix-api
+</div>
 
 [![CI Pipeline](https://github.com/laddertech/pypix-api/workflows/CI%20Pipeline/badge.svg)](https://github.com/laddertech/pypix-api/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/laddertech/pypix-api/branch/main/graph/badge.svg)](https://codecov.io/gh/laddertech/pypix-api)

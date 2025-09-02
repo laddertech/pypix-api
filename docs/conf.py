@@ -72,7 +72,7 @@ html_static_path = ['_static']
 if not os.path.exists('_static'):
     os.makedirs('_static')
 
-html_logo = None
+html_logo = '_static/images/logo.png'
 html_favicon = None
 
 # Napoleon settings for Google and NumPy style docstrings
