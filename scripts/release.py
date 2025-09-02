@@ -177,40 +177,12 @@ class ReleaseManager:
         print()
         print('📝 Next steps:')
         print('   1. Review the changes: git diff')
-        print('   2. Commit the release: make release-commit')
-        print('   3. Push to trigger release: git push origin main --tags')
+        print('   2. Add files: git add pyproject.toml pypix_api/__init__.py')
+        print('   3. Commit: git commit -m "🚀 chore: bump version to {new_version}"')
+        print('   4. Create tag: git tag -a v{new_version} -m "Release v{new_version}"')
+        print('   5. Push: git push origin main --tags')
         print(
-            '   4. Monitor the release workflow at: https://github.com/laddertech/pypix-api/actions'
-        )
-
-    def commit_release(self) -> None:
-        """Commit the version bump and create a tag."""
-        # Get current version from files
-        current_version = self.get_current_version()
-
-        # Check if there are version changes to commit
-        result = self.run_command(['git', 'status', '--porcelain'], check=False)
-        if not result.stdout.strip():
-            print('❌ No changes to commit. Run make release-patch first.')
-            sys.exit(1)
-
-        print(f'🚀 Committing release v{current_version}...')
-
-        # Add version files
-        self.run_command(['git', 'add', str(self.pyproject_path), str(self.init_path)])
-
-        # Commit changes (pre-commit will run here)
-        commit_msg = f'chore: bump version to {current_version}'
-        self.run_command(['git', 'commit', '-m', commit_msg])
-
-        # Create tag
-        self.create_tag(current_version)
-
-        print(f'✅ Release v{current_version} committed and tagged!')
-        print('📝 Next steps:')
-        print('   1. Push to trigger release: git push origin main --tags')
-        print(
-            '   2. Monitor the release workflow at: https://github.com/laddertech/pypix-api/actions'
+            '   6. Monitor the release workflow at: https://github.com/laddertech/pypix-api/actions'
         )
 
 
@@ -232,8 +204,8 @@ Examples:
     parser.add_argument(
         'bump_type',
         nargs='?',
-        choices=['major', 'minor', 'patch', 'commit'],
-        help='Type of version bump or "commit" to commit current changes',
+        choices=['major', 'minor', 'patch'],
+        help='Type of version bump',
     )
 
     parser.add_argument(
@@ -270,11 +242,6 @@ Examples:
 
     if not args.bump_type:
         parser.print_help()
-        return
-
-    # Handle commit command separately
-    if args.bump_type == 'commit':
-        manager.commit_release()
         return
 
     if args.dry_run:
