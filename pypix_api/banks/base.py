@@ -15,6 +15,8 @@ from pypix_api.banks.exceptions import (
 from pypix_api.banks.methods.cob_methods import CobMethods
 from pypix_api.banks.methods.cobr_methods import CobRMethods
 from pypix_api.banks.methods.cobv_methods import CobVMethods
+from pypix_api.banks.methods.loc_methods import LocMethods
+from pypix_api.banks.methods.locrec_methods import LocRecMethods
 from pypix_api.banks.methods.lotecobv_methods import LoteCobVMethods
 from pypix_api.banks.methods.pix_methods import PixMethods
 from pypix_api.banks.methods.rec_methods import RecMethods
@@ -30,6 +32,8 @@ class BankPixAPIBase(
     CobMethods,
     CobRMethods,
     LoteCobVMethods,
+    LocMethods,
+    LocRecMethods,
     PixMethods,
     RecMethods,
     SolicRecMethods,

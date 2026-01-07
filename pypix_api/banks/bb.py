@@ -1,7 +1,8 @@
 from pypix_api.banks.base import BankPixAPIBase
+from pypix_api.banks.methods.pix_bb_methods import PixBBMethods
 
 
-class BBPixAPI(BankPixAPIBase):
+class BBPixAPI(PixBBMethods, BankPixAPIBase):
     """Implementação da API PIX do Banco do Brasil.
 
     Args:
@@ -15,8 +16,8 @@ class BBPixAPI(BankPixAPIBase):
         SCOPES: Scopes necessários para autenticação
     """
 
-    BASE_URL = 'https://api.bb.com.br/pix/v1'
-    SANDBOX_BASE_URL = 'https://api.sandbox.bb.com.br/pix/v1'
+    BASE_URL = 'https://api-pix.bb.com.br/pix/v2'
+    SANDBOX_BASE_URL = 'https://api-pix.hm.bb.com.br/pix/v2'
     TOKEN_URL = 'https://oauth.bb.com.br/oauth/token'  # noqa: S105
 
     def get_bank_code(self) -> str:
