@@ -12,16 +12,17 @@ import pytest
 
 from pypix_api.auth.oauth2 import OAuth2Client
 
+TOKEN_URL = 'https://fake.example.com/oauth/token'
+
 
 class TestOAuth2Performance:
     """Benchmarks for OAuth2 client performance."""
 
     def setup_method(self):
         """Set up test fixtures."""
+        self.token_url = TOKEN_URL
         self.client_id = 'test-client-id'
         self.client_secret = 'test-client-secret'
-        self.cert_path = '/fake/cert.p12'
-        self.cert_password = 'fake-password'
         self.scope = 'test-scope'
 
     @pytest.mark.benchmark(group='oauth-init')
@@ -30,16 +31,15 @@ class TestOAuth2Performance:
 
         def create_client():
             return OAuth2Client(
+                token_url=self.token_url,
                 client_id=self.client_id,
                 client_secret=self.client_secret,
-                cert_path=self.cert_path,
-                cert_password=self.cert_password,
-                scope=self.scope,
+                sandbox_mode=True,
             )
 
         result = benchmark(create_client)
         assert result.client_id == self.client_id
-        assert result.scope == self.scope
+        assert result.client_secret == self.client_secret
 
     @pytest.mark.benchmark(group='oauth-token')
     @patch('pypix_api.auth.oauth2.requests.Session.post')
@@ -58,15 +58,14 @@ class TestOAuth2Performance:
         mock_post.return_value = mock_response
 
         client = OAuth2Client(
+            token_url=self.token_url,
             client_id=self.client_id,
             client_secret=self.client_secret,
-            cert_path=self.cert_path,
-            cert_password=self.cert_password,
-            scope=self.scope,
+            sandbox_mode=True,
         )
 
         def get_token():
-            return client.get_token()
+            return client.get_token(self.scope)
 
         token = benchmark(get_token)
         assert token == 'test-token-123'
@@ -88,18 +87,17 @@ class TestOAuth2Performance:
         mock_post.return_value = mock_response
 
         client = OAuth2Client(
+            token_url=self.token_url,
             client_id=self.client_id,
             client_secret=self.client_secret,
-            cert_path=self.cert_path,
-            cert_password=self.cert_password,
-            scope=self.scope,
+            sandbox_mode=True,
         )
 
         def concurrent_requests():
             # Simulate multiple concurrent requests
             tokens = []
             for _ in range(5):
-                tokens.append(client.get_token())
+                tokens.append(client.get_token(self.scope))
             return tokens
 
         tokens = benchmark(concurrent_requests)
@@ -129,18 +127,17 @@ class TestOAuth2Performance:
         mock_post.side_effect = mock_post_side_effect
 
         client = OAuth2Client(
+            token_url=self.token_url,
             client_id=self.client_id,
             client_secret=self.client_secret,
-            cert_path=self.cert_path,
-            cert_password=self.cert_password,
-            scope=self.scope,
+            sandbox_mode=True,
         )
 
         def test_caching():
             # Multiple calls should use cached token
             tokens = []
             for _ in range(10):
-                tokens.append(client.get_token())
+                tokens.append(client.get_token(self.scope))
             return tokens
 
         tokens = benchmark(test_caching)
@@ -167,11 +164,10 @@ class TestOAuth2MemoryUsage:
             clients = []
             for i in range(100):
                 client = OAuth2Client(
+                    token_url=TOKEN_URL,
                     client_id=f'client-{i}',
                     client_secret=f'secret-{i}',
-                    cert_path='/fake/cert.p12',
-                    cert_password='password',
-                    scope='scope',
+                    sandbox_mode=True,
                 )
                 clients.append(client)
 
@@ -209,17 +205,20 @@ class TestOAuth2ScalabilityBenchmarks:
         # Create a very large scope string
         large_scope = ' '.join([f'scope{i}' for i in range(1000)])
 
-        def create_client_with_large_scope():
-            return OAuth2Client(
+        def request_token_with_large_scope():
+            client = OAuth2Client(
+                token_url=TOKEN_URL,
                 client_id='test-client',
                 client_secret='test-secret',
-                cert_path='/fake/cert.p12',
-                cert_password='password',
-                scope=large_scope,
+                sandbox_mode=True,
             )
+            client.get_token(large_scope)
+            return client
 
-        client = benchmark(create_client_with_large_scope)
-        assert len(client.scope.split()) == 1000
+        client = benchmark(request_token_with_large_scope)
+        # O escopo grande é aceito e cacheado sob sua própria chave
+        assert large_scope in client.token_cache
+        assert len(large_scope.split()) == 1000
 
     @pytest.mark.benchmark(group='oauth-stress')
     @patch('pypix_api.auth.oauth2.requests.Session.post')
@@ -243,23 +242,18 @@ class TestOAuth2ScalabilityBenchmarks:
         mock_post.side_effect = mock_post_with_delay
 
         client = OAuth2Client(
+            token_url=TOKEN_URL,
             client_id='stress-test-client',
             client_secret='stress-test-secret',
-            cert_path='/fake/cert.p12',
-            cert_password='password',
-            scope='test-scope',
+            sandbox_mode=True,
         )
 
         def rapid_requests():
-            # Clear any cached token to force new requests
-            client._token = None
-            client._token_expires_at = 0
-
             tokens = []
             for _ in range(50):
-                client._token = None  # Force new request each time
-                client._token_expires_at = 0
-                tokens.append(client.get_token())
+                # Limpa o cache para forçar nova requisição a cada iteração
+                client.token_cache.clear()
+                tokens.append(client.get_token('test-scope'))
             return tokens
 
         tokens = benchmark(rapid_requests)
