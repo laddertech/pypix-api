@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0-rc1] - 2026-07-22
+
+### Added
+- 🏦 **Integração com o Sicredi** (código 748) reaproveitando a estrutura BACEN:
+  cobrança imediata em v3 (por txid) / v2 (coleção), Pix comum em v2 e Pix
+  Automático em v1, sobre a raiz `/api`
+- Autenticação HTTP Basic opcional (`client_secret`) no `OAuth2Client`, exigida
+  pelo Sicredi
+- Helper `_endpoint_url` na base para versionamento de API por recurso
+  (retrocompatível; sem impacto em BB/Sicoob)
+
+### Fixed
+- Benchmarks de OAuth2 (`tests/benchmarks/test_oauth_performance.py`) alinhados à
+  assinatura real do `OAuth2Client`
+- Sincronização de `__version__` em `pypix_api/__init__.py` com o `pyproject.toml`
+
 ## [0.6.2] - 2025-01-09
 
 ### Added
