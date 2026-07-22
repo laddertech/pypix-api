@@ -49,7 +49,7 @@ class SolicRecMethods:  # pylint: disable=E1101
             resposta = self.criar_solicrec(body)
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/solicrec'
+        url = self._endpoint_url('/solicrec')
 
         resp = self.session.post(url, headers=headers, json=body)
         self._handle_error_response(resp, error_class=None)
@@ -73,7 +73,7 @@ class SolicRecMethods:  # pylint: disable=E1101
             dados = self.consultar_solicrec("123e4567-e89b-12d3-a456-426614174000")
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/solicrec/{id_solic_rec}'
+        url = self._endpoint_url(f'/solicrec/{id_solic_rec}')
 
         resp = self.session.get(url, headers=headers)
         self._handle_error_response(resp, error_class=None)
@@ -104,7 +104,7 @@ class SolicRecMethods:  # pylint: disable=E1101
             resposta = self.revisar_solicrec("123e4567-e89b-12d3-a456-426614174000", body)
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/solicrec/{id_solic_rec}'
+        url = self._endpoint_url(f'/solicrec/{id_solic_rec}')
 
         resp = self.session.patch(url, headers=headers, json=body)
         self._handle_error_response(resp, error_class=None)

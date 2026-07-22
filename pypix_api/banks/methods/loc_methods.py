@@ -62,7 +62,7 @@ class LocMethods:  # pylint: disable=E1101
             HTTPError: Para erros 400, 403, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/loc'
+        url = self._endpoint_url('/loc')
         body = {'tipoCob': tipo_cob}
         resp = self.session.post(url, headers=headers, json=body)
         self._handle_error_response(resp)
@@ -97,7 +97,7 @@ class LocMethods:  # pylint: disable=E1101
             HTTPError: Para erros 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/loc'
+        url = self._endpoint_url('/loc')
         params: dict[str, Any] = {'inicio': inicio, 'fim': fim}
 
         if txid_presente is not None:
@@ -134,7 +134,7 @@ class LocMethods:  # pylint: disable=E1101
             HTTPError: Para erros 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/loc/{id_loc}'
+        url = self._endpoint_url(f'/loc/{id_loc}')
         resp = self.session.get(url, headers=headers)
         self._handle_error_response(resp)
         return resp.json()
@@ -156,7 +156,7 @@ class LocMethods:  # pylint: disable=E1101
             HTTPError: Para erros 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/loc/{id_loc}/txid'
+        url = self._endpoint_url(f'/loc/{id_loc}/txid')
         resp = self.session.delete(url, headers=headers)
         self._handle_error_response(resp)
         return resp.json()

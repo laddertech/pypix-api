@@ -1,3 +1,4 @@
+import base64
 import os
 import time
 from typing import Any, BinaryIO
@@ -20,6 +21,7 @@ class OAuth2Client:
         cert_pfx: str | bytes | BinaryIO | None = None,
         pwd_pfx: str | None = None,
         sandbox_mode: bool = False,
+        client_secret: str | None = None,
     ) -> None:
         """Inicializa o cliente OAuth2
 
@@ -31,10 +33,18 @@ class OAuth2Client:
             cert_pfx: Path ou dados do certificado PFX (opcional)
             pwd_pfx: Senha do certificado PFX (opcional)
             sandbox_mode: Se True, não requer certificado (default: False)
+            client_secret: Client Secret para autenticação via HTTP Basic
+                (opcional). Quando informado, o token é solicitado com o header
+                ``Authorization: Basic base64(client_id:client_secret)``, como
+                exigido por PSPs como o Sicredi. Quando omitido, mantém o fluxo
+                padrão (client_id no corpo, autenticação de cliente via mTLS).
+                Mantido como último parâmetro para preservar a ordem posicional
+                histórica da assinatura.
         """
         load_dotenv()
 
         self.client_id: str | None = client_id or os.getenv('CLIENT_ID')
+        self.client_secret: str | None = client_secret or os.getenv('CLIENT_SECRET')
         self.cert: str | None = cert or os.getenv('CERT')
         self.pvk: str | None = pvk or os.getenv('PVK')
         self.cert_pfx: str | bytes | BinaryIO | None = cert_pfx or os.getenv('CERT_PFX')
@@ -75,13 +85,25 @@ class OAuth2Client:
         if scope in self.token_cache and not self._is_token_expired(scope):
             return self.token_cache[scope]['access_token']
 
-        token_data = {
+        token_data: dict[str, str | None] = {
             'grant_type': 'client_credentials',
-            'client_id': self.client_id,
             'scope': scope,
         }
+        headers: dict[str, str] = {}
 
-        response = self.session.post(self.token_url, data=token_data)
+        if self.client_secret:
+            # Autenticação de cliente via HTTP Basic (ex.: Sicredi).
+            # O client_id vai no header Basic, não no corpo.
+            credentials = base64.b64encode(
+                f'{self.client_id}:{self.client_secret}'.encode()
+            ).decode()
+            headers['Authorization'] = f'Basic {credentials}'
+        else:
+            # Fluxo padrão (BB, Sicoob): client_id no corpo, cliente
+            # autenticado via mTLS. Comportamento inalterado.
+            token_data['client_id'] = self.client_id
+
+        response = self.session.post(self.token_url, data=token_data, headers=headers)
         response.raise_for_status()
 
         token_info = response.json()

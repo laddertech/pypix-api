@@ -108,6 +108,24 @@ class BankPixAPIBase(
     def get_bank_code(self) -> str:
         raise NotImplementedError('get_bank_code not implemented')
 
+    def _endpoint_url(self, path: str) -> str:
+        """Monta a URL absoluta de um endpoint a partir do caminho relativo.
+
+        Por padrão concatena o caminho à URL base única do banco
+        (``get_base_url()``), preservando o comportamento histórico. Bancos
+        cuja API utilize versionamento por recurso (ex.: Sicredi, com ``cob``
+        em v3 e demais recursos em v2/v1) devem sobrescrever este método para
+        resolver a versão correta a partir do ``path``.
+
+        Args:
+            path: Caminho do endpoint relativo à base, iniciado por ``/``
+                (ex.: ``/cob/{txid}``).
+
+        Returns:
+            str: URL absoluta do endpoint.
+        """
+        return f'{self.get_base_url()}{path}'
+
     def _handle_error_response(
         self, response: requests.Response, **kwargs: Any
     ) -> None:

@@ -13,6 +13,7 @@ __license__ = 'MIT'
 from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.banks.bb import BBPixAPI
 from pypix_api.banks.sicoob import SicoobPixAPI
+from pypix_api.banks.sicredi import SicrediPixAPI
 from pypix_api.models.pix import PixCobranca
 
 __all__ = [
@@ -20,6 +21,7 @@ __all__ = [
     'OAuth2Client',
     'PixCobranca',
     'SicoobPixAPI',
+    'SicrediPixAPI',
     '__author__',
     '__email__',
     '__license__',

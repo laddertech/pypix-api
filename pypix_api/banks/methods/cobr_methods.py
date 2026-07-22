@@ -43,7 +43,7 @@ class CobRMethods:  # pylint: disable=E1101
             HTTPError: Para erros 400, 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cobr/{txid}'
+        url = self._endpoint_url(f'/cobr/{txid}')
         resp = self.session.put(url, headers=headers, json=body)
         self._handle_error_response(resp, error_class=None)
         return resp.json()
@@ -62,7 +62,7 @@ class CobRMethods:  # pylint: disable=E1101
             HTTPError: Para erros 400, 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cobr/{txid}'
+        url = self._endpoint_url(f'/cobr/{txid}')
         resp = self.session.patch(url, headers=headers, json=body)
         self._handle_error_response(resp, error_class=None)
         return resp.json()
@@ -80,7 +80,7 @@ class CobRMethods:  # pylint: disable=E1101
             HTTPError: Para erros 400, 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cobr/{txid}'
+        url = self._endpoint_url(f'/cobr/{txid}')
         resp = self.session.get(url, headers=headers)
         self._handle_error_response(resp, error_class=None)
         return resp.json()
@@ -98,7 +98,7 @@ class CobRMethods:  # pylint: disable=E1101
             HTTPError: Para erros 400, 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cobr'
+        url = self._endpoint_url('/cobr')
         resp = self.session.post(url, headers=headers, json=body)
         self._handle_error_response(resp, error_class=None)
         return resp.json()
@@ -139,7 +139,7 @@ class CobRMethods:  # pylint: disable=E1101
             raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cobr'
+        url = self._endpoint_url('/cobr')
 
         params = {'inicio': inicio, 'fim': fim}
 
@@ -178,7 +178,7 @@ class CobRMethods:  # pylint: disable=E1101
         """
         headers = self._create_headers()
         data_str = data.strftime('%Y-%m-%d')
-        url = f'{self.get_base_url()}/cobr/{txid}/retentativa/{data_str}'
+        url = self._endpoint_url(f'/cobr/{txid}/retentativa/{data_str}')
         resp = self.session.post(url, headers=headers)
         self._handle_error_response(resp, error_class=None)
         return resp.json()

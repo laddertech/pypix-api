@@ -28,6 +28,14 @@ Sicoob Scopes
    :undoc-members:
    :show-inheritance:
 
+Sicredi Scopes
+~~~~~~~~~~~~~~
+
+.. automodule:: pypix_api.scopes.sicredi
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Registry System
 ~~~~~~~~~~~~~~~
 

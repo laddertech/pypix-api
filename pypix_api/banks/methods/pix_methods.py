@@ -79,7 +79,7 @@ class PixMethods:  # pylint: disable=E1101
             raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/pix'
+        url = self._endpoint_url('/pix')
         params = {'inicio': inicio, 'fim': fim}
 
         # Adiciona parâmetros opcionais se fornecidos
@@ -118,7 +118,7 @@ class PixMethods:  # pylint: disable=E1101
             HTTPError: Para erros 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/pix/{e2eid}'
+        url = self._endpoint_url(f'/pix/{e2eid}')
         resp = self.session.get(url, headers=headers)
         self._handle_error_response(resp)
         return resp.json()
@@ -155,7 +155,7 @@ class PixMethods:  # pylint: disable=E1101
             A soma dos valores de todas as devoluções não pode ultrapassar o valor total do PIX.
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/pix/{e2eid}/devolucao/{id_devolucao}'
+        url = self._endpoint_url(f'/pix/{e2eid}/devolucao/{id_devolucao}')
         resp = self.session.put(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
@@ -178,7 +178,7 @@ class PixMethods:  # pylint: disable=E1101
             HTTPError: Para erros 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/pix/{e2eid}/devolucao/{id_devolucao}'
+        url = self._endpoint_url(f'/pix/{e2eid}/devolucao/{id_devolucao}')
         resp = self.session.get(url, headers=headers)
         self._handle_error_response(resp)
         return resp.json()

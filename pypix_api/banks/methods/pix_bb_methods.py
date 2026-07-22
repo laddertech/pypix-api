@@ -137,7 +137,7 @@ class PixBBMethods:  # pylint: disable=E1101
             raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/pix-bb'
+        url = self._endpoint_url('/pix-bb')
         params = self._build_pix_bb_params(
             inicio,
             fim,
@@ -196,7 +196,7 @@ class PixBBMethods:  # pylint: disable=E1101
             raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/pix-bb/devolucoes'
+        url = self._endpoint_url('/pix-bb/devolucoes')
         params: dict[str, Any] = {'inicio': inicio, 'fim': fim}
 
         if estado_devolucao:

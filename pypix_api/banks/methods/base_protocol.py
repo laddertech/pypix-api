@@ -21,6 +21,10 @@ class PixAPIProtocol(Protocol):
         """Obtém a URL base da API."""
         ...
 
+    def _endpoint_url(self, path: str) -> str:
+        """Monta a URL absoluta de um endpoint a partir do caminho relativo."""
+        ...
+
     def get_bank_code(self) -> str:
         """Obtém o código do banco."""
         ...

@@ -51,7 +51,7 @@ class WebHookMethods:  # pylint: disable=E1101
             HTTPError: Para erros 400, 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/webhook/{chave}'
+        url = self._endpoint_url(f'/webhook/{chave}')
         body = {'webhookUrl': webhook_url}
         resp = self.session.put(url, headers=headers, json=body)
         self._handle_error_response(resp)
@@ -78,7 +78,7 @@ class WebHookMethods:  # pylint: disable=E1101
             HTTPError: Para erros 403, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/webhook'
+        url = self._endpoint_url('/webhook')
         params = {
             'inicio': inicio,
             'fim': fim,
@@ -107,7 +107,7 @@ class WebHookMethods:  # pylint: disable=E1101
             HTTPError: Para erros 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/webhook/{chave}'
+        url = self._endpoint_url(f'/webhook/{chave}')
         resp = self.session.delete(url, headers=headers)
         self._handle_error_response(resp)
         return resp.status_code == 204
@@ -128,7 +128,7 @@ class WebHookMethods:  # pylint: disable=E1101
             HTTPError: Para erros 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/webhook/{chave}'
+        url = self._endpoint_url(f'/webhook/{chave}')
         resp = self.session.get(url, headers=headers)
         self._handle_error_response(resp)
         return resp.json()

@@ -218,3 +218,7 @@ safety-report.json
 pip-audit-report.json
 semgrep-report.json
 bandit-ci-report.json
+
+# Material de referência de bancos (não versionar binários/collections grandes)
+docs/**/*.pdf
+docs/Sicredi/CollectionAPIPixSicredi.json

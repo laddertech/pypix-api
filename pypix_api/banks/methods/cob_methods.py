@@ -53,7 +53,7 @@ class CobMethods:  # pylint: disable=E1101
             HTTPError: Para erros 400, 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cob/{txid}'
+        url = self._endpoint_url(f'/cob/{txid}')
         resp = self.session.put(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
@@ -74,7 +74,7 @@ class CobMethods:  # pylint: disable=E1101
             HTTPError: Para erros 400, 403, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cob'
+        url = self._endpoint_url('/cob')
         resp = self.session.post(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
@@ -97,7 +97,7 @@ class CobMethods:  # pylint: disable=E1101
             HTTPError: Para erros 400, 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cob/{txid}'
+        url = self._endpoint_url(f'/cob/{txid}')
         resp = self.session.patch(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
@@ -119,7 +119,7 @@ class CobMethods:  # pylint: disable=E1101
             HTTPError: Para erros 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cob/{txid}'
+        url = self._endpoint_url(f'/cob/{txid}')
         params = {}
 
         if revisao is not None:
@@ -167,7 +167,7 @@ class CobMethods:  # pylint: disable=E1101
             raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cob'
+        url = self._endpoint_url('/cob')
         params = {'inicio': inicio, 'fim': fim}
 
         # Adiciona parâmetros opcionais se fornecidos

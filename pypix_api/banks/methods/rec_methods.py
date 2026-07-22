@@ -40,7 +40,7 @@ class RecMethods:  # pylint: disable=E1101
             HTTPError: Para erros 400, 403, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/rec'
+        url = self._endpoint_url('/rec')
         resp = self.session.post(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
@@ -50,7 +50,7 @@ class RecMethods:  # pylint: disable=E1101
         Revisar uma recorrência existente.
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/rec/{id_rec}'
+        url = self._endpoint_url(f'/rec/{id_rec}')
         resp = self.session.patch(url, headers=headers, json=body)
         self._handle_error_response(resp, error_class=None)
         return resp.json()
@@ -65,7 +65,7 @@ class RecMethods:  # pylint: disable=E1101
         params = {}
         if txid:
             params['txid'] = txid
-        url = f'{self.get_base_url()}/rec/{id_rec}'
+        url = self._endpoint_url(f'/rec/{id_rec}')
         resp = self.session.get(url, headers=headers, params=params)
         self._handle_error_response(resp, error_class=None)
         return resp.json()
@@ -105,7 +105,7 @@ class RecMethods:  # pylint: disable=E1101
         if itens_por_pagina is not None:
             params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
-        url = f'{self.get_base_url()}/rec'
+        url = self._endpoint_url('/rec')
         resp = self.session.get(url, headers=headers, params=params)
         self._handle_error_response(resp)
         return resp.json()

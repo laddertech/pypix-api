@@ -33,7 +33,7 @@ class CobVMethods:  # pylint: disable=E1101
         Cria uma cobrança com vencimento (CobV).
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cobv/{txid}'
+        url = self._endpoint_url(f'/cobv/{txid}')
         resp = self.session.put(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
@@ -43,7 +43,7 @@ class CobVMethods:  # pylint: disable=E1101
         Revisa uma cobrança com vencimento (CobV).
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/cobv/{txid}'
+        url = self._endpoint_url(f'/cobv/{txid}')
         resp = self.session.patch(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
@@ -56,7 +56,7 @@ class CobVMethods:  # pylint: disable=E1101
         params = {}
         if revisao is not None:
             params['revisao'] = revisao
-        url = f'{self.get_base_url()}/cobv/{txid}'
+        url = self._endpoint_url(f'/cobv/{txid}')
         resp = self.session.get(url, headers=headers, params=params)
         self._handle_error_response(resp)
         return resp.json()
@@ -96,7 +96,7 @@ class CobVMethods:  # pylint: disable=E1101
         if itens_por_pagina is not None:
             params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
-        url = f'{self.get_base_url()}/cobv'
+        url = self._endpoint_url('/cobv')
         resp = self.session.get(url, headers=headers, params=params)
         self._handle_error_response(resp)
         return resp.json()

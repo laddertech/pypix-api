@@ -66,7 +66,7 @@ class LoteCobVMethods:  # pylint: disable=E1101
             é processada de forma assíncrona.
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/lotecobv/{id_lote}'
+        url = self._endpoint_url(f'/lotecobv/{id_lote}')
         resp = self.session.put(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
@@ -97,7 +97,7 @@ class LoteCobVMethods:  # pylint: disable=E1101
             a este lote. Apenas alterações nas cobranças existentes são permitidas.
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/lotecobv/{id_lote}'
+        url = self._endpoint_url(f'/lotecobv/{id_lote}')
         resp = self.session.patch(url, headers=headers, json=body)
         self._handle_error_response(resp)
         return resp.json()
@@ -123,7 +123,7 @@ class LoteCobVMethods:  # pylint: disable=E1101
             será preenchido com detalhes do erro.
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/lotecobv/{id_lote}'
+        url = self._endpoint_url(f'/lotecobv/{id_lote}')
         resp = self.session.get(url, headers=headers)
         self._handle_error_response(resp)
         return resp.json()
@@ -159,7 +159,7 @@ class LoteCobVMethods:  # pylint: disable=E1101
             serão utilizados os valores padrão do PSP.
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/lotecobv'
+        url = self._endpoint_url('/lotecobv')
         params = {'inicio': inicio, 'fim': fim}
 
         # Adiciona parâmetros opcionais se fornecidos

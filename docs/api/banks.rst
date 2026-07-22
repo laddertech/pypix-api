@@ -19,6 +19,15 @@ Sicoob
    :show-inheritance:
    :exclude-members: BASE_URL, TOKEN_URL, SANDBOX_BASE_URL
 
+Sicredi
+-------
+
+.. automodule:: pypix_api.banks.sicredi
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :exclude-members: BASE_URL, TOKEN_URL, SANDBOX_BASE_URL, SANDBOX_TOKEN_URL
+
 Base Classes
 ------------
 

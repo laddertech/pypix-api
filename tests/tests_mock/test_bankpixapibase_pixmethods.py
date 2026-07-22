@@ -22,6 +22,9 @@ class MockPixAPI(PixMethods):
     def get_base_url(self) -> str:
         return 'https://api.mock.com/v1'
 
+    def _endpoint_url(self, path: str) -> str:
+        return f'{self.get_base_url()}{path}'
+
     def _handle_error_response(self, response: Response) -> None:
         if not response.ok:
             response.raise_for_status()

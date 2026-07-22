@@ -51,7 +51,7 @@ class WebHookCobrMethods:  # pylint: disable=E1101
             HTTPError: Para erros 400, 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/webhookcobr'
+        url = self._endpoint_url('/webhookcobr')
         body = {'webhookUrl': webhook_url}
         resp = self.session.put(url, headers=headers, json=body)
         self._handle_error_response(resp)
@@ -70,7 +70,7 @@ class WebHookCobrMethods:  # pylint: disable=E1101
             HTTPError: Para erros 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/webhookcobr'
+        url = self._endpoint_url('/webhookcobr')
         resp = self.session.get(url, headers=headers)
         self._handle_error_response(resp)
         return resp.json()
@@ -88,7 +88,7 @@ class WebHookCobrMethods:  # pylint: disable=E1101
             HTTPError: Para erros 403, 404, 503
         """
         headers = self._create_headers()
-        url = f'{self.get_base_url()}/webhookcobr'
+        url = self._endpoint_url('/webhookcobr')
         resp = self.session.delete(url, headers=headers)
         self._handle_error_response(resp)
         return resp.status_code == 204
