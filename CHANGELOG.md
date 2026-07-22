@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.9.0-rc1] - 2026-07-22
+## [0.9.0] - 2026-07-22
 
 ### Added
 - 🏦 **Integração com o Sicredi** (código 748) reaproveitando a estrutura BACEN:
