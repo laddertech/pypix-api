@@ -18,13 +18,14 @@ não por `make publish`:
 3. Tags com sufixo `-rc`/`-alpha`/`-beta` (ex.: `v0.9.0-rc1`, normalizada para `0.9.0rc1` no
    PyPI conforme PEP 440) são **pré-release** → vão só para o **Test PyPI**. O job
    `publish-pypi` (produção) é pulado pelo guard `is_prerelease == false`.
-4. **Sobre o `cd.yml`** (comportamento verificado em `v0.9.0-rc1`): ele escuta
-   `release: [published]`. Prereleases emitem `prereleased`, então o `cd.yml` **não dispara**
-   em prerelease — o fluxo de rc é limpo, sem ruído. Em release de **produção**, o `cd.yml`
-   dispara e seu job `deploy` tenta `twine upload` com `secrets.PYPI_TOKEN`, que **não existe**
-   no repo (só há `TWINE_USERNAME`/`TWINE_PASSWORD`) → esse job fica **vermelho**, mas é
-   **redundante** com o `publish-pypi` do `release.yml` (trusted publishing), que é quem
-   realmente publica. O vermelho do `cd.yml` em produção é ruído esperado, não impede o deploy.
+4. **Sobre o `cd.yml`** (verificado em `v0.9.0-rc1` e `v0.9.0`): ele escuta
+   `release: [published]`, mas o GitHub Release é criado pelo próprio `release.yml` via
+   `gh release create` usando o `GITHUB_TOKEN`. **Eventos disparados pelo `GITHUB_TOKEN` não
+   acionam novos workflows** (proteção anti-recursão do GitHub Actions), então o `cd.yml`
+   **nunca dispara** no fluxo de release por tag — nem em prerelease, nem em produção. Ele
+   está efetivamente inerte; toda a publicação é feita pelo `release.yml` (`publish-pypi` via
+   trusted publishing em produção, `publish-test-pypi` em prerelease). Não espere um run do
+   `cd.yml` nem se preocupe com o `PYPI_TOKEN` que ele referencia.
 
 > **Não** use `make publish` (twine local) no fluxo normal — ele existe só para publicação
 > manual de emergência e exige `TWINE_USERNAME`/`TWINE_PASSWORD`. O caminho padrão é a tag.
@@ -91,12 +92,14 @@ Acompanhe em https://github.com/laddertech/pypix-api/actions. Com `gh` autentica
 gh run watch
 ```
 - **Prerelease** (`-rc`/`-alpha`/`-beta`): confirme sucesso do `publish-test-pypi`
-  (release.yml). O `cd.yml` **não roda**. Valide instalando do Test PyPI:
+  (release.yml). Valide instalando do Test PyPI:
   `pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ pypix-api==X.Y.ZrcN`
   (o `--extra-index-url` pega as dependências reais do PyPI).
-- **Produção**: confirme sucesso do `publish-pypi` (release.yml, trusted publishing). O job
-  `deploy` do `cd.yml` pode ficar **vermelho** por falta de `PYPI_TOKEN` — é esperado e
-  redundante; ignore. O pacote fica em `pip install pypix-api==X.Y.Z`.
+- **Produção**: confirme sucesso do `publish-pypi` (release.yml, trusted publishing) e do
+  GitHub Release. Como o `release.yml` não faz smoke test pós-publish, valide manualmente o
+  pacote publicado (isolado do projeto local):
+  `uv run --isolated --no-project --with "pypix-api==X.Y.Z" python -c "import pypix_api; print(pypix_api.__version__)"`.
+- O `cd.yml` **não dispara** neste fluxo (ver "Como funciona", item 4) — não aguarde run dele.
 
 ## Checklist rápido
 - [ ] `main` limpa e sincronizada com `origin`
