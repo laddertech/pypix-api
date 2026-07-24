@@ -35,7 +35,9 @@ Biblioteca em Python para comunicação com APIs bancárias, focada na integraç
 
 ## Visão Geral
 
-O `pypix-api` facilita a integração de sistemas Python com APIs bancárias brasileiras, com ênfase no ecossistema do PIX. A biblioteca abstrai autenticação, comunicação segura (MTLS/OAuth2), e operações comuns de bancos como Banco do Brasil e Sicoob.
+O `pypix-api` facilita a integração de sistemas Python com APIs bancárias brasileiras, com ênfase no ecossistema do PIX. A biblioteca abstrai autenticação, comunicação segura (mTLS/OAuth2), e operações comuns de bancos como **Banco do Brasil** (001), **Sicoob** (756) e **Sicredi** (748).
+
+Além das cobranças (imediata, com vencimento e em lote), cobre Pix Automático (recorrências), locations, consultas de Pix/devoluções e webhooks. Inclui ainda um módulo opcional de observabilidade (logging estruturado, métricas e tratamento de erros).
 
 ## Instalação
 
@@ -92,19 +94,20 @@ make docs-serve  # Servidor local na porta 8000
 ### Banco do Brasil
 
 ```python
-from pypix_api.banks.bb import BancoDoBrasil
+from pypix_api.banks.bb import BBPixAPI
 
 from pypix_api.auth.oauth2 import OAuth2Client
 
-# Primeiro crie o cliente OAuth2
+# Primeiro crie o cliente OAuth2 (o token_url vem da classe do banco)
 oauth = OAuth2Client(
+    token_url=BBPixAPI.TOKEN_URL,
     client_id="SEU_CLIENT_ID",
-    cert="caminho/do/certificado.pem",
-    pvk="caminho/da/chave.key"
+    cert="caminho/do/certificado.pem",  # ou use cert_pfx/pwd_pfx para .pfx
+    pvk="caminho/da/chave.key",
 )
 
 # Depois instancie o banco passando o OAuth2Client
-bb = BancoDoBrasil(oauth=oauth)
+bb = BBPixAPI(oauth=oauth)
 
 # Exemplo: Cobrança com Vencimento
 payload = {
@@ -155,10 +158,19 @@ print(cobv)
 ### Sicoob
 
 ```python
-from pypix_api.banks.sicoob import Sicoob
+from pypix_api.auth.oauth2 import OAuth2Client
+from pypix_api.banks.sicoob import SicoobPixAPI
+
+# Cada banco tem seu próprio token_url, então crie um OAuth2Client para o Sicoob
+oauth_sicoob = OAuth2Client(
+    token_url=SicoobPixAPI.TOKEN_URL,
+    client_id="SEU_CLIENT_ID",
+    cert_pfx="caminho/do/certificado.pfx",
+    pwd_pfx="senha-do-pfx",
+)
 
 # Instanciação do Sicoob
-sicoob = Sicoob(oauth=oauth)  # Reutilizando o mesmo OAuth2Client
+sicoob = SicoobPixAPI(oauth=oauth_sicoob)
 
 # Exemplo: Cobrança imediata
 payload_cob = {
@@ -184,15 +196,20 @@ print(cob)
 
 ```
 pypix_api/
-├── auth/           # Autenticação (MTLS, OAuth2)
-├── banks/          # Integrações com bancos (BB, Sicoob, métodos PIX)
-├── models/         # Modelos de dados do PIX
-├── utils/          # Utilitários (HTTP client, helpers)
-tests/              # Testes automatizados
-openapi.yaml        # Especificação OpenAPI (se aplicável)
-pyproject.toml      # Configuração do projeto Python
-Makefile            # Comandos úteis para desenvolvimento
-.env.exemplo        # Exemplo de variáveis de ambiente
+├── auth/               # Autenticação (mTLS, OAuth2)
+├── banks/              # Integrações com bancos (BB, Sicoob, Sicredi)
+│   └── methods/        # Mixins de operações PIX (cob, cobv, cobr, lote, loc, pix, rec, webhooks)
+├── models/             # Modelos de dados do PIX (PixCobranca)
+├── scopes/             # Registro e definição de escopos OAuth2 por banco
+├── error_handling.py   # Framework de erros (opcional / observabilidade)
+├── logging.py          # Logging estruturado (opcional)
+├── metrics.py          # Coleta de métricas (opcional)
+└── observability.py    # Orquestração de observabilidade (opcional)
+tests/                  # Testes automatizados (tests_mock, tests_integration, benchmarks)
+openapi.yaml            # Especificação OpenAPI de referência
+pyproject.toml          # Configuração do projeto Python
+Makefile                # Comandos úteis para desenvolvimento
+.env.exemplo            # Exemplo de variáveis de ambiente
 ```
 
 ## Configuração
@@ -202,25 +219,30 @@ Makefile            # Comandos úteis para desenvolvimento
 1. Primeiro crie uma instância de OAuth2Client:
 ```python
 from pypix_api.auth.oauth2 import OAuth2Client
+from pypix_api.banks.bb import BBPixAPI
 
 oauth = OAuth2Client(
-    client_id="SEU_CLIENT_ID",       # ID do cliente fornecido pelo banco
-    cert="caminho/do/certificado.pem",  # Certificado digital (.pem)
-    pvk="caminho/da/chave.key"       # Chave privada (.key)
+    token_url=BBPixAPI.TOKEN_URL,       # URL de token do banco (obrigatório)
+    client_id="SEU_CLIENT_ID",          # ID do cliente fornecido pelo banco
+    cert="caminho/do/certificado.pem",  # Certificado digital PEM (.pem)
+    pvk="caminho/da/chave.key",         # Chave privada PEM (.key)
+    # Alternativa a cert/pvk: cert_pfx="cert.pfx", pwd_pfx="senha"
+    # client_secret="...",  # obrigatório para o Sicredi (HTTP Basic)
 )
 ```
 
 2. Depois instancie o banco passando o OAuth2Client:
 ```python
-banco = BancoDoBrasil(oauth=oauth)  # Ou Sicoob(oauth=oauth)
+banco = BBPixAPI(oauth=oauth)  # Ou SicoobPixAPI(oauth=oauth) / SicrediPixAPI(oauth=oauth)
 ```
 
 ### URLs das APIs
 
-As URLs base são configuradas automaticamente por cada banco:
+As URLs base e de token são definidas por cada classe de banco (`BASE_URL`/`TOKEN_URL`):
 
-- **Banco do Brasil**: Definido internamente pela classe `BBPixAPI`
-- **Sicoob**: Definido internamente pela classe `SicoobPixAPI`
+- **Banco do Brasil**: classe `BBPixAPI`
+- **Sicoob**: classe `SicoobPixAPI`
+- **Sicredi**: classe `SicrediPixAPI` — usa versionamento por recurso (raiz `/api`) e exige `client_secret` (HTTP Basic) no `OAuth2Client`
 
 Crie um arquivo `.env` baseado em `.env.exemplo` com as credenciais e configurações necessárias para autenticação e acesso às APIs bancárias.
 

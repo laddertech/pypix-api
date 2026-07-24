@@ -1,6 +1,6 @@
 """
 pypix_api.banks.webhook_rec_methods
----------------------------
+-----------------------------------
 
 Este módulo implementa a classe `WebHookRecMethods`, que fornece métodos para operações de webhook de recorrência do PIX, conforme especificação do Banco Central do Brasil.
 
@@ -22,7 +22,7 @@ Exemplo de uso:
         ...
 
     banco = MeuBanco()
-    resposta = banco.configurar_webhook_rec(webhook_url="https://...")
+    resposta = banco.configurar_webhook_rec(webhook_url="https://example.com/webhook/")
 """
 
 from typing import Any

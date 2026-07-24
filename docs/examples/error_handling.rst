@@ -316,7 +316,7 @@ Exemplo Completo com Banco do Brasil
                     elif 'certificate' in str(e).lower():
                         raise AuthenticationError(
                             "Erro no certificado",
-                            details={'cert_path': self.oauth.cert_path}
+                            details={'cert': self.oauth.cert or self.oauth.cert_pfx}
                         )
                     else:
                         raise NetworkError(f"Falha na autenticacao: {e}")
@@ -375,15 +375,14 @@ Exemplo Completo com Banco do Brasil
 
         # Configuracao OAuth2
         oauth = OAuth2Client(
+            token_url=BBPixAPI.TOKEN_URL,
             client_id=os.getenv('BB_CLIENT_ID'),
-            client_secret=os.getenv('BB_CLIENT_SECRET'),
-            cert_path=os.getenv('BB_CERT_PATH'),
-            cert_password=os.getenv('BB_CERT_PASSWORD'),
-            scope='cob.write cob.read'
+            cert_pfx=os.getenv('BB_CERT_PFX'),
+            pwd_pfx=os.getenv('BB_CERT_PASSWORD'),
         )
 
         # API com observabilidade
-        api = ObservableBBPixAPI(oauth=oauth, sandbox_mode=True)
+        api = ObservableBBPixAPI(oauth=oauth)
 
         # Dados da cobranca
         txid = str(uuid.uuid4())

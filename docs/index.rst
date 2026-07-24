@@ -28,17 +28,17 @@ Overview
 --------
 
 pypix-api é uma biblioteca Python que simplifica a integração com APIs bancárias brasileiras
-para operações PIX. Atualmente suporta Banco do Brasil e Sicoob, com planos de expansão
-para outros bancos.
+para operações PIX. Atualmente suporta Banco do Brasil, Sicoob e Sicredi, com planos de
+expansão para outros bancos.
 
 **Principais funcionalidades:**
 
-* 🏦 **Bancos suportados**: Banco do Brasil, Sicoob
-* 🔐 **Autenticação**: OAuth2 com certificados mTLS
-* 💰 **PIX**: Cobranças imediatas e com vencimento
-* 🔄 **Recorrência**: Gestão de cobranças recorrentes
-* 🪝 **Webhooks**: Configuração e gerenciamento
-* 🔍 **Consultas**: PIX, devoluções e relatórios
+* 🏦 **Bancos suportados**: Banco do Brasil (001), Sicoob (756), Sicredi (748)
+* 🔐 **Autenticação**: OAuth2 com mTLS (PEM/PKCS#12) ou HTTP Basic (Sicredi)
+* 💰 **PIX**: Cobranças imediatas, com vencimento e em lote
+* 🔄 **Recorrência**: Pix Automático (COBR) e gestão de recorrências
+* 🪝 **Webhooks**: Configuração e gerenciamento (Pix, COBR, REC)
+* 🔍 **Consultas**: PIX, devoluções e locations
 
 Quick Start
 -----------
@@ -58,13 +58,12 @@ Basic Usage
    from pypix_api.auth.oauth2 import OAuth2Client
    from pypix_api.banks.bb import BBPixAPI
 
-   # Configure OAuth2 authentication
+   # Configure OAuth2 authentication (token_url comes from the bank class)
    oauth_client = OAuth2Client(
+       token_url=BBPixAPI.TOKEN_URL,
        client_id='your-client-id',
-       client_secret='your-client-secret',
-       cert_path='path/to/certificate.p12',
-       cert_password='cert-password',
-       scope='cob.write cob.read'
+       cert_pfx='path/to/certificate.pfx',
+       pwd_pfx='cert-password',
    )
 
    # Create PIX API instance
@@ -121,6 +120,14 @@ Sicoob
 ~~~~~~
 
 .. automodule:: pypix_api.banks.sicoob
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Sicredi
+~~~~~~~
+
+.. automodule:: pypix_api.banks.sicredi
    :members:
    :undoc-members:
    :show-inheritance:

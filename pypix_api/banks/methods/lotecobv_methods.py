@@ -1,6 +1,6 @@
 """
 pypix_api.banks.lotecobv_methods
--------------------------------
+--------------------------------
 
 Este módulo implementa a classe `LoteCobVMethods`, que fornece métodos para operações
 de lotes de cobrança com vencimento (LoteCobV) do PIX, conforme especificação do

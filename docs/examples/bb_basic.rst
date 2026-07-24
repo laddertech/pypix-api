@@ -24,15 +24,22 @@ Configuração Básica
 
     # Configure as credenciais (prefira usar variáveis de ambiente)
     oauth_client = OAuth2Client(
+        token_url=BBPixAPI.TOKEN_URL,
         client_id=os.getenv('BB_CLIENT_ID'),
-        client_secret=os.getenv('BB_CLIENT_SECRET'),
-        cert_path=os.getenv('BB_CERT_PATH'),  # Caminho para o arquivo .p12
-        cert_password=os.getenv('BB_CERT_PASSWORD'),
-        scope='cob.write cob.read cobv.write cobv.read pix.read pix.write'
+        cert_pfx=os.getenv('BB_CERT_PFX'),  # Caminho para o arquivo .pfx/.p12
+        pwd_pfx=os.getenv('BB_CERT_PASSWORD'),
     )
 
-    # Crie a instância da API (sandbox=True para testes)
-    api = BBPixAPI(oauth=oauth_client, sandbox_mode=True)
+    # Crie a instância da API
+    api = BBPixAPI(oauth=oauth_client)
+
+.. note::
+
+   Para testar no sandbox do banco, passe ``sandbox_mode=True`` **tanto** no
+   ``OAuth2Client`` **quanto** no ``BBPixAPI`` e defina a variável de ambiente
+   ``SANDBOX_TOKEN`` com o token fornecido pelo banco. Nesse modo o certificado é
+   ignorado e esse token fixo é usado nas requisições (o valor padrão
+   ``sandbox-token`` é apenas um placeholder e será rejeitado pela API real).
 
 Criando uma Cobrança Imediata
 -----------------------------
@@ -98,14 +105,13 @@ Exemplo Completo
 
         # Configuração
         oauth_client = OAuth2Client(
+            token_url=BBPixAPI.TOKEN_URL,
             client_id=os.getenv('BB_CLIENT_ID'),
-            client_secret=os.getenv('BB_CLIENT_SECRET'),
-            cert_path=os.getenv('BB_CERT_PATH'),
-            cert_password=os.getenv('BB_CERT_PASSWORD'),
-            scope='cob.write cob.read pix.read'
+            cert_pfx=os.getenv('BB_CERT_PFX'),
+            pwd_pfx=os.getenv('BB_CERT_PASSWORD'),
         )
 
-        api = BBPixAPI(oauth=oauth_client, sandbox_mode=True)
+        api = BBPixAPI(oauth=oauth_client)
 
         print("🏦 Conectando ao Banco do Brasil...")
 
@@ -137,6 +143,5 @@ Crie um arquivo ``.env`` na raiz do seu projeto:
 
     # Banco do Brasil - Produção
     BB_CLIENT_ID=your_production_client_id
-    BB_CLIENT_SECRET=your_production_client_secret
-    BB_CERT_PATH=/path/to/production/certificate.p12
+    BB_CERT_PFX=/path/to/production/certificate.pfx
     BB_CERT_PASSWORD=your_certificate_password

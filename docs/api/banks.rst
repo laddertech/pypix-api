@@ -89,3 +89,67 @@ Recurring Methods
    :members:
    :undoc-members:
    :show-inheritance:
+
+COBR (Pix Automático) Methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: pypix_api.banks.methods.cobr_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Batch CobV (Lote) Methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: pypix_api.banks.methods.lotecobv_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Location Methods
+~~~~~~~~~~~~~~~~
+
+.. automodule:: pypix_api.banks.methods.loc_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Recurrence Location Methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: pypix_api.banks.methods.locrec_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+BB-specific PIX Methods
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: pypix_api.banks.methods.pix_bb_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Recurrence Solicitation Methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: pypix_api.banks.methods.solic_rec_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+COBR Webhook Methods
+~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: pypix_api.banks.methods.webhook_cobr_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Recurrence Webhook Methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: pypix_api.banks.methods.webhook_rec_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:

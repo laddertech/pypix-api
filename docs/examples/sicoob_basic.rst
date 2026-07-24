@@ -24,15 +24,22 @@ Configuração Básica
 
     # Configure as credenciais
     oauth_client = OAuth2Client(
+        token_url=SicoobPixAPI.TOKEN_URL,
         client_id=os.getenv('SICOOB_CLIENT_ID'),
-        client_secret=os.getenv('SICOOB_CLIENT_SECRET'),
-        cert_path=os.getenv('SICOOB_CERT_PATH'),
-        cert_password=os.getenv('SICOOB_CERT_PASSWORD'),
-        scope='cob.write cob.read cobv.write cobv.read pix.read pix.write'
+        cert_pfx=os.getenv('SICOOB_CERT_PFX'),
+        pwd_pfx=os.getenv('SICOOB_CERT_PASSWORD'),
     )
 
     # Crie a instância da API
-    api = SicoobPixAPI(oauth=oauth_client, sandbox_mode=True)
+    api = SicoobPixAPI(oauth=oauth_client)
+
+.. note::
+
+   Para testar no sandbox do banco, passe ``sandbox_mode=True`` **tanto** no
+   ``OAuth2Client`` **quanto** no ``SicoobPixAPI`` e defina a variável de ambiente
+   ``SANDBOX_TOKEN`` com o token fornecido pelo banco. Nesse modo o certificado é
+   ignorado e esse token fixo é usado nas requisições (o valor padrão
+   ``sandbox-token`` é apenas um placeholder e será rejeitado pela API real).
 
 Criando uma Cobrança Simples
 ----------------------------
@@ -82,14 +89,13 @@ Exemplo Completo
         """Fluxo completo com Sicoob."""
 
         oauth_client = OAuth2Client(
+            token_url=SicoobPixAPI.TOKEN_URL,
             client_id=os.getenv('SICOOB_CLIENT_ID'),
-            client_secret=os.getenv('SICOOB_CLIENT_SECRET'),
-            cert_path=os.getenv('SICOOB_CERT_PATH'),
-            cert_password=os.getenv('SICOOB_CERT_PASSWORD'),
-            scope='cob.write cob.read pix.read'
+            cert_pfx=os.getenv('SICOOB_CERT_PFX'),
+            pwd_pfx=os.getenv('SICOOB_CERT_PASSWORD'),
         )
 
-        api = SicoobPixAPI(oauth=oauth_client, sandbox_mode=True)
+        api = SicoobPixAPI(oauth=oauth_client)
 
         txid = str(uuid.uuid4())
         cobranca = {
@@ -116,6 +122,5 @@ Variáveis de Ambiente
 
     # Sicoob - Configuração
     SICOOB_CLIENT_ID=your_sicoob_client_id
-    SICOOB_CLIENT_SECRET=your_sicoob_client_secret
-    SICOOB_CERT_PATH=/path/to/sicoob/certificate.p12
+    SICOOB_CERT_PFX=/path/to/sicoob/certificate.pfx
     SICOOB_CERT_PASSWORD=your_sicoob_cert_password

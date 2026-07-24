@@ -1,6 +1,6 @@
 """
 pypix_api.banks.webhook_cobr_methods
----------------------------
+------------------------------------
 
 Este módulo implementa a classe `WebHookCobrMethods`, que fornece métodos para operações de webhook de cobrança recorrente do PIX, conforme especificação do Banco Central do Brasil.
 
@@ -22,7 +22,7 @@ Exemplo de uso:
         ...
 
     banco = MeuBanco()
-    resposta = banco.configurar_webhook_cobr(webhook_url="https://...")
+    resposta = banco.configurar_webhook_cobr(webhook_url="https://example.com/webhook/")
 """
 
 from typing import Any

@@ -122,7 +122,12 @@ with PerformanceTracker('operacao_complexa'):
 
 ## 📊 Métricas Disponíveis
 
-A biblioteca coleta automaticamente as seguintes métricas:
+> **Nota:** a observabilidade é **opt-in** e **não** instrumenta automaticamente as chamadas
+> HTTP dos clientes de banco. As métricas abaixo são coletadas quando você usa explicitamente
+> os utilitários/decoradores de `pypix_api.metrics`, `pypix_api.logging` e `pypix_api.error_handling`
+> (ou os wrappers demonstrados neste diretório).
+
+Métricas suportadas pelo `MetricsCollector`:
 
 - **api_calls_total** - Total de chamadas para APIs bancárias
 - **api_call_duration** - Tempo de resposta das APIs

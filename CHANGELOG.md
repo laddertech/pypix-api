@@ -179,17 +179,17 @@ from pypix_api.scopes.bb import BBScopes
 
 ### Planned Features (Roadmap)
 
-#### v0.6.0 (Next Release)
-- [ ] Suporte para mais bancos (Caixa, Itaú)
-- [ ] Cache inteligente de tokens
-- [ ] Retry automático com backoff
-- [ ] Métricas de performance
+Já entregue desde o roadmap original:
+- [x] Cache de tokens por escopo (`OAuth2Client`)
+- [x] Retry com backoff e observabilidade opt-in (`error_handling`, `logging`, `metrics`)
+- [x] Operações em lote de CobV (`LoteCobVMethods`)
+- [x] Novos bancos: Sicredi (código 748), além de BB e Sicoob
 
-#### v0.7.0
+#### Próximas versões
+- [ ] Suporte para mais bancos (ex.: Caixa, Itaú)
 - [ ] Async/await support
 - [ ] Webhook server helpers
-- [ ] Batch operations
-- [ ] Enhanced logging
+- [ ] Observabilidade plugada automaticamente no caminho HTTP dos mixins
 
 #### v1.0.0 (Stable)
 - [ ] API estável e documentação completa

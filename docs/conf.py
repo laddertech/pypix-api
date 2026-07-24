@@ -12,8 +12,10 @@ sys.path.insert(0, os.path.abspath('..'))
 project = 'pypix-api'
 copyright = '2025, Fábio Thomaz'
 author = 'Fábio Thomaz'
-release = '0.6.2'
-version = '0.6.2'
+from pypix_api import __version__ as _pkg_version  # noqa: E402
+
+release = _pkg_version
+version = _pkg_version
 
 # General configuration
 extensions = [
@@ -74,6 +76,11 @@ if not os.path.exists('_static'):
 
 html_logo = '_static/images/logo.png'
 html_favicon = None
+
+# Linkcheck: ignora domínios de exemplo/placeholder usados em docstrings
+linkcheck_ignore = [
+    r'https?://([a-z0-9-]+\.)?example\.com.*',
+]
 
 # Napoleon settings for Google and NumPy style docstrings
 napoleon_google_docstring = True

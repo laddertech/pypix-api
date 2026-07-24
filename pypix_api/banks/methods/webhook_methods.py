@@ -1,6 +1,6 @@
 """
 pypix_api.banks.webhook_methods
----------------------------
+-------------------------------
 
 Este módulo implementa a classe `WebHookMethods`, que fornece métodos para operações de webhook do PIX, conforme especificação do Banco Central do Brasil.
 
@@ -20,7 +20,7 @@ Exemplo de uso:
         ...
 
     banco = MeuBanco()
-    resposta = banco.configurar_webhook(chave="minha-chave", webhook_url="https://...")
+    resposta = banco.configurar_webhook(chave="minha-chave", webhook_url="https://example.com/webhook/")
 
 """
 

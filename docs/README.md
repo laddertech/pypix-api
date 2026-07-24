@@ -6,18 +6,18 @@ This directory contains the source files for the pypix-api documentation, built 
 
 ```
 docs/
-├── index.rst           # Main documentation index
-├── installation.rst    # Installation guide
-├── quickstart.rst      # Quick start guide
-├── usage.rst          # Usage examples
-├── api_reference.rst  # Manual API reference
-├── banks/             # Bank-specific documentation
-├── security.rst       # Security guide
-├── contributing.rst   # Contribution guide
-├── changelog.rst      # Changelog
-├── conf.py           # Sphinx configuration
-├── api/              # Auto-generated API docs (created by sphinx-apidoc)
-└── _build/           # Built documentation (ignored by git)
+├── index.rst              # Main documentation index (overview + quick start)
+├── conf.py                # Sphinx configuration
+├── api/                   # API reference (auth, banks, models, scopes, utils)
+├── examples/              # Usage examples (bb_basic, sicoob_basic, webhooks, recurring, error_handling)
+├── CI_CD_GUIDE.md         # CI/CD pipeline guide
+├── PRE_COMMIT_GUIDE.md    # Pre-commit hooks guide
+├── TESTING_COVERAGE_GUIDE.md  # Testing & coverage guide
+├── TYPE_CHECKING_GUIDE.md # MyPy type checking guide
+├── SECURITY_IMPLEMENTATION.md # Security implementation details
+├── Sicredi/               # Sicredi integration viability report
+├── _static/               # Static assets (images)
+└── _build/                # Built documentation (ignored by git)
 ```
 
 ## 🚀 Building Documentation
@@ -154,17 +154,17 @@ class OAuth2Client:
 
     Attributes:
         client_id: OAuth2 client identifier provided by the bank
-        scope: Permission scope for API access (e.g., 'pix.read pix.write')
+        token_url: OAuth2 token endpoint (usually <Bank>.TOKEN_URL)
 
     Example:
+        >>> from pypix_api.banks.bb import BBPixAPI
         >>> client = OAuth2Client(
+        ...     token_url=BBPixAPI.TOKEN_URL,
         ...     client_id='your-client-id',
-        ...     client_secret='your-secret',
-        ...     cert_path='path/to/cert.p12',
-        ...     cert_password='cert-password',
-        ...     scope='pix.read pix.write'
+        ...     cert_pfx='path/to/cert.pfx',
+        ...     pwd_pfx='cert-password',
         ... )
-        >>> token = client.get_token()
+        >>> token = client.get_token('cob.read')
         >>> print(f"Access token: {token}")
     """
 ```

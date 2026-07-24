@@ -65,33 +65,41 @@ This is a Python library for integrating with Brazilian bank APIs, focused on PI
 ### Core Components
 
 **Authentication Layer (`pypix_api/auth/`)**
-- `oauth2.py`: OAuth2 client implementation for bank API authentication
-- `mtls.py`: Mutual TLS authentication support
-- Banks require OAuth2Client initialization with client_id, certificate (.pem), and private key (.key)
+- `oauth2.py`: OAuth2 client. `OAuth2Client(token_url, client_id, cert, pvk, cert_pfx, pwd_pfx, sandbox_mode, client_secret)`. `token_url` is required (use `<Bank>.TOKEN_URL`). Two client-auth flows: mTLS (default, BB/Sicoob) or HTTP Basic via `client_secret` (Sicredi). Token cache per scope.
+- `mtls.py`: Mutual TLS support — PEM via `cert`/`pvk` OR PKCS#12 via `cert_pfx`/`pwd_pfx`.
 
 **Bank Integration Layer (`pypix_api/banks/`)**
-- `base.py`: Abstract base class `BankPixAPIBase` that all bank implementations inherit from
-- `bb.py`: Banco do Brasil implementation
-- `sicoob.py`: Sicoob implementation
+- `base.py`: Abstract base class `BankPixAPIBase` that aggregates all method mixins. Instantiated with an `OAuth2Client`; subclasses define `BASE_URL`/`TOKEN_URL`/`SCOPES`.
+- `bb.py`: Banco do Brasil (`BBPixAPI`, code 001) — adds `PixBBMethods` for BB-specific Pix/refund queries
+- `sicoob.py`: Sicoob (`SicoobPixAPI`, code 756)
+- `sicredi.py`: Sicredi (`SicrediPixAPI`, code 748) — per-resource API versioning via `_endpoint_url` (`RESOURCE_VERSIONS`), HTTP Basic auth
 - `exceptions.py`: Bank-specific exception classes for error handling
 
 **Method Mixins (`pypix_api/banks/methods/`)**
 The base class uses multiple inheritance with method mixins for different PIX operations:
+- `base_protocol.py`: `PixAPIProtocol` typing the interface the mixins expect
 - `cob_methods.py`: Immediate charges (cobranças imediatas)
 - `cobv_methods.py`: Charges with due date (cobranças com vencimento)
+- `cobr_methods.py`: Recurring charges / Pix Automático (COBR)
+- `lotecobv_methods.py`: Batch of due-date charges (lote de CobV)
+- `loc_methods.py` / `locrec_methods.py`: Locations (payload/QR) for charges and recurrences
 - `pix_methods.py`: PIX transaction operations (consult, refund)
+- `pix_bb_methods.py`: BB-specific Pix/refund query variants
 - `rec_methods.py`: Recurrence operations
 - `solic_rec_methods.py`: Recurrence solicitation methods
 - `webhook_methods.py`: Webhook configuration
-- `webhook_cobr_methods.py`: Charge webhook specific methods
+- `webhook_cobr_methods.py`: Charge (COBR) webhook specific methods
 - `webhook_rec_methods.py`: Recurrence webhook specific methods
 
 **Models (`pypix_api/models/`)**
-- `pix.py`: PIX data models and structures
+- `pix.py`: `PixCobranca` dataclass. Note: minimal helper — PIX operations send/return raw `dict`, not typed models.
 
 **Scopes (`pypix_api/scopes/`)**
 - `registry.py`: OAuth2 scope registry system
-- Bank-specific scope definitions for API permissions
+- `base.py`, `bb.py`, `sicoob.py`, `sicredi.py`: bank-specific scope definitions
+
+**Observability (optional, top-level modules)**
+- `error_handling.py`, `logging.py`, `metrics.py`, `observability.py`: opt-in framework (errors, structured logging, metrics, health checks). Imported conditionally in `__init__.py`. NOT wired into the bank mixins' HTTP calls automatically — it must be used explicitly.
 
 ### Key Design Patterns
 

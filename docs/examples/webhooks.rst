@@ -12,22 +12,19 @@ Configuração Básica
     from pypix_api.banks.bb import BBPixAPI
 
     oauth = OAuth2Client(
+        token_url=BBPixAPI.TOKEN_URL,
         client_id='seu_client_id',
-        client_secret='seu_client_secret',
-        cert_path='certificado.p12',
-        cert_password='senha_cert',
-        scope='webhook.read webhook.write'
+        cert_pfx='certificado.pfx',
+        pwd_pfx='senha_cert',
     )
 
     api = BBPixAPI(oauth=oauth)
 
     def configurar_webhook():
-        webhook_config = {
-            'webhookUrl': 'https://seu-sistema.com/webhook/pix',
-            'chave': 'sua-chave-pix@email.com'
-        }
-
-        resultado = api.criar_webhook('pix', webhook_config)
+        resultado = api.configurar_webhook(
+            chave='sua-chave-pix@email.com',
+            webhook_url='https://seu-sistema.com/webhook/pix',
+        )
         print(f"✅ Webhook configurado: {resultado['webhookUrl']}")
 
 Servidor Flask para Webhooks
@@ -75,20 +72,24 @@ Gerenciamento de Webhooks
 .. code-block:: python
 
     def gerenciar_webhooks():
-        # Listar webhooks existentes
-        webhooks = api.consultar_webhooks('pix')
+        # Listar webhooks existentes (por período)
+        webhooks = api.listar_webhooks(
+            inicio='2025-01-01T00:00:00-03:00',
+            fim='2025-12-31T23:59:59-03:00',
+        )
         print(f"📋 Webhooks: {len(webhooks.get('webhooks', []))}")
 
-        # Configurar novo webhook
-        resultado = api.criar_webhook('pix', {
-            'webhookUrl': 'https://novo-sistema.com/webhook',
-            'chave': 'chave@email.com'
-        })
+        # Configurar/atualizar webhook (PUT idempotente pela chave)
+        resultado = api.configurar_webhook(
+            chave='chave@email.com',
+            webhook_url='https://novo-sistema.com/webhook',
+        )
 
-        # Atualizar webhook
-        api.atualizar_webhook('pix', 'chave@email.com', {
-            'webhookUrl': 'https://sistema-atualizado.com/webhook'
-        })
+        # Consultar um webhook específico
+        api.consultar_webhook(chave='chave@email.com')
+
+        # Excluir o webhook
+        api.excluir_webhook(chave='chave@email.com')
 
 Testando Webhooks Localmente
 ----------------------------

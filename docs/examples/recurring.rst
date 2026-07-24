@@ -14,11 +14,10 @@ Cobrança com Vencimento Simples
     from pypix_api.banks.bb import BBPixAPI
 
     oauth = OAuth2Client(
+        token_url=BBPixAPI.TOKEN_URL,
         client_id='seu_client_id',
-        client_secret='seu_client_secret',
-        cert_path='certificado.p12',
-        cert_password='senha_cert',
-        scope='cobv.write cobv.read'
+        cert_pfx='certificado.pfx',
+        pwd_pfx='senha_cert',
     )
 
     api = BBPixAPI(oauth=oauth)
@@ -128,9 +127,9 @@ Monitoramento de Cobranças
         inicio = datetime.now() - timedelta(days=30)
         fim = datetime.now()
 
-        cobrancas = api.consultar_cobvs(
-            data_inicio=inicio.strftime('%Y-%m-%dT%H:%M:%S-03:00'),
-            data_fim=fim.strftime('%Y-%m-%dT%H:%M:%S-03:00')
+        cobrancas = api.listar_cobv(
+            inicio=inicio.strftime('%Y-%m-%dT%H:%M:%S-03:00'),
+            fim=fim.strftime('%Y-%m-%dT%H:%M:%S-03:00')
         )
 
         for cob in cobrancas.get('cobs', []):
@@ -157,11 +156,10 @@ Script Completo
 
     def main():
         oauth = OAuth2Client(
+            token_url=BBPixAPI.TOKEN_URL,
             client_id=os.getenv('BB_CLIENT_ID'),
-            client_secret=os.getenv('BB_CLIENT_SECRET'),
-            cert_path=os.getenv('BB_CERT_PATH'),
-            cert_password=os.getenv('BB_CERT_PASSWORD'),
-            scope='cobv.write cobv.read'
+            cert_pfx=os.getenv('BB_CERT_PFX'),
+            pwd_pfx=os.getenv('BB_CERT_PASSWORD'),
         )
 
         api = BBPixAPI(oauth=oauth)

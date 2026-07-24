@@ -16,7 +16,8 @@ Dependências:
 - session HTTP compatível (ex: requests.Session)
 - Métodos auxiliares: `_create_headers()`, `get_base_url()`
 
-Exemplo de uso:
+Exemplo de uso::
+
     from pypix_api.banks.bb import BBPixAPI
 
     bb = BBPixAPI(oauth=oauth_client)
