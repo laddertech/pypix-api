@@ -6,6 +6,7 @@ This script helps with version bumping and release preparation.
 """
 
 import argparse
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -62,29 +63,50 @@ class ReleaseManager:
         return new_version
 
     def update_version_files(self, new_version: str) -> None:
-        """Update version in all relevant files."""
+        """Update version in all relevant files.
+
+        A versão atual é lida UMA vez, antes de qualquer escrita. Se fosse relida
+        após reescrever o pyproject.toml, ``get_current_version()`` já retornaria a
+        versão nova e o replace no ``__init__.py`` viraria um no-op (era o bug que
+        deixava ``__version__`` dessincronizado).
+        """
+        current_version = self.get_current_version()
+
         # Update pyproject.toml
         with open(self.pyproject_path, encoding='utf-8') as f:
             content = f.read()
 
         content = content.replace(
-            f'version = "{self.get_current_version()}"', f'version = "{new_version}"'
+            f'version = "{current_version}"', f'version = "{new_version}"'
         )
 
         with open(self.pyproject_path, 'w', encoding='utf-8') as f:
             f.write(content)
 
-        # Update __init__.py
+        # Update __init__.py — regex torna a troca robusta mesmo que __version__
+        # esteja dessincronizado do pyproject.toml.
         with open(self.init_path, encoding='utf-8') as f:
             content = f.read()
 
-        content = content.replace(
-            f"__version__ = '{self.get_current_version()}'",
+        content, n_subs = re.subn(
+            r"__version__ = '[^']*'",
             f"__version__ = '{new_version}'",
+            content,
         )
+        if n_subs == 0:
+            raise RuntimeError(
+                f'Não encontrei __version__ em {self.init_path} para atualizar'
+            )
 
         with open(self.init_path, 'w', encoding='utf-8') as f:
             f.write(content)
+
+        # Verificação final: pyproject.toml e __init__.py devem ficar sincronizados.
+        if self.get_current_version() != new_version:
+            raise RuntimeError('pyproject.toml não sincronizou com a nova versão')
+        init_content = self.init_path.read_text(encoding='utf-8')
+        if f"__version__ = '{new_version}'" not in init_content:
+            raise RuntimeError('__init__.py não sincronizou com a nova versão')
 
     def run_command(
         self, cmd: list[str], check: bool = True
