@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-07-24
+
+### Documentation
+- 📝 Alinha toda a documentação à realidade do código (v0.9.x): corrige exemplos
+  quebrados no README e nos guias (`BBPixAPI`/`SicoobPixAPI`/`SicrediPixAPI`,
+  `token_url` obrigatório, remoção de parâmetros inexistentes
+  `cert_path`/`cert_password`/`scope`) e chamadas inválidas (`configurar_webhook`,
+  `listar_cobv`)
+- 📝 Documenta o Sicredi, os mixins de métodos faltantes e os módulos de
+  observabilidade; esclarece que a observabilidade é opt-in e não instrumenta
+  automaticamente as chamadas HTTP
+- 📝 Atualiza a versão da documentação Sphinx (`conf.py`), as versões suportadas em
+  `SECURITY.md` e o roadmap do CHANGELOG
+- 🧹 Corrige formatação RST em docstrings de mixins (sem mudança de comportamento)
+
+### Note
+- Release **somente de documentação**: nenhuma mudança de API ou de comportamento
+  em relação à `0.9.0`.
+
 ## [0.9.0] - 2026-07-22
 
 ### Added
