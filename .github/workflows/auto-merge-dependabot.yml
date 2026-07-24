@@ -83,3 +83,31 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
+
+      - name: Comment for grouped/other updates (manual review)
+        # PRs agrupados do Dependabot têm título "bump the ... group ... with N updates",
+        # sem patch/minor/major, então nenhuma das regras acima dispara. Sem auto-merge:
+        # apenas sinaliza para revisão manual (comenta só ao abrir/reabrir para evitar spam
+        # a cada rebase/synchronize).
+        if: |
+          (github.event.action == 'opened' || github.event.action == 'reopened') &&
+          steps.wait-for-checks.outputs.conclusion == 'success' &&
+          contains(github.event.pull_request.labels.*.name, 'dependencies') &&
+          !contains(steps.pr-info.outputs.title, 'patch') &&
+          !contains(steps.pr-info.outputs.title, 'minor') &&
+          !contains(steps.pr-info.outputs.title, 'major')
+        run: |
+          gh pr comment "${{ github.event.pull_request.number }}" --body "
+          🔎 **Atualização agrupada de dependências detectada.**
+
+          Este PR agrupa múltiplas atualizações e não se enquadra em patch/minor/major
+          único, então o auto-merge **não** é aplicado. Revise e faça o merge manualmente:
+
+          1. Verifique a tabela de bumps e as release notes de cada dependência
+          2. Atenção a mudanças major (podem conter breaking changes)
+          3. Confirme que os checks de CI passaram
+          4. Faça o merge manual quando estiver seguro
+          "
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
