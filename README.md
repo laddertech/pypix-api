@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/_static/images/logo.png" alt="PyPix-API" width="400"/>
+  <img src="https://raw.githubusercontent.com/laddertech/pypix-api/main/docs/_static/images/logo.png" alt="PyPix-API" width="400"/>
 
   # pypix-api
 </div>
