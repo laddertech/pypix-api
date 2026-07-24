@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-07-24
+
+### Documentation
+- 📝 Adiciona exemplo de uso completo do **Sicredi** (bloco no README + guia
+  `docs/examples/sicredi_basic.rst`), destacando o `client_secret` (HTTP Basic)
+- 📝 Inclui o Sicredi no sumário e na referência de bancos do README
+- 🖼️ Corrige a logo do README para URL absoluta, permitindo a renderização na
+  página do PyPI (caminho relativo não é resolvido pelo PyPI)
+
+### Note
+- Release **somente de documentação**: nenhuma mudança de API ou de comportamento
+  em relação à `0.9.1`.
+
 ## [0.9.1] - 2026-07-24
 
 ### Documentation
