@@ -141,6 +141,7 @@ Examples
 
    examples/bb_basic
    examples/sicoob_basic
+   examples/sicredi_basic
    examples/webhooks
    examples/recurring
    examples/error_handling

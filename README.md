@@ -79,6 +79,7 @@ pip install -e ".[dev]"
 
 - 🏦 **[Banco do Brasil - Básico](docs/examples/bb_basic.rst)**
 - 🏛️ **[Sicoob - Básico](docs/examples/sicoob_basic.rst)**
+- 🌱 **[Sicredi - Básico](docs/examples/sicredi_basic.rst)**
 - 🪝 **[Configuração de Webhooks](docs/examples/webhooks.rst)**
 - 🔄 **[Pagamentos Recorrentes](docs/examples/recurring.rst)**
 
@@ -189,6 +190,48 @@ payload_cob = {
 }
 
 cob = sicoob.criar_cob(txid="uuid-unico-2", body=payload_cob)
+print(cob)
+```
+
+### Sicredi
+
+O Sicredi exige autenticação **HTTP Basic**, então o `OAuth2Client` recebe também o
+`client_secret` (além do certificado). O banco usa versionamento por recurso, resolvido
+internamente pela própria `SicrediPixAPI`.
+
+```python
+from pypix_api.auth.oauth2 import OAuth2Client
+from pypix_api.banks.sicredi import SicrediPixAPI
+
+# Sicredi: client_secret é obrigatório (Authorization: Basic)
+oauth_sicredi = OAuth2Client(
+    token_url=SicrediPixAPI.TOKEN_URL,
+    client_id="SEU_CLIENT_ID",
+    client_secret="SEU_CLIENT_SECRET",
+    cert_pfx="caminho/do/certificado.pfx",
+    pwd_pfx="senha-do-pfx",
+)
+
+# Instanciação do Sicredi
+sicredi = SicrediPixAPI(oauth=oauth_sicredi)
+
+# Exemplo: Cobrança imediata
+payload_cob = {
+    "calendario": {
+        "expiracao": 3600
+    },
+    "devedor": {
+        "cpf": "12345678909",
+        "nome": "Francisco da Silva"
+    },
+    "valor": {
+        "original": "37.00"
+    },
+    "chave": "5f84a4c5-c5cb-4599-9f13-7eb4d419dacc",
+    "solicitacaoPagador": "Pagamento de serviços."
+}
+
+cob = sicredi.criar_cob(txid="uuid-unico-3", body=payload_cob)
 print(cob)
 ```
 
