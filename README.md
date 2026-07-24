@@ -24,6 +24,7 @@ Biblioteca em Python para comunicação com APIs bancárias, focada na integraç
   - [Exemplo de Uso](#exemplo-de-uso)
     - [Banco do Brasil](#banco-do-brasil)
     - [Sicoob](#sicoob)
+    - [Sicredi](#sicredi)
   - [Estrutura do Projeto](#estrutura-do-projeto)
   - [Configuração](#configuração)
     - [Parâmetros de Inicialização](#parâmetros-de-inicialização)
@@ -70,7 +71,7 @@ pip install -e ".[dev]"
 
 ### Referência da API
 
-- 🏦 **[Bancos](docs/api/banks.rst)** - Banco do Brasil, Sicoob
+- 🏦 **[Bancos](docs/api/banks.rst)** - Banco do Brasil, Sicoob, Sicredi
 - 🔐 **[Autenticação](docs/api/auth.rst)** - OAuth2, mTLS
 - 📊 **[Modelos](docs/api/models.rst)** - Estruturas de dados PIX
 - 🎯 **[Scopes](docs/api/scopes.rst)** - Gerenciamento de escopos OAuth2
