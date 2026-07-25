@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-07-25
+
 ### Added
 - ✨ Novo módulo `pypix_api.models.enums` com os status da especificação do BACEN:
   `StatusCob`, `StatusCobR`, `StatusRec`, `StatusSolicRec` e `PoliticaRetentativa`.
@@ -35,9 +37,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`rec` → `solicrec` → `cobr`), a tabela de status escrivíveis por recurso, a
   regra de formação do `idRec` e a distinção entre cancelar uma CobR e cancelar
   a recorrência inteira
-- 📝 Documenta nos `revisar_cobr`/`revisar_recorrencia`/`revisar_solicrec` o único
-  status aceito e a restrição de prazo (o PSP recusa cancelamento em data igual
-  ou posterior à primeira tentativa de liquidação)
+- 📝 Documenta nos `revisar_*` e nos `cancelar_*` o único status aceito e a
+  precondição que faz o PSP recusar o cancelamento com 400: para a CobR, data
+  igual ou posterior à primeira tentativa de liquidação; para a Rec, já estar
+  expirada, cancelada ou rejeitada; para a SolicRec, status diferente de
+  `CRIADA`, `ENVIADA` ou `RECEBIDA`
 - 📝 Aviso em `docs/examples/recurring.rst`, que apesar do nome trata de `cobv`
 
 ## [0.9.2] - 2026-07-24
