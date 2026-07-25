@@ -14,3 +14,15 @@ PIX Models
    :members:
    :undoc-members:
    :show-inheritance:
+
+Status Enums
+------------
+
+Valores de status definidos pela especificação do BACEN, válidos para todos os
+PSPs. Veja :doc:`../examples/pix_automatico` para o uso no cancelamento de
+cobranças recorrentes.
+
+.. automodule:: pypix_api.models.enums
+   :members:
+   :undoc-members:
+   :show-inheritance:

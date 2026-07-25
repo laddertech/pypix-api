@@ -69,6 +69,19 @@ def test_revisar_cobr(dummy_bank_pix_api) -> None:
     assert kwargs['json'] == body
 
 
+def test_cancelar_cobr(dummy_bank_pix_api) -> None:
+    dummy_bank_pix_api.session.patch.return_value = MagicMock(
+        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    )
+    txid = 'txid_cobr_cancelar'
+    result = dummy_bank_pix_api.cancelar_cobr(txid)
+    assert result == {'result': 'ok'}
+    dummy_bank_pix_api.session.patch.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.patch.call_args
+    assert txid in args[0]
+    assert kwargs['json'] == {'status': 'CANCELADA'}
+
+
 def test_consultar_cobr(dummy_bank_pix_api) -> None:
     dummy_bank_pix_api.session.get.return_value = MagicMock(
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None

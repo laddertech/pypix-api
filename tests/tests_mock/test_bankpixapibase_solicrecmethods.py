@@ -74,11 +74,26 @@ def test_revisar_solicrec(dummy_bank_pix_api) -> None:
         json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
     )
     id_solic_rec = 'solic456'
-    body = {'status': 'REJEITADA', 'motivo': 'Motivo da rejeição'}
+    body = {'status': 'CANCELADA'}
     result = dummy_bank_pix_api.revisar_solicrec(id_solic_rec, body)
     assert result == {'result': 'ok'}
     dummy_bank_pix_api.session.patch.assert_called_once()
     args, kwargs = dummy_bank_pix_api.session.patch.call_args
     assert id_solic_rec in args[0]
     assert kwargs['json'] == body
+    assert 'headers' in kwargs
+
+
+def test_cancelar_solicrec(dummy_bank_pix_api) -> None:
+    """Test cancelar_solicrec method."""
+    dummy_bank_pix_api.session.patch.return_value = MagicMock(
+        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    )
+    id_solic_rec = 'solic789'
+    result = dummy_bank_pix_api.cancelar_solicrec(id_solic_rec)
+    assert result == {'result': 'ok'}
+    dummy_bank_pix_api.session.patch.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.patch.call_args
+    assert id_solic_rec in args[0]
+    assert kwargs['json'] == {'status': 'CANCELADA'}
     assert 'headers' in kwargs

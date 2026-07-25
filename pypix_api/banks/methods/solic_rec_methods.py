@@ -20,6 +20,8 @@ Exemplo de uso:
 
 from typing import Any
 
+from pypix_api.models.enums import StatusSolicRec
+
 
 class SolicRecMethods:  # pylint: disable=E1101
     """
@@ -96,11 +98,16 @@ class SolicRecMethods:  # pylint: disable=E1101
         Exceções:
             HTTPError: Em caso de erro na requisição HTTP.
 
+        Observação:
+            O schema `SolicRecRevisada` aceita apenas o campo `status`, e o
+            único valor permitido é `CANCELADA`. `REJEITADA` é um status de
+            resposta, atribuído pelo PSP do pagador — nunca deve ser enviado.
+            Para cancelar, prefira `cancelar_solicrec`, que monta o corpo.
+            O cancelamento só é aceito enquanto o status da solicitação for
+            `CRIADA`, `ENVIADA` ou `RECEBIDA`; fora disso o PSP retorna 400.
+
         Exemplo:
-            body = {
-                "status": "REJEITADA",
-                "motivo": "Motivo da rejeição"
-            }
+            body = {"status": StatusSolicRec.CANCELADA.value}
             resposta = self.revisar_solicrec("123e4567-e89b-12d3-a456-426614174000", body)
         """
         headers = self._create_headers()
@@ -110,3 +117,24 @@ class SolicRecMethods:  # pylint: disable=E1101
         self._handle_error_response(resp, error_class=None)
 
         return resp.json()
+
+    def cancelar_solicrec(self, id_solic_rec: str) -> dict[str, Any]:
+        """
+        Cancela uma solicitação de confirmação de recorrência (SolicRec).
+
+        Atalho para `revisar_solicrec` com `{"status": "CANCELADA"}`.
+
+        Parâmetros:
+            id_solic_rec (str): ID da solicitação de confirmação de recorrência.
+
+        Retorna:
+            dict: Dados da solicitação cancelada retornados pela API.
+
+        Exceções:
+            HTTPError: Em caso de erro na requisição HTTP. O PSP retorna 400
+                quando o status da solicitação é diferente de `CRIADA`,
+                `ENVIADA` ou `RECEBIDA`.
+        """
+        return self.revisar_solicrec(
+            id_solic_rec, {'status': StatusSolicRec.CANCELADA.value}
+        )

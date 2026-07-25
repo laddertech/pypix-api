@@ -144,6 +144,7 @@ Examples
    examples/sicredi_basic
    examples/webhooks
    examples/recurring
+   examples/pix_automatico
    examples/error_handling
 
 Contributing

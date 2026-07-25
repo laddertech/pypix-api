@@ -6,6 +6,7 @@ conforme especificado na API OpenAPI. Inclui operações para:
 - Criar recorrências
 - Consultar recorrência específica
 - Revisar recorrências existentes
+- Cancelar recorrências
 - Listar recorrências com filtros
 
 Classes:
@@ -13,6 +14,8 @@ Classes:
 """
 
 from typing import Any
+
+from pypix_api.models.enums import StatusRec
 
 
 class RecMethods:  # pylint: disable=E1101
@@ -48,12 +51,62 @@ class RecMethods:  # pylint: disable=E1101
     def revisar_recorrencia(self, id_rec: str, body: dict[str, Any]) -> dict[str, Any]:
         """
         Revisar uma recorrência existente.
+
+        Endpoint PATCH /rec/{idRec}. O schema ``RecRevisada`` aceita, além do
+        status, os campos ``vinculo.devedor.nome``, ``loc``,
+        ``calendario.dataInicial`` e ``ativacao.dadosJornada.txid``.
+
+        O único status aceito é ``CANCELADA``::
+
+            api.revisar_recorrencia(id_rec, {'status': StatusRec.CANCELADA.value})
+
+        Para cancelar, prefira :meth:`cancelar_recorrencia`, que monta o corpo.
+        Cancelar a recorrência encerra o vínculo por completo, incluindo as
+        cobranças futuras. Para cancelar apenas uma cobrança do ciclo, use
+        :meth:`~pypix_api.banks.methods.cobr_methods.CobRMethods.cancelar_cobr`.
+
+        O PSP recusa a revisão (HTTP 400) se a recorrência já estiver expirada,
+        cancelada ou rejeitada. Os campos ``loc`` e ``calendario.dataInicial``
+        só podem ser alterados enquanto o status for ``CRIADA``.
+
+        Args:
+            id_rec: Identificador da recorrência
+            body: Dados para revisão da recorrência
+
+        Returns:
+            dict contendo os dados da recorrência revisada
+
+        Raises:
+            HTTPError: Para erros 400, 403, 404, 503
         """
         headers = self._create_headers()
         url = self._endpoint_url(f'/rec/{id_rec}')
         resp = self.session.patch(url, headers=headers, json=body)
         self._handle_error_response(resp, error_class=None)
         return resp.json()
+
+    def cancelar_recorrencia(self, id_rec: str) -> dict[str, Any]:
+        """
+        Cancelar uma recorrência por completo.
+
+        Atalho para :meth:`revisar_recorrencia` com ``{'status': 'CANCELADA'}``.
+
+        Encerra o vínculo de recorrência e, com ele, as cobranças dos ciclos
+        seguintes. Para cancelar apenas uma cobrança específica mantendo a
+        recorrência ativa, use
+        :meth:`~pypix_api.banks.methods.cobr_methods.CobRMethods.cancelar_cobr`.
+
+        Args:
+            id_rec: Identificador da recorrência
+
+        Returns:
+            dict contendo os dados da recorrência cancelada
+
+        Raises:
+            HTTPError: Para erros 400, 403, 404, 503. O PSP retorna 400 quando a
+                recorrência já se encontra expirada, cancelada ou rejeitada.
+        """
+        return self.revisar_recorrencia(id_rec, {'status': StatusRec.CANCELADA.value})
 
     def consultar_recorrencia(
         self, id_rec: str, txid: str | None = None

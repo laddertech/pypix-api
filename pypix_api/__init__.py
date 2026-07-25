@@ -14,18 +14,32 @@ from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.banks.bb import BBPixAPI
 from pypix_api.banks.sicoob import SicoobPixAPI
 from pypix_api.banks.sicredi import SicrediPixAPI
+from pypix_api.models.enums import (
+    PoliticaRetentativa,
+    StatusCob,
+    StatusCobR,
+    StatusRec,
+    StatusSolicRec,
+)
 from pypix_api.models.pix import PixCobranca
+from pypix_api.utils.identificadores import gerar_id_rec
 
 __all__ = [
     'BBPixAPI',
     'OAuth2Client',
     'PixCobranca',
+    'PoliticaRetentativa',
     'SicoobPixAPI',
     'SicrediPixAPI',
+    'StatusCob',
+    'StatusCobR',
+    'StatusRec',
+    'StatusSolicRec',
     '__author__',
     '__email__',
     '__license__',
     '__version__',
+    'gerar_id_rec',
 ]
 
 # Observabilidade (imports e exports opcionais)

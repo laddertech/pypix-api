@@ -7,6 +7,7 @@ Este módulo fornece métodos para operações com cobranças recorrentes (CobR)
 Funcionalidades principais:
 - Criação de cobranças recorrentes com txid específico ou gerado pelo PSP.
 - Revisão de cobranças recorrentes existentes.
+- Cancelamento de uma cobrança recorrente específica, sem afetar a recorrência.
 - Consulta de cobranças recorrentes por txid.
 - Listagem de cobranças recorrentes com filtros por período, status, CPF/CNPJ, entre outros.
 - Solicitação de retentativa de cobrança em data específica.
@@ -24,6 +25,8 @@ Exemplo de uso:
 
 from datetime import date
 from typing import Any
+
+from pypix_api.models.enums import StatusCobR
 
 
 class CobRMethods:  # pylint: disable=E1101
@@ -51,6 +54,22 @@ class CobRMethods:  # pylint: disable=E1101
     def revisar_cobr(self, txid: str, body: dict[str, Any]) -> dict[str, Any]:
         """Revisar cobrança recorrente.
 
+        A revisão de uma CobR só admite a alteração do status, e o único valor
+        aceito é ``CANCELADA`` (schema ``CobRStatusRevisada``). O corpo é plano,
+        com um único campo::
+
+            api.revisar_cobr(txid, {'status': StatusCobR.CANCELADA.value})
+
+        Para cancelar, prefira :meth:`cancelar_cobr`, que monta o corpo.
+
+        Cancelar uma CobR encerra apenas aquela cobrança do ciclo — a
+        recorrência (``rec``) permanece ativa e as cobranças dos ciclos
+        seguintes continuam sendo geradas. Para encerrar a recorrência inteira,
+        use :meth:`~pypix_api.banks.methods.rec_methods.RecMethods.cancelar_recorrencia`.
+
+        O PSP recusa o cancelamento (HTTP 400) quando a data corrente é igual ou
+        posterior à data prevista da primeira tentativa de liquidação.
+
         Args:
             txid: Identificador da transação
             body: Dados para revisão da cobrança
@@ -66,6 +85,28 @@ class CobRMethods:  # pylint: disable=E1101
         resp = self.session.patch(url, headers=headers, json=body)
         self._handle_error_response(resp, error_class=None)
         return resp.json()
+
+    def cancelar_cobr(self, txid: str) -> dict[str, Any]:
+        """Cancelar uma cobrança recorrente específica.
+
+        Atalho para :meth:`revisar_cobr` com ``{'status': 'CANCELADA'}``.
+
+        Cancela apenas a cobrança identificada por ``txid``. A recorrência
+        (``rec``) associada permanece ativa — para encerrá-la, use
+        :meth:`~pypix_api.banks.methods.rec_methods.RecMethods.cancelar_recorrencia`.
+
+        Args:
+            txid: Identificador da transação
+
+        Returns:
+            dict contendo os dados da cobrança cancelada
+
+        Raises:
+            HTTPError: Para erros 400, 403, 404, 503. O PSP retorna 400 quando a
+                data corrente é igual ou posterior à data prevista da primeira
+                tentativa de liquidação.
+        """
+        return self.revisar_cobr(txid, {'status': StatusCobR.CANCELADA.value})
 
     def consultar_cobr(self, txid: str) -> dict[str, Any]:
         """Consultar cobrança recorrente através de um determinado txid.

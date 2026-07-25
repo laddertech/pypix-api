@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- ✨ Novo módulo `pypix_api.models.enums` com os status da especificação do BACEN:
+  `StatusCob`, `StatusCobR`, `StatusRec`, `StatusSolicRec` e `PoliticaRetentativa`.
+  Herdam de `str`, então comparam direto com as respostas cruas da API e
+  serializam corretamente em JSON. Exportados no pacote raiz
+- ✨ `gerar_id_rec(ispb, politica_retentativa, data_criacao, sequencial)` em
+  `pypix_api.utils.identificadores`, que monta o `idRec` conforme a regra de
+  formação do schema `RecId` (`RAxxxxxxxxyyyyMMddkkkkkkkkkkk`). O segundo
+  caractere é derivado da política de retentativa, impedindo a contradição entre
+  o identificador e o campo `politicaRetentativa` — inconsistência que o schema
+  não detecta, já que o `pattern` só valida 29 caracteres alfanuméricos
+- ✨ Helpers de cancelamento que dispensam montar o corpo à mão:
+  `cancelar_cobr(txid)`, `cancelar_recorrencia(id_rec)` e
+  `cancelar_solicrec(id_solic_rec)`. Todos delegam ao respectivo `revisar_*` com
+  `{"status": "CANCELADA"}` — `cancelar_cobr` encerra apenas a cobrança do ciclo,
+  mantendo a recorrência ativa
+
+### Fixed
+- 🐛 Corrige o exemplo da docstring de `revisar_solicrec`, que indicava
+  `{"status": "REJEITADA", "motivo": ...}` — o schema `SolicRecRevisada` aceita
+  apenas `status: CANCELADA`, e `REJEITADA` é um status de resposta do PSP do
+  pagador. O teste que replicava o exemplo incorreto também foi corrigido
+
+### Documentation
+- 📝 Novo guia `docs/examples/pix_automatico.rst` com o fluxo de Pix Automático
+  (`rec` → `solicrec` → `cobr`), a tabela de status escrivíveis por recurso, a
+  regra de formação do `idRec` e a distinção entre cancelar uma CobR e cancelar
+  a recorrência inteira
+- 📝 Documenta nos `revisar_cobr`/`revisar_recorrencia`/`revisar_solicrec` o único
+  status aceito e a restrição de prazo (o PSP recusa cancelamento em data igual
+  ou posterior à primeira tentativa de liquidação)
+- 📝 Aviso em `docs/examples/recurring.rst`, que apesar do nome trata de `cobv`
+
 ## [0.9.2] - 2026-07-24
 
 ### Documentation

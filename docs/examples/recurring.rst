@@ -3,6 +3,12 @@ Cobranças com Vencimento
 
 Este guia mostra como criar e gerenciar cobranças PIX com data de vencimento.
 
+.. note::
+   Apesar do nome do arquivo, este guia trata de cobranças com vencimento
+   (``cobv``) — inclusive quando emitidas repetidamente em um laço. Para o
+   **Pix Automático** propriamente dito (``rec``, ``solicrec`` e ``cobr``, com
+   débito autorizado pelo pagador), veja :doc:`pix_automatico`.
+
 Cobrança com Vencimento Simples
 -------------------------------
 
