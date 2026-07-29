@@ -280,6 +280,56 @@ oauth = OAuth2Client(
 banco = BBPixAPI(oauth=oauth)  # Ou SicoobPixAPI(oauth=oauth) / SicrediPixAPI(oauth=oauth)
 ```
 
+### Escopos OAuth2
+
+Os escopos Pix são liberados **por credencial**, conforme as modalidades que o associado
+contratou com o PSP. Por padrão a biblioteca pede o grupo Pix **completo** do banco — no
+Sicredi, 22 escopos. Se a credencial só tem parte das modalidades, isso pede permissão a mais
+e, dependendo do PSP, resulta em `400 — Escopo Negado` ou na concessão silenciosa de apenas
+o subconjunto liberado.
+
+Informe em `scopes=` exatamente o que a credencial tem. O helper `compose_scopes` monta a
+string a partir dos nomes dos grupos:
+
+```python
+from pypix_api.banks.sicredi import SicrediPixAPI
+from pypix_api.scopes import compose_scopes
+
+# Pix Automático: cobrança imediata + recorrência, sem cobv/lotecobv/location
+scopes = compose_scopes(
+    "748", "cob", "cobr", "rec", "solicrec", "webhook_rec", "webhook_cobr"
+)
+sicredi = SicrediPixAPI(oauth=oauth_sicredi, scopes=scopes)
+```
+
+O parâmetro aceita também um `ScopeGroup`, uma lista de escopos e uma lista de grupos:
+
+```python
+from pypix_api.scopes.sicredi import SicrediScopes
+
+banco = SicrediPixAPI(oauth=oauth_sicredi, scopes=SicrediScopes.COBR)
+banco = SicrediPixAPI(oauth=oauth_sicredi, scopes=["cob.read", "cob.write"])
+banco = SicrediPixAPI(oauth=oauth_sicredi, scopes=[SicrediScopes.COB, SicrediScopes.COBR])
+```
+
+Omitir o parâmetro (ou passar `None`) mantém o grupo completo do banco. Um valor **vazio**
+(`""` ou `[]`) levanta `ValueError` — um conjunto vazio não vira silenciosamente "todos os
+escopos".
+
+Os grupos disponíveis de cada banco podem ser listados em runtime:
+
+```python
+from pypix_api.scopes import ScopeRegistry
+
+ScopeRegistry.list_scope_groups("748")
+# ['COB', 'COBR', 'COBV', 'LOCATION', 'LOTECOBV', 'PIX', 'PIX_BASIC',
+#  'REC', 'SOLICREC', 'WEBHOOK', 'WEBHOOK_COBR', 'WEBHOOK_REC']
+```
+
+Quando o PSP devolve o token concedendo **menos** escopos do que os solicitados, a biblioteca
+registra um `WARNING` no logger `pypix_api.auth.oauth2` com os que faltaram — sem isso, a
+modalidade não contratada só apareceria como erro no endpoint de negócio, longe da causa.
+
 ### Timeout
 
 Toda requisição da biblioteca — incluindo a de token — leva timeout. O padrão é

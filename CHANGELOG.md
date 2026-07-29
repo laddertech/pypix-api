@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- ✨ Parâmetro `scopes` em `BankPixAPIBase` (e portanto em `BBPixAPI`, `SicoobPixAPI` e
+  `SicrediPixAPI`), aceitando `str`, `ScopeGroup` ou lista de ambos. Permite pedir ao PSP
+  apenas os escopos liberados para a credencial, em vez do grupo Pix completo do banco. Omitir
+  o parâmetro (ou passar `None`) mantém o comportamento da 0.11.0; um valor vazio (`''`, `[]`)
+  levanta `ValueError`, para que uma entrada malformada não vire silenciosamente "todos os
+  escopos"
+- ✨ `pypix_api.scopes.compose_scopes(bank_code, *grupos)`: compõe a string de escopos a partir
+  dos nomes dos grupos do banco, deduplicando e preservando a ordem. Uso típico no Pix
+  Automático do Sicredi:
+  `compose_scopes('748', 'cob', 'cobr', 'rec', 'solicrec', 'webhook_rec', 'webhook_cobr')`.
+  Um nome de grupo inexistente levanta `ValueError` listando os disponíveis — antes de compor
+- ✨ `ScopeGroup` passa a ser exportado por `pypix_api.scopes`
+- ✅ Testes dos escopos configuráveis, do `compose_scopes`, do cache de token e do aviso de
+  escopo negado (`tests/tests_mock/test_scopes_configuraveis.py`)
+- 📝 Seção "Escopos OAuth2" no README e `pypix_api.scopes` na documentação da API
+
+### Fixed
+- 🐛 O campo `scope` da resposta de token era descartado. Quando o PSP responde `200`
+  concedendo **menos** escopos do que os solicitados — comportamento documentado no Guia
+  Técnico do Sicredi —, a falta só aparecia como erro no endpoint de negócio, longe da causa.
+  `OAuth2Client.get_token` passa a comparar o concedido com o solicitado e a registrar um
+  `WARNING` com os escopos ausentes no logger `pypix_api.auth.oauth2` (a lista é truncada em
+  20 escopos, já que o campo vem do PSP e não tem limite de tamanho). O token continua sendo
+  devolvido normalmente
+- 🐛 O cache de token era sensível à ordem dos escopos: `'cob.read cob.write'` e
+  `'cob.write cob.read'` ocupavam entradas distintas e cada uma custava um
+  `POST /oauth/token` — o Guia Técnico do Sicredi (§11) associa volume de requisições de token
+  a bloqueio por IP. A chave do cache passa a ser o conjunto canônico; a ordem informada
+  continua sendo a enviada ao PSP
+
 ## [0.11.0] - 2026-07-28
 
 ### Added

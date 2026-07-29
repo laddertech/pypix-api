@@ -27,7 +27,7 @@ from pypix_api.exceptions import (
     excecao_para_status,
 )
 from pypix_api.http import DEFAULT_TIMEOUT, Timeout, texto_do_corpo
-from pypix_api.scopes import get_pix_scopes
+from pypix_api.scopes import ScopeGroup, get_pix_scopes
 
 #: Headers montados por `_create_headers` que ``extra_headers`` não pode
 #: redefinir — trocá-los quebraria a autenticação da requisição.
@@ -51,6 +51,67 @@ def _para_int(valor: Any, padrao: int) -> int:
         return int(valor)
     except (TypeError, ValueError):
         return padrao
+
+
+#: Mensagem do `TypeError` de `_normaliza_scopes`, que nomeia o parâmetro — sem
+#: ela, o erro chega como um `AttributeError` de `.split()`, sem pista da causa.
+_TIPO_SCOPES_INVALIDO = (
+    'O parâmetro `scopes` aceita str, ScopeGroup ou uma lista desses tipos; '
+    'recebido {tipo}.'
+)
+
+
+def _normaliza_scopes(
+    scopes: str | ScopeGroup | list[str | ScopeGroup],
+) -> str:
+    """Normaliza o parâmetro ``scopes`` para a string enviada ao PSP.
+
+    Aceita as formas naturais de expressar um conjunto de escopos — a string
+    crua, um :class:`ScopeGroup`, e a lista de qualquer um dos dois — e devolve
+    sempre a string separada por espaços que o ``grant_type=client_credentials``
+    espera, sem duplicatas e preservando a ordem informada.
+
+    Args:
+        scopes: Escopos a solicitar, como string, :class:`ScopeGroup` ou lista
+            de ambos (ex.: ``[SicrediScopes.COB, SicrediScopes.COBR]``)
+
+    Returns:
+        str: Escopos separados por espaço
+
+    Raises:
+        ValueError: Se a entrada não produzir escopo algum (``''``, ``'   '``,
+            ``[]``). Um conjunto vazio não pode virar silenciosamente "todos os
+            escopos do banco": quem quer o conjunto completo omite o parâmetro
+        TypeError: Se a entrada — ou algum item da lista — não for ``str`` nem
+            :class:`ScopeGroup`
+    """
+    if isinstance(scopes, str | ScopeGroup):
+        entradas: list[Any] = [scopes]
+    else:
+        try:
+            entradas = list(scopes)
+        except TypeError as exc:
+            raise TypeError(
+                _TIPO_SCOPES_INVALIDO.format(tipo=type(scopes).__name__)
+            ) from exc
+
+    itens: list[str] = []
+    for entrada in entradas:
+        if isinstance(entrada, ScopeGroup):
+            itens.extend(entrada.scopes)
+        elif isinstance(entrada, str):
+            itens.extend(entrada.split())
+        else:
+            raise TypeError(_TIPO_SCOPES_INVALIDO.format(tipo=type(entrada).__name__))
+
+    unicos = list(dict.fromkeys(itens))
+    if not unicos:
+        raise ValueError(
+            'O parâmetro `scopes` não pode ser vazio. Informe os escopos '
+            'liberados para a credencial (ver `pypix_api.scopes.compose_scopes`) '
+            'ou omita o parâmetro para usar o conjunto Pix completo do banco.'
+        )
+    return ' '.join(unicos)
 
 
 def _classe_da_excecao(status: int, type_: str) -> type[PixAPIException]:
@@ -101,12 +162,14 @@ class BankPixAPIBase(
     session: requests.Session
     client_id: str | None
     timeout: Timeout
+    scopes: str | None
 
     def __init__(
         self,
         oauth: OAuth2Client,
         sandbox_mode: bool = False,
         timeout: Timeout | None = None,
+        scopes: str | ScopeGroup | list[str | ScopeGroup] | None = None,
     ) -> None:
         """Inicializa o cliente Pix do banco.
 
@@ -118,9 +181,18 @@ class BankPixAPIBase(
                 tupla ``(conexão, leitura)``. ``None`` usa
                 :data:`DEFAULT_TIMEOUT`. Para leitura sem limite, use
                 ``(5.0, None)``
+            scopes: Escopos OAuth2 a solicitar, como string, :class:`ScopeGroup`
+                ou lista de ambos. ``None`` (padrão) mantém o comportamento
+                histórico: o grupo Pix completo do banco. Informe este parâmetro
+                quando a credencial tiver apenas parte das modalidades
+                contratadas junto ao PSP — ver
+                :func:`pypix_api.scopes.compose_scopes`
 
         Raises:
-            ValueError: Se BASE_URL, TOKEN_URL ou SCOPES não forem definidos na subclasse
+            ValueError: Se BASE_URL ou TOKEN_URL não forem definidos na
+                subclasse, ou se ``scopes`` for informado e vazio
+            TypeError: Se ``scopes`` não for ``str``, :class:`ScopeGroup` nem
+                lista desses tipos
         """
         if not self.BASE_URL or not self.TOKEN_URL:
             raise ValueError(
@@ -131,6 +203,10 @@ class BankPixAPIBase(
         self.session = self.oauth.session
         self.client_id = self.oauth.client_id
         self.timeout = DEFAULT_TIMEOUT if timeout is None else timeout
+        # O agregado do banco continua sendo resolvido em `_create_headers`, e
+        # não aqui: um banco fora do ScopeRegistry ou em `sandbox_mode` nunca
+        # chega a pedir token, e não deve falhar na construção.
+        self.scopes = None if scopes is None else _normaliza_scopes(scopes)
 
     def _create_headers(self) -> dict[str, str]:
         """
@@ -145,8 +221,7 @@ class BankPixAPIBase(
 
             token = os.getenv('SANDBOX_TOKEN', 'sandbox-token')
         else:
-            pix_scopes = get_pix_scopes(self.get_bank_code())
-            token = self.oauth.get_token(pix_scopes)
+            token = self.oauth.get_token(self._scopes_do_token())
 
         return {
             'Authorization': f'Bearer {token}',
@@ -154,6 +229,18 @@ class BankPixAPIBase(
             'User-Agent': 'PyPixAPIClient/0.1',
             'client_id': self.client_id or '',
         }
+
+    def _scopes_do_token(self) -> str:
+        """Escopos a solicitar ao PSP nesta instância.
+
+        Devolve os escopos informados em ``scopes=`` quando houver; do
+        contrário, o grupo Pix completo do banco — resolvido aqui, e não na
+        construção, para que a instância só dependa do ``ScopeRegistry`` no
+        momento em que realmente pede um token.
+        """
+        if self.scopes is not None:
+            return self.scopes
+        return get_pix_scopes(self.get_bank_code())
 
     def get_bank_code(self) -> str:
         raise NotImplementedError('get_bank_code not implemented')

@@ -1,4 +1,5 @@
 import base64
+import logging
 import os
 import time
 from typing import Any, BinaryIO
@@ -15,6 +16,13 @@ from pypix_api.exceptions import (
     excecao_para_status,
 )
 from pypix_api.http import DEFAULT_TIMEOUT, Timeout, texto_do_corpo
+
+logger = logging.getLogger(__name__)
+
+#: Máximo de escopos listados no aviso de escopo negado. O campo ``scope`` da
+#: resposta é controlado pelo PSP e não tem limite de tamanho; sem o corte, uma
+#: resposta inesperada vira uma linha de log de tamanho arbitrário.
+_MAX_ESCOPOS_NO_AVISO = 20
 
 
 class OAuth2Client:
@@ -64,7 +72,11 @@ class OAuth2Client:
         self.pwd_pfx: str | None = pwd_pfx or os.getenv('PWD_PFX')
 
         self.token_url: str = token_url  # URL de autenticação OAuth2
-        self.token_cache: dict[str, dict[str, Any]] = {}  # Cache de tokens por escopo
+        # Cache de tokens por conjunto de escopos. A chave é a forma canônica
+        # (ver `_chave_de_cache`), e não a string solicitada: é detalhe interno,
+        # sem garantia de estabilidade entre versões. Para saber se há token
+        # válido para um escopo, use `_is_token_expired`, que canoniza a entrada.
+        self.token_cache: dict[str, dict[str, Any]] = {}
         self.session: requests.Session = requests.Session()
         self.timeout: Timeout = DEFAULT_TIMEOUT if timeout is None else timeout
 
@@ -96,8 +108,9 @@ class OAuth2Client:
             scope = 'cco_extrato cco_consulta'
 
         # Verifica se já existe token válido para este escopo
-        if scope in self.token_cache and not self._is_token_expired(scope):
-            return self.token_cache[scope]['access_token']
+        chave = self._chave_de_cache(scope)
+        if chave in self.token_cache and not self._is_token_expired(chave):
+            return self.token_cache[chave]['access_token']
 
         token_data: dict[str, str | None] = {
             'grant_type': 'client_credentials',
@@ -138,12 +151,70 @@ class OAuth2Client:
             raise self._erro_do_token(response)
 
         token_info = self._le_token(response)
+        self._avisa_escopos_ausentes(scope, token_info.get('scope'))
         token_info['expires_at'] = time.time() + token_info['expires_in']
 
         # Armazena o token no cache por escopo
-        self.token_cache[scope] = token_info
+        self.token_cache[chave] = token_info
 
         return token_info['access_token']
+
+    @staticmethod
+    def _chave_de_cache(scope: str) -> str:
+        """Chave canônica do cache para um conjunto de escopos.
+
+        O PSP concede o mesmo token para os mesmos escopos, independentemente da
+        ordem e de repetições. Sem canonizar, ``'cob.read cob.write'`` e
+        ``'cob.write cob.read'`` seriam entradas distintas e cada uma custaria um
+        ``POST /oauth/token`` — o Guia Técnico do Sicredi (§11) associa volume de
+        requisições de token a bloqueio por IP. A ordem original é preservada no
+        que se envia ao PSP; só a chave do cache é normalizada.
+        """
+        return ' '.join(sorted(set(scope.split())))
+
+    def _avisa_escopos_ausentes(self, solicitado: str, concedido: Any) -> None:
+        """Alerta quando o PSP concede menos escopos do que os solicitados.
+
+        Um PSP pode responder ``200`` devolvendo apenas o subconjunto de
+        escopos liberado para a credencial, em vez de recusar o token. Sem este
+        aviso, a informação é descartada e a falta só aparece como ``403`` no
+        endpoint de negócio, longe da causa — que é a modalidade não contratada.
+
+        Só compara quando a resposta traz o campo ``scope``: a RFC 6749 o torna
+        opcional quando o concedido é idêntico ao solicitado.
+
+        Args:
+            solicitado: Escopos enviados na requisição de token
+            concedido: Campo ``scope`` da resposta, quando presente
+        """
+        if not isinstance(concedido, str):
+            return
+
+        recebidos = set(concedido.split())
+        ausentes = [escopo for escopo in solicitado.split() if escopo not in recebidos]
+        if not ausentes:
+            return
+
+        logger.warning(
+            'O PSP concedeu menos escopos do que os solicitados em %s. '
+            'Ausentes: %s. Concedidos: %s. Verifique as modalidades '
+            'contratadas para esta credencial e ajuste o parâmetro `scopes`.',
+            self.token_url,
+            self._resume_escopos(ausentes),
+            self._resume_escopos(concedido.split()),
+        )
+
+    @staticmethod
+    def _resume_escopos(escopos: list[str]) -> str:
+        """Formata uma lista de escopos para o log, limitando o tamanho.
+
+        Ver :data:`_MAX_ESCOPOS_NO_AVISO`: o excedente vira uma contagem, para
+        que a linha de log não cresça sem limite.
+        """
+        if len(escopos) <= _MAX_ESCOPOS_NO_AVISO:
+            return ' '.join(escopos)
+        restantes = len(escopos) - _MAX_ESCOPOS_NO_AVISO
+        return f'{" ".join(escopos[:_MAX_ESCOPOS_NO_AVISO])} (+{restantes})'
 
     @staticmethod
     def _corpo_json(response: requests.Response) -> dict[str, Any]:
@@ -204,9 +275,14 @@ class OAuth2Client:
         return dados
 
     def _is_token_expired(self, scope: str) -> bool:
-        """Verifica se o token para o escopo especificado expirou"""
-        if scope not in self.token_cache or 'expires_at' not in self.token_cache[scope]:
+        """Verifica se o token para o escopo especificado expirou.
+
+        Aceita tanto a string de escopos crua quanto a chave já canônica de
+        :meth:`_chave_de_cache` — a canonização é idempotente.
+        """
+        chave = self._chave_de_cache(scope)
+        if chave not in self.token_cache or 'expires_at' not in self.token_cache[chave]:
             return True
         return (
-            time.time() >= self.token_cache[scope]['expires_at'] - 60
+            time.time() >= self.token_cache[chave]['expires_at'] - 60
         )  # 60s de margem

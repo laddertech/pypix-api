@@ -4,6 +4,14 @@ Scopes
 OAuth2 Scopes Management
 ------------------------
 
+Composição de escopos
+~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: pypix_api.scopes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Base Scopes
 ~~~~~~~~~~~
 

@@ -216,8 +216,13 @@ class TestOAuth2ScalabilityBenchmarks:
             return client
 
         client = benchmark(request_token_with_large_scope)
-        # O escopo grande é aceito e cacheado sob sua própria chave
-        assert large_scope in client.token_cache
+        # O escopo grande é aceito e ocupa uma única entrada do cache. A chave é
+        # o conjunto canônico (ver `OAuth2Client._chave_de_cache`), não a string
+        # crua: afirmar o formato da chave acoplaria o benchmark a um detalhe
+        # interno do cache.
+        assert len(client.token_cache) == 1
+        entrada = next(iter(client.token_cache.values()))
+        assert entrada['access_token'] == 'large-scope-token'
         assert len(large_scope.split()) == 1000
 
     @pytest.mark.benchmark(group='oauth-stress')
