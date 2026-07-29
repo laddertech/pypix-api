@@ -16,7 +16,7 @@ Esta classe é herdada por implementações específicas de bancos (ex: Banco do
 
 Dependências:
 - session HTTP compatível (ex: requests.Session)
-- Métodos auxiliares: `_create_headers()`, `get_base_url()`
+- Método auxiliar: `_request()`, fornecido por `BankPixAPIBase`
 
 Exemplo de uso:
     class MeuBanco(PixMethods):
@@ -78,8 +78,6 @@ class PixMethods:  # pylint: disable=E1101
         if cpf and cnpj:
             raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
-        headers = self._create_headers()
-        url = self._endpoint_url('/pix')
         params = {'inicio': inicio, 'fim': fim}
 
         # Adiciona parâmetros opcionais se fornecidos
@@ -98,9 +96,8 @@ class PixMethods:  # pylint: disable=E1101
         if itens_por_pagina is not None:
             params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
-        resp = self.session.get(url, headers=headers, params=params)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', '/pix', params=params)
+        return self._json(resp)
 
     def consultar_pix_por_e2eid(self, e2eid: str) -> dict[str, Any]:
         """
@@ -117,11 +114,8 @@ class PixMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/pix/{e2eid}')
-        resp = self.session.get(url, headers=headers)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', f'/pix/{e2eid}')
+        return self._json(resp)
 
     def solicitar_devolucao_pix(
         self, e2eid: str, id_devolucao: str, body: dict[str, Any]
@@ -154,11 +148,8 @@ class PixMethods:  # pylint: disable=E1101
 
             A soma dos valores de todas as devoluções não pode ultrapassar o valor total do PIX.
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/pix/{e2eid}/devolucao/{id_devolucao}')
-        resp = self.session.put(url, headers=headers, json=body)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('PUT', f'/pix/{e2eid}/devolucao/{id_devolucao}', json=body)
+        return self._json(resp)
 
     def consultar_devolucao_pix(self, e2eid: str, id_devolucao: str) -> dict[str, Any]:
         """
@@ -177,8 +168,5 @@ class PixMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/pix/{e2eid}/devolucao/{id_devolucao}')
-        resp = self.session.get(url, headers=headers)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', f'/pix/{e2eid}/devolucao/{id_devolucao}')
+        return self._json(resp)

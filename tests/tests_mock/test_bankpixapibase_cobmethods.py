@@ -5,6 +5,7 @@ import pytest
 
 from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.banks.base import BankPixAPIBase
+from tests.conftest import make_response
 
 
 class DummyBankPixAPIBase(BankPixAPIBase):
@@ -36,69 +37,69 @@ def dummy_bank_pix_api() -> DummyBankPixAPIBase:
 
 
 def test_criar_cob(dummy_bank_pix_api: DummyBankPixAPIBase) -> None:
-    dummy_bank_pix_api.session.put.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     txid = 'txid123'
     body = {'valor': 100}
     result = dummy_bank_pix_api.criar_cob(txid, body)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.put.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.put.call_args
-    assert txid in args[0]
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert txid in args[1]
     assert kwargs['json'] == body
 
 
 def test_criar_cob_auto_txid(dummy_bank_pix_api: DummyBankPixAPIBase) -> None:
-    dummy_bank_pix_api.session.post.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     body = {'valor': 200}
     result = dummy_bank_pix_api.criar_cob_auto_txid(body)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.post.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.post.call_args
-    assert args[0].endswith('/cob')
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert args[1].endswith('/cob')
     assert kwargs['json'] == body
 
 
 def test_revisar_cob(dummy_bank_pix_api: DummyBankPixAPIBase) -> None:
-    dummy_bank_pix_api.session.patch.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     txid = 'txid456'
     body = {'valor': 300}
     result = dummy_bank_pix_api.revisar_cob(txid, body)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.patch.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.patch.call_args
-    assert txid in args[0]
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert txid in args[1]
     assert kwargs['json'] == body
 
 
 def test_consultar_cob(dummy_bank_pix_api: DummyBankPixAPIBase) -> None:
-    dummy_bank_pix_api.session.get.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     txid = 'txid789'
     result = dummy_bank_pix_api.consultar_cob(txid)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.get.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.get.call_args
-    assert txid in args[0]
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert txid in args[1]
 
 
 def test_consultar_cobs(dummy_bank_pix_api: DummyBankPixAPIBase) -> None:
-    dummy_bank_pix_api.session.get.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     inicio = '2024-01-01T00:00:00Z'
     fim = '2024-01-31T23:59:59Z'
     result = dummy_bank_pix_api.consultar_cobs(inicio, fim, cpf='12345678901')
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.get.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.get.call_args
-    assert args[0].endswith('/cob')
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert args[1].endswith('/cob')
     assert kwargs['params']['inicio'] == inicio
     assert kwargs['params']['fim'] == fim
     assert kwargs['params']['cpf'] == '12345678901'

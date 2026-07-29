@@ -15,7 +15,7 @@ Esta classe é herdada por implementações específicas de bancos (ex: Banco do
 
 Dependências:
 - session HTTP compatível (ex: requests.Session)
-- Métodos auxiliares: `_create_headers()`, `get_base_url()`
+- Método auxiliar: `_request()`, fornecido por `BankPixAPIBase`
 
 Exemplo de uso:
     class MeuBanco(WebHookCobrMethods):
@@ -50,12 +50,9 @@ class WebHookCobrMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/webhookcobr')
         body = {'webhookUrl': webhook_url}
-        resp = self.session.put(url, headers=headers, json=body)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('PUT', '/webhookcobr', json=body)
+        return self._json_opcional(resp)
 
     def consultar_webhook_cobr(self) -> dict[str, Any]:
         """
@@ -69,11 +66,8 @@ class WebHookCobrMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/webhookcobr')
-        resp = self.session.get(url, headers=headers)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', '/webhookcobr')
+        return self._json(resp)
 
     def excluir_webhook_cobr(self) -> bool:
         """
@@ -87,8 +81,8 @@ class WebHookCobrMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/webhookcobr')
-        resp = self.session.delete(url, headers=headers)
-        self._handle_error_response(resp)
-        return resp.status_code == 204
+        resp = self._request('DELETE', '/webhookcobr')
+        # `_request` já levantou em caso de erro: qualquer 2xx é exclusão
+        # bem-sucedida. A especificação prevê 204, mas um PSP que responda
+        # 200 não deve ser lido como "não excluiu".
+        return resp.ok

@@ -16,7 +16,7 @@ Esta classe é herdada por implementações específicas de bancos (ex: Banco do
 
 Dependências:
 - session HTTP compatível (ex: requests.Session)
-- Métodos auxiliares: `_create_headers()`, `get_base_url()`
+- Método auxiliar: `_request()`, fornecido por `BankPixAPIBase`
 
 Exemplo de uso:
     class MeuBanco(CobMethods):
@@ -52,11 +52,8 @@ class CobMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/cob/{txid}')
-        resp = self.session.put(url, headers=headers, json=body)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('PUT', f'/cob/{txid}', json=body)
+        return self._json(resp)
 
     def criar_cob_auto_txid(self, body: dict[str, Any]) -> dict[str, Any]:
         """
@@ -73,11 +70,8 @@ class CobMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/cob')
-        resp = self.session.post(url, headers=headers, json=body)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('POST', '/cob', json=body)
+        return self._json(resp)
 
     def revisar_cob(self, txid: str, body: dict[str, Any]) -> dict[str, Any]:
         """
@@ -96,11 +90,8 @@ class CobMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/cob/{txid}')
-        resp = self.session.patch(url, headers=headers, json=body)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('PATCH', f'/cob/{txid}', json=body)
+        return self._json(resp)
 
     def consultar_cob(self, txid: str, revisao: int | None = None) -> dict[str, Any]:
         """
@@ -118,16 +109,13 @@ class CobMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/cob/{txid}')
         params = {}
 
         if revisao is not None:
             params['revisao'] = revisao
 
-        resp = self.session.get(url, headers=headers, params=params)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', f'/cob/{txid}', params=params)
+        return self._json(resp)
 
     def consultar_cobs(
         self,
@@ -166,8 +154,6 @@ class CobMethods:  # pylint: disable=E1101
         if cpf and cnpj:
             raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
-        headers = self._create_headers()
-        url = self._endpoint_url('/cob')
         params = {'inicio': inicio, 'fim': fim}
 
         # Adiciona parâmetros opcionais se fornecidos
@@ -184,6 +170,5 @@ class CobMethods:  # pylint: disable=E1101
         if itens_por_pagina is not None:
             params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
-        resp = self.session.get(url, headers=headers, params=params)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', '/cob', params=params)
+        return self._json(resp)

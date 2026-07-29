@@ -22,7 +22,7 @@ Esta classe é herdada por implementações específicas de bancos (ex: Banco do
 
 Dependências:
 - session HTTP compatível (ex: requests.Session)
-- Métodos auxiliares: `_create_headers()`, `get_base_url()`
+- Método auxiliar: `_request()`, fornecido por `BankPixAPIBase`
 
 Exemplo de uso:
     class MeuBanco(LoteCobVMethods):
@@ -65,11 +65,8 @@ class LoteCobVMethods:  # pylint: disable=E1101
             Este endpoint retorna status 202 (Accepted) pois a criação do lote
             é processada de forma assíncrona.
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/lotecobv/{id_lote}')
-        resp = self.session.put(url, headers=headers, json=body)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('PUT', f'/lotecobv/{id_lote}', json=body)
+        return self._json_opcional(resp)
 
     def alterar_lote_cobv(self, id_lote: str, body: dict[str, Any]) -> dict[str, Any]:
         """
@@ -96,11 +93,8 @@ class LoteCobVMethods:  # pylint: disable=E1101
             Uma vez criado um lote, não se pode remover ou adicionar cobranças
             a este lote. Apenas alterações nas cobranças existentes são permitidas.
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/lotecobv/{id_lote}')
-        resp = self.session.patch(url, headers=headers, json=body)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('PATCH', f'/lotecobv/{id_lote}', json=body)
+        return self._json_opcional(resp)
 
     def consultar_lote_cobv(self, id_lote: str) -> dict[str, Any]:
         """
@@ -122,11 +116,8 @@ class LoteCobVMethods:  # pylint: disable=E1101
             criação de cobrança esteja em status "NEGADA", o atributo `problema`
             será preenchido com detalhes do erro.
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/lotecobv/{id_lote}')
-        resp = self.session.get(url, headers=headers)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', f'/lotecobv/{id_lote}')
+        return self._json(resp)
 
     def listar_lotes_cobv(
         self,
@@ -158,8 +149,6 @@ class LoteCobVMethods:  # pylint: disable=E1101
             Os parâmetros de paginação são opcionais. Se não informados,
             serão utilizados os valores padrão do PSP.
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/lotecobv')
         params = {'inicio': inicio, 'fim': fim}
 
         # Adiciona parâmetros opcionais se fornecidos
@@ -168,6 +157,5 @@ class LoteCobVMethods:  # pylint: disable=E1101
         if itens_por_pagina is not None:
             params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
-        resp = self.session.get(url, headers=headers, params=params)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', '/lotecobv', params=params)
+        return self._json(resp)

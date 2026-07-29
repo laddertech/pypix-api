@@ -4,6 +4,7 @@ import pytest
 
 from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.banks.base import BankPixAPIBase
+from tests.conftest import make_response
 
 
 class DummyBankPixAPIBaseSolicRec(BankPixAPIBase):
@@ -38,8 +39,8 @@ def dummy_bank_pix_api() -> DummyBankPixAPIBaseSolicRec:
 
 def test_criar_solicrec(dummy_bank_pix_api) -> None:
     """Test criar_solicrec method."""
-    dummy_bank_pix_api.session.post.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     body = {
         'calendario': {'expiracao': 3600},
@@ -47,53 +48,53 @@ def test_criar_solicrec(dummy_bank_pix_api) -> None:
     }
     result = dummy_bank_pix_api.criar_solicrec(body)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.post.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.post.call_args
-    assert args[0].endswith('/solicrec')
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert args[1].endswith('/solicrec')
     assert kwargs['json'] == body
     assert 'headers' in kwargs
 
 
 def test_consultar_solicrec(dummy_bank_pix_api) -> None:
     """Test consultar_solicrec method."""
-    dummy_bank_pix_api.session.get.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     id_solic_rec = 'solic123'
     result = dummy_bank_pix_api.consultar_solicrec(id_solic_rec)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.get.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.get.call_args
-    assert id_solic_rec in args[0]
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert id_solic_rec in args[1]
     assert 'headers' in kwargs
 
 
 def test_revisar_solicrec(dummy_bank_pix_api) -> None:
     """Test revisar_solicrec method."""
-    dummy_bank_pix_api.session.patch.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     id_solic_rec = 'solic456'
     body = {'status': 'CANCELADA'}
     result = dummy_bank_pix_api.revisar_solicrec(id_solic_rec, body)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.patch.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.patch.call_args
-    assert id_solic_rec in args[0]
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert id_solic_rec in args[1]
     assert kwargs['json'] == body
     assert 'headers' in kwargs
 
 
 def test_cancelar_solicrec(dummy_bank_pix_api) -> None:
     """Test cancelar_solicrec method."""
-    dummy_bank_pix_api.session.patch.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     id_solic_rec = 'solic789'
     result = dummy_bank_pix_api.cancelar_solicrec(id_solic_rec)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.patch.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.patch.call_args
-    assert id_solic_rec in args[0]
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert id_solic_rec in args[1]
     assert kwargs['json'] == {'status': 'CANCELADA'}
     assert 'headers' in kwargs

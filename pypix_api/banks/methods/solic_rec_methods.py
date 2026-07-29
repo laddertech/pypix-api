@@ -6,7 +6,7 @@ solicitações de confirmação de recorrência via API Pix. Deve ser herdada po
 a interface de comunicação com bancos que suportam o recurso de SolicRec.
 
 Requisitos:
-    - A classe base deve fornecer os métodos auxiliares `_create_headers()` e `get_base_url()`.
+    - A classe base deve fornecer o método auxiliar `_request()`.
     - Atributo `session` deve ser uma instância de requests.Session ou compatível.
 
 Exemplo de uso:
@@ -50,13 +50,10 @@ class SolicRecMethods:  # pylint: disable=E1101
             }
             resposta = self.criar_solicrec(body)
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/solicrec')
 
-        resp = self.session.post(url, headers=headers, json=body)
-        self._handle_error_response(resp, error_class=None)
+        resp = self._request('POST', '/solicrec', json=body)
 
-        return resp.json()
+        return self._json(resp)
 
     def consultar_solicrec(self, id_solic_rec: str) -> dict[str, Any]:
         """
@@ -74,13 +71,10 @@ class SolicRecMethods:  # pylint: disable=E1101
         Exemplo:
             dados = self.consultar_solicrec("123e4567-e89b-12d3-a456-426614174000")
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/solicrec/{id_solic_rec}')
 
-        resp = self.session.get(url, headers=headers)
-        self._handle_error_response(resp, error_class=None)
+        resp = self._request('GET', f'/solicrec/{id_solic_rec}')
 
-        return resp.json()
+        return self._json(resp)
 
     def revisar_solicrec(
         self, id_solic_rec: str, body: dict[str, Any]
@@ -110,13 +104,10 @@ class SolicRecMethods:  # pylint: disable=E1101
             body = {"status": StatusSolicRec.CANCELADA.value}
             resposta = self.revisar_solicrec("123e4567-e89b-12d3-a456-426614174000", body)
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/solicrec/{id_solic_rec}')
 
-        resp = self.session.patch(url, headers=headers, json=body)
-        self._handle_error_response(resp, error_class=None)
+        resp = self._request('PATCH', f'/solicrec/{id_solic_rec}', json=body)
 
-        return resp.json()
+        return self._json(resp)
 
     def cancelar_solicrec(self, id_solic_rec: str) -> dict[str, Any]:
         """

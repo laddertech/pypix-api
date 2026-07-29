@@ -19,7 +19,7 @@ Esta classe é herdada por implementações específicas de bancos (ex: Banco do
 
 Dependências:
 - session HTTP compatível (ex: requests.Session)
-- Métodos auxiliares: `_create_headers()`, `get_base_url()`
+- Método auxiliar: `_request()`, fornecido por `BankPixAPIBase`
 
 Exemplo de uso:
     class MeuBanco(LocRecMethods):
@@ -57,11 +57,8 @@ class LocRecMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/locrec')
-        resp = self.session.post(url, headers=headers, json={})
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('POST', '/locrec', json={})
+        return self._json(resp)
 
     def listar_locations_rec(
         self,
@@ -89,8 +86,6 @@ class LocRecMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/locrec')
         params: dict[str, Any] = {'inicio': inicio, 'fim': fim}
 
         if id_rec_presente is not None:
@@ -100,9 +95,8 @@ class LocRecMethods:  # pylint: disable=E1101
         if itens_por_pagina is not None:
             params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
-        resp = self.session.get(url, headers=headers, params=params)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', '/locrec', params=params)
+        return self._json(resp)
 
     def consultar_location_rec(self, id_loc: int) -> dict[str, Any]:
         """
@@ -123,11 +117,8 @@ class LocRecMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/locrec/{id_loc}')
-        resp = self.session.get(url, headers=headers)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', f'/locrec/{id_loc}')
+        return self._json(resp)
 
     def desvincular_idrec_location(self, id_loc: int) -> dict[str, Any]:
         """
@@ -145,8 +136,5 @@ class LocRecMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/locrec/{id_loc}/idRec')
-        resp = self.session.delete(url, headers=headers)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('DELETE', f'/locrec/{id_loc}/idRec')
+        return self._json(resp)

@@ -13,6 +13,7 @@ import pytest
 from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.banks.sicredi import SicrediPixAPI
 from pypix_api.scopes import ScopeRegistry, get_pix_scopes
+from tests.conftest import make_response
 
 SANDBOX_BASE = 'https://api-pix-h.sicredi.com.br/api'
 
@@ -73,32 +74,26 @@ def test_endpoint_url_producao_usa_host_de_producao() -> None:
 
 
 def test_criar_cob_usa_v3(sicredi_pix_api: SicrediPixAPI) -> None:
-    sicredi_pix_api.session.put.return_value = MagicMock(
-        json=lambda: {'txid': 'abc'}, raise_for_status=lambda: None
-    )
+    sicredi_pix_api.session.request.return_value = make_response(200, {'txid': 'abc'})
     sicredi_pix_api.criar_cob('abc', {'valor': {'original': '1.00'}})
-    args, _ = sicredi_pix_api.session.put.call_args
-    assert args[0] == f'{SANDBOX_BASE}/v3/cob/abc'
+    args, _ = sicredi_pix_api.session.request.call_args
+    assert args[1] == f'{SANDBOX_BASE}/v3/cob/abc'
 
 
 def test_consultar_cobs_usa_v2(sicredi_pix_api: SicrediPixAPI) -> None:
-    sicredi_pix_api.session.get.return_value = MagicMock(
-        json=lambda: {'cobs': []}, raise_for_status=lambda: None
-    )
+    sicredi_pix_api.session.request.return_value = make_response(200, {'cobs': []})
     sicredi_pix_api.consultar_cobs(
         inicio='2025-01-01T00:00:00Z', fim='2025-01-31T23:59:59Z'
     )
-    args, _ = sicredi_pix_api.session.get.call_args
-    assert args[0] == f'{SANDBOX_BASE}/v2/cob'
+    args, _ = sicredi_pix_api.session.request.call_args
+    assert args[1] == f'{SANDBOX_BASE}/v2/cob'
 
 
 def test_criar_recorrencia_usa_v1(sicredi_pix_api: SicrediPixAPI) -> None:
-    sicredi_pix_api.session.post.return_value = MagicMock(
-        json=lambda: {'idRec': 'RR1'}, raise_for_status=lambda: None
-    )
+    sicredi_pix_api.session.request.return_value = make_response(200, {'idRec': 'RR1'})
     sicredi_pix_api.criar_recorrencia({'vinculo': {}})
-    args, _ = sicredi_pix_api.session.post.call_args
-    assert args[0] == f'{SANDBOX_BASE}/v1/rec'
+    args, _ = sicredi_pix_api.session.request.call_args
+    assert args[1] == f'{SANDBOX_BASE}/v1/rec'
 
 
 # --- Identidade do banco e escopos --------------------------------------------
@@ -140,13 +135,10 @@ def test_get_token_com_client_secret_usa_basic() -> None:
     )
     captured: dict = {}
 
-    def fake_post(url: str, data=None, headers=None):  # type: ignore[no-untyped-def]
+    def fake_post(url: str, data=None, headers=None, timeout=None):  # type: ignore[no-untyped-def]
         captured['data'] = data
         captured['headers'] = headers
-        return MagicMock(
-            json=lambda: {'access_token': 'tok', 'expires_in': 3600},
-            raise_for_status=lambda: None,
-        )
+        return make_response(200, {'access_token': 'tok', 'expires_in': 3600})
 
     client.session.post = fake_post  # type: ignore[method-assign]
     token = client.get_token('cob.read')
@@ -167,13 +159,10 @@ def test_get_token_sem_client_secret_mantem_fluxo_padrao() -> None:
     )
     captured: dict = {}
 
-    def fake_post(url: str, data=None, headers=None):  # type: ignore[no-untyped-def]
+    def fake_post(url: str, data=None, headers=None, timeout=None):  # type: ignore[no-untyped-def]
         captured['data'] = data
         captured['headers'] = headers
-        return MagicMock(
-            json=lambda: {'access_token': 'tok', 'expires_in': 3600},
-            raise_for_status=lambda: None,
-        )
+        return make_response(200, {'access_token': 'tok', 'expires_in': 3600})
 
     client.session.post = fake_post  # type: ignore[method-assign]
     client.get_token('pix.read')

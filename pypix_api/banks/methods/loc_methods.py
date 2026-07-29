@@ -19,7 +19,7 @@ Esta classe é herdada por implementações específicas de bancos (ex: Banco do
 
 Dependências:
 - session HTTP compatível (ex: requests.Session)
-- Métodos auxiliares: `_create_headers()`, `get_base_url()`
+- Método auxiliar: `_request()`, fornecido por `BankPixAPIBase`
 
 Exemplo de uso:
     class MeuBanco(LocMethods):
@@ -61,12 +61,9 @@ class LocMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/loc')
         body = {'tipoCob': tipo_cob}
-        resp = self.session.post(url, headers=headers, json=body)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('POST', '/loc', json=body)
+        return self._json(resp)
 
     def listar_locations(
         self,
@@ -96,8 +93,6 @@ class LocMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/loc')
         params: dict[str, Any] = {'inicio': inicio, 'fim': fim}
 
         if txid_presente is not None:
@@ -109,9 +104,8 @@ class LocMethods:  # pylint: disable=E1101
         if itens_por_pagina is not None:
             params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
-        resp = self.session.get(url, headers=headers, params=params)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', '/loc', params=params)
+        return self._json(resp)
 
     def consultar_location(self, id_loc: int) -> dict[str, Any]:
         """
@@ -133,11 +127,8 @@ class LocMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/loc/{id_loc}')
-        resp = self.session.get(url, headers=headers)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', f'/loc/{id_loc}')
+        return self._json(resp)
 
     def desvincular_txid_location(self, id_loc: int) -> dict[str, Any]:
         """
@@ -155,8 +146,5 @@ class LocMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/loc/{id_loc}/txid')
-        resp = self.session.delete(url, headers=headers)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('DELETE', f'/loc/{id_loc}/txid')
+        return self._json(resp)

@@ -42,11 +42,8 @@ class RecMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/rec')
-        resp = self.session.post(url, headers=headers, json=body)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('POST', '/rec', json=body)
+        return self._json(resp)
 
     def revisar_recorrencia(self, id_rec: str, body: dict[str, Any]) -> dict[str, Any]:
         """
@@ -79,11 +76,8 @@ class RecMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/rec/{id_rec}')
-        resp = self.session.patch(url, headers=headers, json=body)
-        self._handle_error_response(resp, error_class=None)
-        return resp.json()
+        resp = self._request('PATCH', f'/rec/{id_rec}', json=body)
+        return self._json(resp)
 
     def cancelar_recorrencia(self, id_rec: str) -> dict[str, Any]:
         """
@@ -114,14 +108,11 @@ class RecMethods:  # pylint: disable=E1101
         """
         Consultar uma recorrência específica.
         """
-        headers = self._create_headers()
         params = {}
         if txid:
             params['txid'] = txid
-        url = self._endpoint_url(f'/rec/{id_rec}')
-        resp = self.session.get(url, headers=headers, params=params)
-        self._handle_error_response(resp, error_class=None)
-        return resp.json()
+        resp = self._request('GET', f'/rec/{id_rec}', params=params)
+        return self._json(resp)
 
     def listar_recorrencias(
         self,
@@ -141,7 +132,6 @@ class RecMethods:  # pylint: disable=E1101
         if cpf and cnpj:
             raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
-        headers = self._create_headers()
         params = {'inicio': inicio, 'fim': fim}
         if cpf:
             params['cpf'] = cpf
@@ -158,7 +148,5 @@ class RecMethods:  # pylint: disable=E1101
         if itens_por_pagina is not None:
             params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
-        url = self._endpoint_url('/rec')
-        resp = self.session.get(url, headers=headers, params=params)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', '/rec', params=params)
+        return self._json(resp)

@@ -7,6 +7,14 @@ import requests
 from dotenv import load_dotenv
 
 from pypix_api.auth.mtls import get_session_with_mtls
+from pypix_api.exceptions import (
+    PixAPIException,
+    PixConexaoException,
+    PixRespostaInvalidaError,
+    PixTimeoutException,
+    excecao_para_status,
+)
+from pypix_api.http import DEFAULT_TIMEOUT, Timeout, texto_do_corpo
 
 
 class OAuth2Client:
@@ -22,6 +30,7 @@ class OAuth2Client:
         pwd_pfx: str | None = None,
         sandbox_mode: bool = False,
         client_secret: str | None = None,
+        timeout: Timeout | None = None,
     ) -> None:
         """Inicializa o cliente OAuth2
 
@@ -40,6 +49,10 @@ class OAuth2Client:
                 padrão (client_id no corpo, autenticação de cliente via mTLS).
                 Mantido como último parâmetro para preservar a ordem posicional
                 histórica da assinatura.
+            timeout: Tempo limite da requisição de token, no formato aceito pelo
+                ``requests``: um número ou a tupla ``(conexão, leitura)``.
+                ``None`` usa :data:`DEFAULT_TIMEOUT`. Para leitura sem limite,
+                use ``(5.0, None)``.
         """
         load_dotenv()
 
@@ -53,6 +66,7 @@ class OAuth2Client:
         self.token_url: str = token_url  # URL de autenticação OAuth2
         self.token_cache: dict[str, dict[str, Any]] = {}  # Cache de tokens por escopo
         self.session: requests.Session = requests.Session()
+        self.timeout: Timeout = DEFAULT_TIMEOUT if timeout is None else timeout
 
         self.sandbox_mode = sandbox_mode
 
@@ -103,16 +117,91 @@ class OAuth2Client:
             # autenticado via mTLS. Comportamento inalterado.
             token_data['client_id'] = self.client_id
 
-        response = self.session.post(self.token_url, data=token_data, headers=headers)
-        response.raise_for_status()
+        try:
+            response = self.session.post(
+                self.token_url,
+                data=token_data,
+                headers=headers,
+                timeout=self.timeout,
+            )
+        except requests.Timeout as exc:
+            raise PixTimeoutException(
+                detail=f'Requisição de token excedeu o tempo limite '
+                f'({self.timeout}): {exc}'
+            ) from exc
+        except requests.RequestException as exc:
+            raise PixConexaoException(
+                detail=f'Falha ao solicitar token em {self.token_url}: {exc}'
+            ) from exc
 
-        token_info = response.json()
+        if not response.ok:
+            raise self._erro_do_token(response)
+
+        token_info = self._le_token(response)
         token_info['expires_at'] = time.time() + token_info['expires_in']
 
         # Armazena o token no cache por escopo
         self.token_cache[scope] = token_info
 
         return token_info['access_token']
+
+    @staticmethod
+    def _corpo_json(response: requests.Response) -> dict[str, Any]:
+        """Devolve o corpo JSON quando for um objeto; caso contrário, ``{}``."""
+        try:
+            dados = response.json()
+        except ValueError:
+            return {}
+        return dados if isinstance(dados, dict) else {}
+
+    def _erro_do_token(self, response: requests.Response) -> PixAPIException:
+        """Converte um erro do endpoint de token para a hierarquia da biblioteca.
+
+        O corpo segue a RFC 6749 (``error``/``error_description``), não o
+        ``problem+json`` do BACEN — por isso o tratamento é próprio, e não o
+        ``_handle_error_response`` dos bancos.
+        """
+        dados = self._corpo_json(response)
+        erro = str(dados.get('error') or '')
+        descricao = str(dados.get('error_description') or '')
+        detail = ': '.join(parte for parte in (erro, descricao) if parte)
+        if not detail and response.content:
+            detail = texto_do_corpo(response)
+
+        return excecao_para_status(response.status_code)(
+            type_=erro,
+            title=f'Falha ao obter token em {self.token_url}',
+            status=response.status_code,
+            detail=detail,
+        )
+
+    def _le_token(self, response: requests.Response) -> dict[str, Any]:
+        """Valida o corpo da resposta de token.
+
+        Sem isto, um 200 com corpo vazio ou sem ``access_token`` estouraria com
+        ``JSONDecodeError``/``KeyError`` no meio da chamada de negócio.
+        """
+        dados = self._corpo_json(response)
+        if not isinstance(dados.get('access_token'), str) or not dados['access_token']:
+            raise PixRespostaInvalidaError(
+                '',
+                'Resposta de token inválida',
+                response.status_code,
+                f'`access_token` ausente ou inválido na resposta de {self.token_url}',
+            )
+        try:
+            # `expires_in` pode vir como string; sem converter, a soma com
+            # time.time() estoura TypeError fora da hierarquia da biblioteca.
+            dados['expires_in'] = int(dados['expires_in'])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise PixRespostaInvalidaError(
+                '',
+                'Resposta de token inválida',
+                response.status_code,
+                f'`expires_in` ausente ou não numérico na resposta de '
+                f'{self.token_url}: {dados.get("expires_in")!r}',
+            ) from exc
+        return dados
 
     def _is_token_expired(self, scope: str) -> bool:
         """Verifica se o token para o escopo especificado expirou"""

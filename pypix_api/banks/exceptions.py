@@ -1,33 +1,39 @@
-class PixAPIException(Exception):
-    """Exceção base para erros da API Pix."""
+"""Reexporta a hierarquia de exceções, definida em :mod:`pypix_api.exceptions`.
 
-    def __init__(self, type_: str, title: str, status: int, detail: str):
-        self.type = type_
-        self.title = title
-        self.status = status
-        self.detail = detail
-        super().__init__(f'{title} ({status}): {detail} [{type_}]')
+As classes moraram aqui até a 0.10.0 e continuam importáveis deste módulo; a
+definição foi movida para fora de ``banks/`` porque o ``auth/`` também a usa.
+"""
 
+from pypix_api.exceptions import (
+    EXCECOES_POR_STATUS,
+    PixAcessoNegadoException,
+    PixAPIException,
+    PixConexaoException,
+    PixErroDesconhecidoException,
+    PixErroServicoIndisponivelException,
+    PixErroServidorException,
+    PixErroTransporteException,
+    PixErroValidacaoException,
+    PixNaoAutorizadoException,
+    PixRecursoNaoEncontradoException,
+    PixRespostaInvalidaError,
+    PixTimeoutException,
+    excecao_para_status,
+)
 
-class PixAcessoNegadoException(PixAPIException):
-    """Erro de acesso negado (403)."""
-
-
-class PixRecursoNaoEncontradoException(PixAPIException):
-    """Erro de recurso não encontrado (404)."""
-
-
-class PixErroValidacaoException(PixAPIException):
-    """Erro de validação (400)."""
-
-
-class PixErroServicoIndisponivelException(PixAPIException):
-    """Erro de serviço indisponível (503)."""
-
-
-class PixErroDesconhecidoException(PixAPIException):
-    """Erro desconhecido da API Pix."""
-
-
-class PixRespostaInvalidaError(PixAPIException):
-    """Erro quando a resposta da API não está no formato esperado"""
+__all__ = [
+    'EXCECOES_POR_STATUS',
+    'PixAPIException',
+    'PixAcessoNegadoException',
+    'PixConexaoException',
+    'PixErroDesconhecidoException',
+    'PixErroServicoIndisponivelException',
+    'PixErroServidorException',
+    'PixErroTransporteException',
+    'PixErroValidacaoException',
+    'PixNaoAutorizadoException',
+    'PixRecursoNaoEncontradoException',
+    'PixRespostaInvalidaError',
+    'PixTimeoutException',
+    'excecao_para_status',
+]

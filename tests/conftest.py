@@ -1,5 +1,6 @@
 """Configuração compartilhada para testes do pypix-api."""
 
+import json
 import os
 from collections.abc import Generator
 from typing import Any
@@ -7,6 +8,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 import requests
+
+from pypix_api.http import DEFAULT_TIMEOUT
 
 
 @pytest.fixture(scope='session')
@@ -54,18 +57,67 @@ def mock_env_vars(test_env_vars: dict[str, str]) -> Generator[None, None, None]:
         yield
 
 
+def make_response(
+    status_code: int,
+    json_body: Any | None = None,
+    content_type: str = 'application/json',
+    content: bytes | None = None,
+) -> requests.Response:
+    """Monta um ``requests.Response`` real.
+
+    Usado no lugar de ``Mock`` sempre que o teste precisar passar pelo
+    ``_handle_error_response``: com um mock, o handler recebia um objeto que não
+    se comporta como resposta HTTP e o tratamento de erro nunca era exercitado.
+    """
+    response = requests.Response()
+    response.status_code = status_code
+    if content is not None:
+        response._content = content
+    elif json_body is not None:
+        # ensure_ascii=False para que o corpo tenha acentuação real, como a de
+        # um PSP — o texto cru é preservado em `detail` quando o formato não é
+        # o do BACEN, e o escape \uXXXX mascararia isso nos testes
+        response._content = json.dumps(json_body, ensure_ascii=False).encode()
+    else:
+        response._content = b''
+    if content_type:
+        response.headers['Content-Type'] = content_type
+    return response
+
+
+def assert_requisicao(
+    session: Mock,
+    metodo: str,
+    url: str,
+    *,
+    timeout: Any = DEFAULT_TIMEOUT,
+    **kwargs_esperados: Any,
+) -> None:
+    """Confere a única requisição feita na sessão mockada.
+
+    Verifica verbo, URL, os kwargs informados e — sempre — que a requisição
+    levou timeout. Os headers não são conferidos aqui: são montados pelo
+    ``_request`` e testados em ``test_request_base``.
+    """
+    session.request.assert_called_once()
+    args, kwargs = session.request.call_args
+    assert args[0] == metodo
+    assert args[1] == url
+    assert kwargs['timeout'] == timeout
+    for chave, esperado in kwargs_esperados.items():
+        assert kwargs[chave] == esperado
+
+
 @pytest.fixture
 def mock_session() -> Mock:
     """Fixture que retorna uma sessão HTTP mockada."""
     session = Mock(spec=requests.Session)
 
     # Mock response padrão
-    mock_response = Mock()
-    mock_response.status_code = 200
-    mock_response.json.return_value = {'success': True, 'data': {}}
-    mock_response.headers = {'Content-Type': 'application/json'}
+    mock_response = make_response(200, {'success': True, 'data': {}})
 
-    # Configura métodos HTTP
+    # Toda saída HTTP da biblioteca passa por session.request
+    session.request.return_value = mock_response
     session.get.return_value = mock_response
     session.post.return_value = mock_response
     session.put.return_value = mock_response
@@ -202,48 +254,45 @@ def mock_sicoob_responses() -> dict[str, dict[str, Any]]:
 
 
 @pytest.fixture
-def mock_error_response() -> Mock:
-    """Fixture que retorna uma resposta de erro mockada."""
-    response = Mock()
-    response.status_code = 400
-    response.headers = {'Content-Type': 'application/json'}
-    response.json.return_value = {
-        'type': 'ErroValidacao',
-        'title': 'Erro de validação',
-        'status': 400,
-        'detail': 'Dados inválidos fornecidos',
-    }
-    return response
+def mock_error_response() -> requests.Response:
+    """Resposta 400 real, para exercitar o tratamento de erro."""
+    return make_response(
+        400,
+        {
+            'type': 'ErroValidacao',
+            'title': 'Erro de validação',
+            'status': 400,
+            'detail': 'Dados inválidos fornecidos',
+        },
+    )
 
 
 @pytest.fixture
-def mock_unauthorized_response() -> Mock:
-    """Fixture que retorna uma resposta 403 mockada."""
-    response = Mock()
-    response.status_code = 403
-    response.headers = {'Content-Type': 'application/json'}
-    response.json.return_value = {
-        'type': 'AcessoNegado',
-        'title': 'Acesso negado',
-        'status': 403,
-        'detail': 'Token inválido ou expirado',
-    }
-    return response
+def mock_unauthorized_response() -> requests.Response:
+    """Resposta 403 real, para exercitar o tratamento de erro."""
+    return make_response(
+        403,
+        {
+            'type': 'AcessoNegado',
+            'title': 'Acesso negado',
+            'status': 403,
+            'detail': 'Token inválido ou expirado',
+        },
+    )
 
 
 @pytest.fixture
-def mock_not_found_response() -> Mock:
-    """Fixture que retorna uma resposta 404 mockada."""
-    response = Mock()
-    response.status_code = 404
-    response.headers = {'Content-Type': 'application/json'}
-    response.json.return_value = {
-        'type': 'RecursoNaoEncontrado',
-        'title': 'Recurso não encontrado',
-        'status': 404,
-        'detail': 'O recurso solicitado não foi encontrado',
-    }
-    return response
+def mock_not_found_response() -> requests.Response:
+    """Resposta 404 real, para exercitar o tratamento de erro."""
+    return make_response(
+        404,
+        {
+            'type': 'RecursoNaoEncontrado',
+            'title': 'Recurso não encontrado',
+            'status': 404,
+            'detail': 'O recurso solicitado não foi encontrado',
+        },
+    )
 
 
 @pytest.fixture

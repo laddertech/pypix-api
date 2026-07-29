@@ -280,6 +280,72 @@ oauth = OAuth2Client(
 banco = BBPixAPI(oauth=oauth)  # Ou SicoobPixAPI(oauth=oauth) / SicrediPixAPI(oauth=oauth)
 ```
 
+### Timeout
+
+Toda requisição da biblioteca — incluindo a de token — leva timeout. O padrão é
+`(5s para conectar, 30s para ler)`.
+
+**O banco e o `OAuth2Client` têm timeouts independentes** — só o valor padrão é comum. Para
+ajustar as duas pontas, informe em cada uma:
+
+```python
+oauth = OAuth2Client(token_url=..., client_id=..., timeout=(5.0, 15.0))  # requisição de token
+banco = BBPixAPI(oauth=oauth, timeout=(5.0, 60.0))                       # chamadas de negócio
+banco = BBPixAPI(oauth=oauth, timeout=(5.0, None))                       # leitura sem limite
+```
+
+`timeout=None` significa "use o padrão", não "espere para sempre". Para leitura sem limite,
+use `(conexão, None)`, no formato nativo do `requests`.
+
+Um estouro de tempo levanta `PixTimeoutException`; uma falha de rede, `PixConexaoException`.
+Ambas herdam de `PixErroTransporteException` — que por sua vez herda de `PixAPIException`,
+então um único `except` cobre erros do PSP e falhas de transporte. Como não houve resposta
+HTTP, o atributo `status` dessas exceções é `None`.
+
+### Erros devolvidos pelo PSP
+
+Toda resposta de erro vira uma exceção tipada, inclusive quando o corpo vem vazio ou fora do
+padrão do BACEN — nesse caso o texto da resposta é preservado em `detail`, que é o que os PSPs
+pedem para abrir chamado:
+
+| Status | Exceção |
+|---|---|
+| 400 | `PixErroValidacaoException` |
+| 401 | `PixNaoAutorizadoException` |
+| 403 | `PixAcessoNegadoException` |
+| 404 | `PixRecursoNaoEncontradoException` |
+| 500 | `PixErroServidorException` |
+| 503 | `PixErroServicoIndisponivelException` |
+| outros | `PixErroDesconhecidoException` |
+
+O campo `violacoes` do corpo — onde o PSP explica a recusa de um 400 (chave Pix não encontrada,
+escopo negado, thumbprint incorreto) — fica disponível em `exc.violacoes` e entra na mensagem
+da exceção:
+
+```python
+try:
+    banco.criar_cob(txid, body)
+except PixErroValidacaoException as exc:
+    logger.warning('Cobrança recusada: %s', exc)   # inclui as violações
+    for violacao in exc.violacoes:
+        tratar(violacao['propriedade'], violacao['razao'])
+```
+
+### Idempotência: o que fazer depois de um timeout
+
+Um `PixTimeoutException` significa **estado desconhecido**, não "não criou": o PSP pode ter
+processado a requisição e apenas a resposta ter se perdido.
+
+| Operações | Depois de um timeout |
+|---|---|
+| `PUT /cob/{txid}`, `/cobv/{txid}`, `/cobr/{txid}`, `/lotecobv/{id}`, `/pix/{e2eid}/devolucao/{id}`, `/webhook/{chave}`, `/webhookrec`, `/webhookcobr` | Pode repetir — o identificador é seu |
+| `PATCH /cob/{txid}`, `/cobv/{txid}`, `/cobr/{txid}`, `/rec/{idRec}`, `/solicrec/{id}`, `/lotecobv/{id}` | Pode repetir; o contador de revisão sobe a cada chamada. Para cancelamento é seguro |
+| `POST /cob`, `/cobr`, `/rec`, `/solicrec`, `/loc`, `/locrec` | **Consulte antes de recriar** — o identificador é gerado pelo PSP |
+| `POST /cobr/{txid}/retentativa/{data}` | Consulte antes de repetir — comportamento não documentado pelo PSP |
+
+A biblioteca **não faz retry automático**. Repetição é decisão do consumidor, que é quem sabe
+se a operação é segura de repetir.
+
 ### URLs das APIs
 
 As URLs base e de token são definidas por cada classe de banco (`BASE_URL`/`TOKEN_URL`):

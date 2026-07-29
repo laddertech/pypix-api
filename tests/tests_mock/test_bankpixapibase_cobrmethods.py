@@ -9,6 +9,7 @@ import pytest
 
 from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.banks.base import BankPixAPIBase
+from tests.conftest import make_response
 
 
 class DummyBankPixAPIBase(BankPixAPIBase):
@@ -42,80 +43,80 @@ def dummy_bank_pix_api() -> DummyBankPixAPIBase:
 
 
 def test_criar_cobr_com_txid(dummy_bank_pix_api) -> None:
-    dummy_bank_pix_api.session.put.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     txid = 'txid_cobr'
     body = {'valor': 123}
     result = dummy_bank_pix_api.criar_cobr_com_txid(txid, body)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.put.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.put.call_args
-    assert txid in args[0]
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert txid in args[1]
     assert kwargs['json'] == body
 
 
 def test_revisar_cobr(dummy_bank_pix_api) -> None:
-    dummy_bank_pix_api.session.patch.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     txid = 'txid_cobr_revisar'
     body = {'valor': 456}
     result = dummy_bank_pix_api.revisar_cobr(txid, body)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.patch.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.patch.call_args
-    assert txid in args[0]
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert txid in args[1]
     assert kwargs['json'] == body
 
 
 def test_cancelar_cobr(dummy_bank_pix_api) -> None:
-    dummy_bank_pix_api.session.patch.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     txid = 'txid_cobr_cancelar'
     result = dummy_bank_pix_api.cancelar_cobr(txid)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.patch.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.patch.call_args
-    assert txid in args[0]
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert txid in args[1]
     assert kwargs['json'] == {'status': 'CANCELADA'}
 
 
 def test_consultar_cobr(dummy_bank_pix_api) -> None:
-    dummy_bank_pix_api.session.get.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     txid = 'txid_cobr_consultar'
     result = dummy_bank_pix_api.consultar_cobr(txid)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.get.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.get.call_args
-    assert txid in args[0]
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert txid in args[1]
 
 
 def test_criar_cobr(dummy_bank_pix_api) -> None:
-    dummy_bank_pix_api.session.post.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     body = {'valor': 789}
     result = dummy_bank_pix_api.criar_cobr(body)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.post.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.post.call_args
-    assert args[0].endswith('/cobr')
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert args[1].endswith('/cobr')
     assert kwargs['json'] == body
 
 
 def test_consultar_lista_cobr(dummy_bank_pix_api) -> None:
-    dummy_bank_pix_api.session.get.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     result = dummy_bank_pix_api.consultar_lista_cobr('2024-01-01', '2024-12-31')
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.get.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.get.call_args
-    assert args[0].endswith('/cobr')
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert args[1].endswith('/cobr')
 
 
 def test_consultar_lista_cobr_cpf_cnpj_error(dummy_bank_pix_api) -> None:
@@ -132,14 +133,14 @@ def test_consultar_lista_cobr_cpf_cnpj_error(dummy_bank_pix_api) -> None:
 
 
 def test_solicitar_retentativa_cobr(dummy_bank_pix_api) -> None:
-    dummy_bank_pix_api.session.post.return_value = MagicMock(
-        json=lambda: {'result': 'ok'}, raise_for_status=lambda: None
+    dummy_bank_pix_api.session.request.return_value = make_response(
+        200, {'result': 'ok'}
     )
     txid = 'txid_cobr_retentativa'
     data_retentativa = date(2024, 12, 31)
     result = dummy_bank_pix_api.solicitar_retentativa_cobr(txid, data_retentativa)
     assert result == {'result': 'ok'}
-    dummy_bank_pix_api.session.post.assert_called_once()
-    args, kwargs = dummy_bank_pix_api.session.post.call_args
-    assert txid in args[0]
-    assert '2024-12-31' in args[0]
+    dummy_bank_pix_api.session.request.assert_called_once()
+    args, kwargs = dummy_bank_pix_api.session.request.call_args
+    assert txid in args[1]
+    assert '2024-12-31' in args[1]

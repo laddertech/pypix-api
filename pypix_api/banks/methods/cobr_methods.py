@@ -45,11 +45,8 @@ class CobRMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/cobr/{txid}')
-        resp = self.session.put(url, headers=headers, json=body)
-        self._handle_error_response(resp, error_class=None)
-        return resp.json()
+        resp = self._request('PUT', f'/cobr/{txid}', json=body)
+        return self._json(resp)
 
     def revisar_cobr(self, txid: str, body: dict[str, Any]) -> dict[str, Any]:
         """Revisar cobrança recorrente.
@@ -80,11 +77,8 @@ class CobRMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/cobr/{txid}')
-        resp = self.session.patch(url, headers=headers, json=body)
-        self._handle_error_response(resp, error_class=None)
-        return resp.json()
+        resp = self._request('PATCH', f'/cobr/{txid}', json=body)
+        return self._json(resp)
 
     def cancelar_cobr(self, txid: str) -> dict[str, Any]:
         """Cancelar uma cobrança recorrente específica.
@@ -120,11 +114,8 @@ class CobRMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url(f'/cobr/{txid}')
-        resp = self.session.get(url, headers=headers)
-        self._handle_error_response(resp, error_class=None)
-        return resp.json()
+        resp = self._request('GET', f'/cobr/{txid}')
+        return self._json(resp)
 
     def criar_cobr(self, body: dict[str, Any]) -> dict[str, Any]:
         """Criar cobrança recorrente, onde o txid é definido pelo PSP.
@@ -138,11 +129,8 @@ class CobRMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 404, 503
         """
-        headers = self._create_headers()
-        url = self._endpoint_url('/cobr')
-        resp = self.session.post(url, headers=headers, json=body)
-        self._handle_error_response(resp, error_class=None)
-        return resp.json()
+        resp = self._request('POST', '/cobr', json=body)
+        return self._json(resp)
 
     def consultar_lista_cobr(
         self,
@@ -179,9 +167,6 @@ class CobRMethods:  # pylint: disable=E1101
         if cpf and cnpj:
             raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
-        headers = self._create_headers()
-        url = self._endpoint_url('/cobr')
-
         params = {'inicio': inicio, 'fim': fim}
 
         # Adicionar parâmetros opcionais se fornecidos
@@ -200,9 +185,8 @@ class CobRMethods:  # pylint: disable=E1101
         if itens_por_pagina is not None:
             params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
-        resp = self.session.get(url, headers=headers, params=params)
-        self._handle_error_response(resp, error_class=None)
-        return resp.json()
+        resp = self._request('GET', '/cobr', params=params)
+        return self._json(resp)
 
     def solicitar_retentativa_cobr(self, txid: str, data: date) -> dict[str, Any]:
         """Solicitar retentativa de uma cobrança recorrente.
@@ -217,9 +201,6 @@ class CobRMethods:  # pylint: disable=E1101
         Raises:
             HTTPError: Para erros 400, 403, 404, 503
         """
-        headers = self._create_headers()
         data_str = data.strftime('%Y-%m-%d')
-        url = self._endpoint_url(f'/cobr/{txid}/retentativa/{data_str}')
-        resp = self.session.post(url, headers=headers)
-        self._handle_error_response(resp, error_class=None)
-        return resp.json()
+        resp = self._request('POST', f'/cobr/{txid}/retentativa/{data_str}')
+        return self._json(resp)

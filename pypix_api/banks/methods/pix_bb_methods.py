@@ -14,7 +14,7 @@ pois os endpoints /pix-bb são exclusivos do Banco do Brasil.
 
 Dependências:
 - session HTTP compatível (ex: requests.Session)
-- Métodos auxiliares: `_create_headers()`, `get_base_url()`
+- Método auxiliar: `_request()`, fornecido por `BankPixAPIBase`
 
 Exemplo de uso::
 
@@ -137,8 +137,6 @@ class PixBBMethods:  # pylint: disable=E1101
         if cpf and cnpj:
             raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
-        headers = self._create_headers()
-        url = self._endpoint_url('/pix-bb')
         params = self._build_pix_bb_params(
             inicio,
             fim,
@@ -153,9 +151,8 @@ class PixBBMethods:  # pylint: disable=E1101
             itens_por_pagina,
         )
 
-        resp = self.session.get(url, headers=headers, params=params)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', '/pix-bb', params=params)
+        return self._json(resp)
 
     def consultar_devolucoes_bb(
         self,
@@ -196,8 +193,6 @@ class PixBBMethods:  # pylint: disable=E1101
         if cpf and cnpj:
             raise ValueError('CPF e CNPJ não podem ser utilizados simultaneamente')
 
-        headers = self._create_headers()
-        url = self._endpoint_url('/pix-bb/devolucoes')
         params: dict[str, Any] = {'inicio': inicio, 'fim': fim}
 
         if estado_devolucao:
@@ -211,6 +206,5 @@ class PixBBMethods:  # pylint: disable=E1101
         if itens_por_pagina is not None:
             params['paginacao.itensPorPagina'] = str(itens_por_pagina)
 
-        resp = self.session.get(url, headers=headers, params=params)
-        self._handle_error_response(resp)
-        return resp.json()
+        resp = self._request('GET', '/pix-bb/devolucoes', params=params)
+        return self._json(resp)
