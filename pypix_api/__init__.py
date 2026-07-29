@@ -4,7 +4,7 @@ Esta biblioteca facilita a integracao com APIs de bancos brasileiros,
 fornecendo uma interface simples e consistente para operacoes PIX.
 """
 
-__version__ = '0.11.0'
+__version__ = '0.12.0'
 __author__ = 'Fabio Thomaz'
 __email__ = 'fabio@ladder.dev.br'
 __license__ = 'MIT'

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-07-28
+
 ### Added
 - ✨ Parâmetro `scopes` em `BankPixAPIBase` (e portanto em `BBPixAPI`, `SicoobPixAPI` e
   `SicrediPixAPI`), aceitando `str`, `ScopeGroup` ou lista de ambos. Permite pedir ao PSP
