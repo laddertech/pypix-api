@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-07-28
+
 ### Added
 - ✨ Parâmetro `timeout` em `BankPixAPIBase` e `OAuth2Client`, no formato nativo do `requests`
   (um número ou a tupla `(conexão, leitura)`). Padrão: `(5.0, 30.0)`, exposto em
@@ -50,38 +52,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   substituíam o método por um fake. O desvio foi removido e os testes reescritos com
   `requests.Response` de verdade
 - 🐛 A requisição de token não tinha timeout e podia prender um worker indefinidamente
-- 🐛 Erros com corpo vazio (um 500 sem corpo, por exemplo) escapavam do tratamento: `excluir_webhook`
-  devolvia `False` — uma falha lida como "não excluiu" — e as demais chamadas vazavam
-  `JSONDecodeError`. Respostas sem corpo passam a ser aceitas apenas quando o status é de sucesso
-- 🐛 Erros cujo corpo não é JSON (HTML de proxy, texto puro) viravam `PixRespostaInvalidaError`,
-  descartando a informação do status. Agora viram a exceção do status, com o corpo em `detail`
+- 🐛 **Corpos de erro em `application/problem+json` eram descartados.** A especificação do BACEN
+  declara todo corpo de erro nesse content-type, e a checagem exigia `application/json` — com um PSP
+  conforme, o erro virava `PixRespostaInvalidaError` e `type`/`title`/`detail` se perdiam. Qualquer
+  subtipo JSON passa a ser reconhecido, inclusive com `charset` e tipos de fornecedor
+- 🐛 `criar_lote_cobv`, `alterar_lote_cobv` e os três `configurar_webhook*` levantavam
+  `PixRespostaInvalidaError` em chamadas **bem-sucedidas**: a especificação define 202 (lote) e 200
+  (webhook) sem corpo. A exigência de corpo passou do tratamento de erro para cada método
+- 🐛 Erros cujo corpo não é JSON (HTML de proxy, texto puro) ou cujo JSON foge ao padrão do BACEN
+  (formato próprio de gateway) produziam `PixRespostaInvalidaError` ou exceção com `detail` vazio,
+  descartando o status e o motivo da recusa. Agora viram a exceção do status, com o corpo em `detail`
 - 🐛 Corpo de erro em JSON válido mas fora do formato de objeto (`null`, lista, número) vazava
   `AttributeError`, porque `null` não levanta `ValueError` no `json()`. O mesmo valia para campos
   nulos (`"type": null`), que vazavam `TypeError`
 - 🐛 O `status` do corpo é coagido para inteiro: PSPs que o enviam como string (`"status": "404"`)
   caíam silenciosamente em `PixErroDesconhecidoException`
-- 🐛 Respostas 2xx sem corpo fora de 204/205 passavam pelo tratamento e vazavam `JSONDecodeError`
-  no `resp.json()` do método chamador. Agora levantam `PixRespostaInvalidaError`
-- 🐛 Itens de `violacoes` fora do formato de objeto (`[null]`, `["texto"]`, listas mistas) faziam a
-  **construção da exceção** estourar com `AttributeError`, destruindo o status e o detalhe do erro
-  que ela deveria descrever. Itens inválidos passam a ser descartados
 - 🐛 Erros HTTP do endpoint de token vazavam `requests.HTTPError`, fora da hierarquia da biblioteca —
   justamente no caminho percorrido antes de toda operação autenticada. Passam a virar a exceção do
   status, com `error`/`error_description` da RFC 6749 preservados em `detail`
 - 🐛 Uma resposta de token sem `access_token`/`expires_in` (200 vazio, `null`, objeto incompleto)
   estourava `JSONDecodeError` ou `KeyError` no meio da chamada de negócio. Agora levanta
   `PixRespostaInvalidaError`. `expires_in` como string é convertido em vez de estourar `TypeError`
-- 🐛 **Corpos de erro em `application/problem+json` eram descartados.** A especificação do BACEN
-  declara todo corpo de erro nesse content-type, e a checagem exigia `application/json` — com um PSP
-  conforme, `type`, `status` e `violacoes` se perdiam. Qualquer subtipo JSON passa a ser reconhecido
-- 🐛 `criar_lote_cobv`, `alterar_lote_cobv` e os três `configurar_webhook*` levantavam
-  `PixRespostaInvalidaError` em chamadas **bem-sucedidas**: a especificação define 202 (lote) e 200
-  (webhook) sem corpo. A decisão de exigir corpo passou do tratamento de erro para cada método
-- 🐛 Erros com corpo JSON fora do padrão do BACEN (formato próprio de gateway) produziam exceção com
-  `detail` vazio — a recusa chegava ao consumidor sem motivo algum
-- 🐛 Acentuação do corpo cru era corrompida quando o PSP não declarava `charset` no `Content-Type`
-  ("inválida" virava "inv√°lida" no log). JSON é UTF-8 por definição (RFC 8259)
-- 🐛 `extra_headers` em conflito levantava `ValueError` só depois de solicitar um token ao PSP
+- 🐛 Acentuação do corpo preservado em `detail` era corrompida quando o PSP não declarava `charset`
+  no `Content-Type` ("inválida" virava "inv√°lida" no log). JSON é UTF-8 por definição (RFC 8259)
 
 ## [0.10.0] - 2026-07-25
 
