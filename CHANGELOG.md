@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-14
+
 ### Changed
 - ♻️ `consultar_cobv(txid, revisao=None)`: `revisao` passa a ser opcional, como na
   especificação; chamadas com dois argumentos seguem funcionando
