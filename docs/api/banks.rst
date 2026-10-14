@@ -28,6 +28,19 @@ Sicredi
    :show-inheritance:
    :exclude-members: BASE_URL, TOKEN_URL, SANDBOX_BASE_URL, SANDBOX_TOKEN_URL
 
+Banco Inter
+-----------
+
+.. automodule:: pypix_api.banks.inter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :exclude-members: BASE_URL, TOKEN_URL, SANDBOX_BASE_URL, SANDBOX_TOKEN_URL
+
+.. automodule:: pypix_api.banks.methods.pix_inter_methods
+   :members:
+   :undoc-members:
+
 Base Classes
 ------------
 

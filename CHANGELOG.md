@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- ♻️ `consultar_cobv(txid, revisao=None)`: `revisao` passa a ser opcional, como na
+  especificação; chamadas com dois argumentos seguem funcionando
+
+### Added
+- ✨ Suporte ao Banco Inter (077): `InterPixAPI`, com Pix comum e Pix Automático na URL única
+  `/pix/v2`. Parâmetros próprios: `conta_corrente`, enviado no header `x-conta-corrente`
+  (normalizado para só dígitos, sem zero à esquerda), e `homologacao`, que aponta para o
+  Sandbox do Inter usando OAuth e mTLS reais
+- ✨ `PixInterMethods`: callbacks de webhook (`consultar_callbacks_webhook` e
+  `reenviar_callbacks_webhook`, este recusado no Sandbox por só existir em produção) e
+  simulações do Sandbox (`sandbox_pagar_cob`, `sandbox_pagar_cobv`, `sandbox_pagar_qrcode`, `sandbox_pagar_cobr`,
+  `sandbox_alterar_status_rec`, `sandbox_alterar_status_solicrec`, `sandbox_cancelar_cobr`),
+  que exigem `homologacao=True` e recusam a chamada antes de pedir token. O `sandbox_mode`
+  não basta, porque usa token fixo e o Sandbox do Inter exige OAuth e mTLS reais
+- ✨ `InterScopes`, registrado como `077`, `inter` e `banco_inter`. O grupo `PIX` inclui
+  `payloadlocationrec.*` (grupo `LOCATION_REC`), exigido pelo `/locrec` do Inter
+- ✨ `OAuth2Client(client_auth='body')`: envia `client_id` e `client_secret` no corpo do form
+  da requisição de token, como exige o Inter. O padrão `'basic'` mantém o fluxo do Sicredi
+  intacto. Nesse modo a requisição de token não segue redirecionamentos, para que o segredo
+  não seja reenviado a outra origem
+- ✨ `PixMethods.PARAM_TXID_CONSULTA_PIX`: nome do filtro de txid em `consultar_pix`. O padrão
+  continua `txid`; o Inter usa `txId`, como pede a especificação dele. No Inter,
+  `listar_webhooks` levanta `NotImplementedError`, porque não há `GET /webhook`
+- ✨ `listar_locations_rec` aceita o filtro `convenio`, como já faziam `rec` e `cobr`
+- ✅ Testes mock do Inter (`tests/tests_mock/test_inter_pixapi.py`)
+
 ## [0.12.0] - 2026-07-28
 
 ### Added

@@ -12,6 +12,7 @@ __license__ = 'MIT'
 # Exports principais
 from pypix_api.auth.oauth2 import OAuth2Client
 from pypix_api.banks.bb import BBPixAPI
+from pypix_api.banks.inter import InterPixAPI
 from pypix_api.banks.sicoob import SicoobPixAPI
 from pypix_api.banks.sicredi import SicrediPixAPI
 from pypix_api.models.enums import (
@@ -26,6 +27,7 @@ from pypix_api.utils.identificadores import gerar_id_rec
 
 __all__ = [
     'BBPixAPI',
+    'InterPixAPI',
     'OAuth2Client',
     'PixCobranca',
     'PoliticaRetentativa',

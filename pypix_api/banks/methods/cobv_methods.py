@@ -42,7 +42,7 @@ class CobVMethods:  # pylint: disable=E1101
         resp = self._request('PATCH', f'/cobv/{txid}', json=body)
         return self._json(resp)
 
-    def consultar_cobv(self, txid: str, revisao: int | None) -> dict[str, Any]:
+    def consultar_cobv(self, txid: str, revisao: int | None = None) -> dict[str, Any]:
         """
         Consulta uma cobrança com vencimento (CobV) por txid.
         """

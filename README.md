@@ -25,6 +25,7 @@ Biblioteca em Python para comunicação com APIs bancárias, focada na integraç
     - [Banco do Brasil](#banco-do-brasil)
     - [Sicoob](#sicoob)
     - [Sicredi](#sicredi)
+    - [Banco Inter](#banco-inter)
   - [Estrutura do Projeto](#estrutura-do-projeto)
   - [Configuração](#configuração)
     - [Parâmetros de Inicialização](#parâmetros-de-inicialização)
@@ -36,7 +37,7 @@ Biblioteca em Python para comunicação com APIs bancárias, focada na integraç
 
 ## Visão Geral
 
-O `pypix-api` facilita a integração de sistemas Python com APIs bancárias brasileiras, com ênfase no ecossistema do PIX. A biblioteca abstrai autenticação, comunicação segura (mTLS/OAuth2), e operações comuns de bancos como **Banco do Brasil** (001), **Sicoob** (756) e **Sicredi** (748).
+O `pypix-api` facilita a integração de sistemas Python com APIs bancárias brasileiras, com ênfase no ecossistema do PIX. A biblioteca abstrai autenticação, comunicação segura (mTLS/OAuth2), e operações comuns de bancos como **Banco do Brasil** (001), **Sicoob** (756), **Sicredi** (748) e **Banco Inter** (077).
 
 Além das cobranças (imediata, com vencimento e em lote), cobre Pix Automático (recorrências), locations, consultas de Pix/devoluções e webhooks. Inclui ainda um módulo opcional de observabilidade (logging estruturado, métricas e tratamento de erros).
 
@@ -71,7 +72,7 @@ pip install -e ".[dev]"
 
 ### Referência da API
 
-- 🏦 **[Bancos](docs/api/banks.rst)** - Banco do Brasil, Sicoob, Sicredi
+- 🏦 **[Bancos](docs/api/banks.rst)** - Banco do Brasil, Sicoob, Sicredi, Banco Inter
 - 🔐 **[Autenticação](docs/api/auth.rst)** - OAuth2, mTLS
 - 📊 **[Modelos](docs/api/models.rst)** - Estruturas de dados PIX
 - 🎯 **[Scopes](docs/api/scopes.rst)** - Gerenciamento de escopos OAuth2
@@ -236,12 +237,59 @@ cob = sicredi.criar_cob(txid="uuid-unico-3", body=payload_cob)
 print(cob)
 ```
 
+### Banco Inter
+
+O Inter exige mTLS e envia `client_id` e `client_secret` **no corpo** da requisição de token,
+então o `OAuth2Client` recebe `client_secret` e `client_auth="body"`. Se a integração estiver
+associada a mais de uma conta corrente, informe `conta_corrente`, que vai no header
+`x-conta-corrente`.
+
+```python
+from pypix_api.auth.oauth2 import OAuth2Client
+from pypix_api.banks.inter import InterPixAPI
+
+oauth_inter = OAuth2Client(
+    token_url=InterPixAPI.TOKEN_URL,
+    client_id="SEU_CLIENT_ID",
+    client_secret="SEU_CLIENT_SECRET",
+    client_auth="body",
+    cert="caminho/do/certificado.crt",
+    pvk="caminho/da/chave.key",
+)
+
+inter = InterPixAPI(oauth=oauth_inter, conta_corrente="12345678")
+cob = inter.criar_cob(txid="uuid-unico-4", body=payload_cob)
+```
+
+O Sandbox do Inter também exige OAuth e mTLS, com as credenciais da integração de testes. Para
+usá-lo, aponte o token para `InterPixAPI.SANDBOX_TOKEN_URL` e construa a API com
+`homologacao=True`. Nesse modo ficam disponíveis os métodos de simulação `sandbox_*`
+(pagar cobrança, aprovar recorrência, aceitar solicitação etc.):
+
+```python
+oauth_sandbox = OAuth2Client(
+    token_url=InterPixAPI.SANDBOX_TOKEN_URL,
+    client_id="ID_SANDBOX",
+    client_secret="SECRET_SANDBOX",
+    client_auth="body",
+    cert="sandbox.crt",
+    pvk="sandbox.key",
+)
+inter = InterPixAPI(oauth=oauth_sandbox, homologacao=True)
+
+cob = inter.criar_cob(txid="uuid-unico-5", body=payload_cob)
+inter.sandbox_pagar_qrcode(cob["pixCopiaECola"], valor=37.00)
+```
+
+Os endpoints exclusivos do Inter de callbacks de webhook também estão disponíveis:
+`consultar_callbacks_webhook` e `reenviar_callbacks_webhook` (este só em produção).
+
 ## Estrutura do Projeto
 
 ```
 pypix_api/
 ├── auth/               # Autenticação (mTLS, OAuth2)
-├── banks/              # Integrações com bancos (BB, Sicoob, Sicredi)
+├── banks/              # Integrações com bancos (BB, Sicoob, Sicredi, Inter)
 │   └── methods/        # Mixins de operações PIX (cob, cobv, cobr, lote, loc, pix, rec, webhooks)
 ├── models/             # Modelos de dados do PIX (PixCobranca)
 ├── scopes/             # Registro e definição de escopos OAuth2 por banco
@@ -271,13 +319,14 @@ oauth = OAuth2Client(
     cert="caminho/do/certificado.pem",  # Certificado digital PEM (.pem)
     pvk="caminho/da/chave.key",         # Chave privada PEM (.key)
     # Alternativa a cert/pvk: cert_pfx="cert.pfx", pwd_pfx="senha"
-    # client_secret="...",  # obrigatório para o Sicredi (HTTP Basic)
+    # client_secret="...",  # obrigatório para o Sicredi (HTTP Basic) e o Inter
+    # client_auth="body",     # Inter: client_secret no corpo, não em HTTP Basic
 )
 ```
 
 2. Depois instancie o banco passando o OAuth2Client:
 ```python
-banco = BBPixAPI(oauth=oauth)  # Ou SicoobPixAPI(oauth=oauth) / SicrediPixAPI(oauth=oauth)
+banco = BBPixAPI(oauth=oauth)  # Ou SicoobPixAPI / SicrediPixAPI / InterPixAPI
 ```
 
 ### Escopos OAuth2

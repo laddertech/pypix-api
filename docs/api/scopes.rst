@@ -44,6 +44,14 @@ Sicredi Scopes
    :undoc-members:
    :show-inheritance:
 
+Banco Inter Scopes
+~~~~~~~~~~~~~~~~~~
+
+.. automodule:: pypix_api.scopes.inter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Registry System
 ~~~~~~~~~~~~~~~
 

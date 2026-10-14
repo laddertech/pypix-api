@@ -39,6 +39,10 @@ class PixMethods:  # pylint: disable=E1101
     Esta classe é herdada pela BankPixAPIBase.
     """
 
+    #: Nome do filtro de txid na query de ``GET /pix``. A especificação do
+    #: BACEN usa ``txid``; bancos que divergem (Inter: ``txId``) sobrescrevem.
+    PARAM_TXID_CONSULTA_PIX = 'txid'
+
     def consultar_pix(
         self,
         inicio: str,
@@ -82,7 +86,7 @@ class PixMethods:  # pylint: disable=E1101
 
         # Adiciona parâmetros opcionais se fornecidos
         if txid:
-            params['txid'] = txid
+            params[self.PARAM_TXID_CONSULTA_PIX] = txid
         if txid_presente is not None:
             params['txIdPresente'] = str(txid_presente).lower()
         if devolucao_presente is not None:

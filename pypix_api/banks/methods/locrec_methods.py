@@ -67,6 +67,7 @@ class LocRecMethods:  # pylint: disable=E1101
         id_rec_presente: bool | None = None,
         pagina_atual: int | None = None,
         itens_por_pagina: int | None = None,
+        convenio: str | None = None,
     ) -> dict[str, Any]:
         """
         Consultar locations de recorrência cadastradas.
@@ -79,6 +80,7 @@ class LocRecMethods:  # pylint: disable=E1101
             id_rec_presente: Filtro por presença de idRec vinculado (opcional)
             pagina_atual: Página atual para paginação (padrão: 0)
             itens_por_pagina: Quantidade de itens por página (padrão: 100)
+            convenio: Filtro pelo convênio associado (opcional)
 
         Returns:
             dict contendo a lista de locations e parâmetros de paginação
@@ -94,6 +96,8 @@ class LocRecMethods:  # pylint: disable=E1101
             params['paginacao.paginaAtual'] = str(pagina_atual)
         if itens_por_pagina is not None:
             params['paginacao.itensPorPagina'] = str(itens_por_pagina)
+        if convenio is not None:
+            params['convenio'] = convenio
 
         resp = self._request('GET', '/locrec', params=params)
         return self._json(resp)

@@ -28,13 +28,13 @@ Overview
 --------
 
 pypix-api é uma biblioteca Python que simplifica a integração com APIs bancárias brasileiras
-para operações PIX. Atualmente suporta Banco do Brasil, Sicoob e Sicredi, com planos de
+para operações PIX. Atualmente suporta Banco do Brasil, Sicoob, Sicredi e Banco Inter, com planos de
 expansão para outros bancos.
 
 **Principais funcionalidades:**
 
-* 🏦 **Bancos suportados**: Banco do Brasil (001), Sicoob (756), Sicredi (748)
-* 🔐 **Autenticação**: OAuth2 com mTLS (PEM/PKCS#12) ou HTTP Basic (Sicredi)
+* 🏦 **Bancos suportados**: Banco do Brasil (001), Sicoob (756), Sicredi (748), Banco Inter (077)
+* 🔐 **Autenticação**: OAuth2 com mTLS (PEM/PKCS#12) ou HTTP Basic (Sicredi) ou credenciais no corpo (Banco Inter)
 * 💰 **PIX**: Cobranças imediatas, com vencimento e em lote
 * 🔄 **Recorrência**: Pix Automático (COBR) e gestão de recorrências
 * 🪝 **Webhooks**: Configuração e gerenciamento (Pix, COBR, REC)
@@ -128,6 +128,14 @@ Sicredi
 ~~~~~~~
 
 .. automodule:: pypix_api.banks.sicredi
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Banco Inter
+~~~~~~~~~~~
+
+.. automodule:: pypix_api.banks.inter
    :members:
    :undoc-members:
    :show-inheritance:

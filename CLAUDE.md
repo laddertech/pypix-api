@@ -65,7 +65,7 @@ This is a Python library for integrating with Brazilian bank APIs, focused on PI
 ### Core Components
 
 **Authentication Layer (`pypix_api/auth/`)**
-- `oauth2.py`: OAuth2 client. `OAuth2Client(token_url, client_id, cert, pvk, cert_pfx, pwd_pfx, sandbox_mode, client_secret)`. `token_url` is required (use `<Bank>.TOKEN_URL`). Two client-auth flows: mTLS (default, BB/Sicoob) or HTTP Basic via `client_secret` (Sicredi). Token cache per scope.
+- `oauth2.py`: OAuth2 client. `OAuth2Client(token_url, client_id, cert, pvk, cert_pfx, pwd_pfx, sandbox_mode, client_secret)`. `token_url` is required (use `<Bank>.TOKEN_URL`). Client-auth flows: mTLS (default, BB/Sicoob); `client_secret` via HTTP Basic (Sicredi, `client_auth='basic'`, default) or in the form body (Inter, `client_auth='body'`). Token cache per scope.
 - `mtls.py`: Mutual TLS support — PEM via `cert`/`pvk` OR PKCS#12 via `cert_pfx`/`pwd_pfx`.
 
 **Bank Integration Layer (`pypix_api/banks/`)**
@@ -73,6 +73,7 @@ This is a Python library for integrating with Brazilian bank APIs, focused on PI
 - `bb.py`: Banco do Brasil (`BBPixAPI`, code 001) — adds `PixBBMethods` for BB-specific Pix/refund queries
 - `sicoob.py`: Sicoob (`SicoobPixAPI`, code 756)
 - `sicredi.py`: Sicredi (`SicrediPixAPI`, code 748) — per-resource API versioning via `_endpoint_url` (`RESOURCE_VERSIONS`), HTTP Basic auth
+- `inter.py`: Banco Inter (`InterPixAPI`, code 077) — adds `PixInterMethods`; optional `conta_corrente` (`x-conta-corrente` header); `homologacao=True` targets the real Inter sandbox with OAuth/mTLS (unlike `sandbox_mode`, which uses a fixed token)
 - `exceptions.py`: Bank-specific exception classes for error handling
 
 **Method Mixins (`pypix_api/banks/methods/`)**
@@ -85,6 +86,7 @@ The base class uses multiple inheritance with method mixins for different PIX op
 - `loc_methods.py` / `locrec_methods.py`: Locations (payload/QR) for charges and recurrences
 - `pix_methods.py`: PIX transaction operations (consult, refund)
 - `pix_bb_methods.py`: BB-specific Pix/refund query variants
+- `pix_inter_methods.py`: Inter-specific webhook callbacks and sandbox simulations (`sandbox_*`, refused outside sandbox)
 - `rec_methods.py`: Recurrence operations
 - `solic_rec_methods.py`: Recurrence solicitation methods
 - `webhook_methods.py`: Webhook configuration
@@ -96,7 +98,7 @@ The base class uses multiple inheritance with method mixins for different PIX op
 
 **Scopes (`pypix_api/scopes/`)**
 - `registry.py`: OAuth2 scope registry system
-- `base.py`, `bb.py`, `sicoob.py`, `sicredi.py`: bank-specific scope definitions
+- `base.py`, `bb.py`, `sicoob.py`, `sicredi.py`, `inter.py`: bank-specific scope definitions
 
 **Observability (optional, top-level modules)**
 - `error_handling.py`, `logging.py`, `metrics.py`, `observability.py`: opt-in framework (errors, structured logging, metrics, health checks). Imported conditionally in `__init__.py`. NOT wired into the bank mixins' HTTP calls automatically — it must be used explicitly.

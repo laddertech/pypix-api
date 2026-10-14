@@ -24,6 +24,10 @@ logger = logging.getLogger(__name__)
 #: resposta inesperada vira uma linha de log de tamanho arbitrário.
 _MAX_ESCOPOS_NO_AVISO = 20
 
+#: Formas de apresentar o ``client_secret`` ao endpoint de token (RFC 6749,
+#: §2.3.1): HTTP Basic ou parâmetros no corpo do form.
+_CLIENT_AUTH_VALIDOS = ('basic', 'body')
+
 
 class OAuth2Client:
     """Cliente OAuth2 para autenticação com a API"""
@@ -39,6 +43,7 @@ class OAuth2Client:
         sandbox_mode: bool = False,
         client_secret: str | None = None,
         timeout: Timeout | None = None,
+        client_auth: str = 'basic',
     ) -> None:
         """Inicializa o cliente OAuth2
 
@@ -61,7 +66,22 @@ class OAuth2Client:
                 ``requests``: um número ou a tupla ``(conexão, leitura)``.
                 ``None`` usa :data:`DEFAULT_TIMEOUT`. Para leitura sem limite,
                 use ``(5.0, None)``.
+            client_auth: Como o ``client_secret`` é apresentado ao PSP, quando
+                informado. ``'basic'`` (padrão) usa o header
+                ``Authorization: Basic`` (Sicredi); ``'body'`` envia
+                ``client_id`` e ``client_secret`` no corpo do form, como exige o
+                Banco Inter. Sem ``client_secret``, não tem efeito.
+
+        Raises:
+            ValueError: Se ``client_auth`` não for ``'basic'`` nem ``'body'``
         """
+        if client_auth not in _CLIENT_AUTH_VALIDOS:
+            raise ValueError(
+                f'client_auth inválido: {client_auth!r}. '
+                f'Use {" ou ".join(repr(v) for v in _CLIENT_AUTH_VALIDOS)}.'
+            )
+        self.client_auth: str = client_auth
+
         load_dotenv()
 
         self.client_id: str | None = client_id or os.getenv('CLIENT_ID')
@@ -117,8 +137,16 @@ class OAuth2Client:
             'scope': scope,
         }
         headers: dict[str, str] = {}
+        extras: dict[str, Any] = {}
 
-        if self.client_secret:
+        if self.client_secret and self.client_auth == 'body':
+            # Credenciais no corpo do form (ex.: Banco Inter), além do mTLS.
+            token_data['client_id'] = self.client_id
+            token_data['client_secret'] = self.client_secret
+            # Um 307/308 faria o `requests` reenviar o corpo — e o segredo — ao
+            # destino do redirecionamento, mesmo em outra origem.
+            extras['allow_redirects'] = False
+        elif self.client_secret:
             # Autenticação de cliente via HTTP Basic (ex.: Sicredi).
             # O client_id vai no header Basic, não no corpo.
             credentials = base64.b64encode(
@@ -136,6 +164,7 @@ class OAuth2Client:
                 data=token_data,
                 headers=headers,
                 timeout=self.timeout,
+                **extras,
             )
         except requests.Timeout as exc:
             raise PixTimeoutException(

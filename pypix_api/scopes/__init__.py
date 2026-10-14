@@ -2,6 +2,7 @@
 
 from pypix_api.scopes.base import ScopeGroup
 from pypix_api.scopes.bb import BBScopes
+from pypix_api.scopes.inter import InterScopes
 from pypix_api.scopes.registry import ScopeRegistry, get_bank_scopes, get_pix_scopes
 from pypix_api.scopes.sicoob import SicoobScopes
 from pypix_api.scopes.sicredi import SicrediScopes
@@ -16,6 +17,10 @@ ScopeRegistry.register('banco_do_brasil', BBScopes)
 
 ScopeRegistry.register('748', SicrediScopes)
 ScopeRegistry.register('sicredi', SicrediScopes)
+
+ScopeRegistry.register('077', InterScopes)
+ScopeRegistry.register('inter', InterScopes)
+ScopeRegistry.register('banco_inter', InterScopes)
 
 
 def compose_scopes(bank_code: str, *group_names: str) -> str:
@@ -70,6 +75,7 @@ def compose_scopes(bank_code: str, *group_names: str) -> str:
 # Exportar funções principais
 __all__ = [
     'BBScopes',
+    'InterScopes',
     'ScopeGroup',
     'ScopeRegistry',
     'SicoobScopes',
