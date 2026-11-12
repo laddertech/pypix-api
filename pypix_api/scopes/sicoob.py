@@ -29,6 +29,19 @@ class SicoobScopes(BankScopesBase):
     SCOPE_PAYLOADLOCATION_WRITE = 'payloadlocation.write'
     SCOPE_PAYLOADLOCATION_READ = 'payloadlocation.read'
 
+    # Pix Automático — escopos declarados no spec "Pix Recebimentos" do Sicoob
+    # (v2.0.23.28). O Sicoob usa `locr.*` para a location de recorrência, não o
+    # `payloadlocationrec.*` de outros PSPs, e não declara escopo de webhook de
+    # recorrência/cobrança recorrente.
+    SCOPE_REC_WRITE = 'rec.write'
+    SCOPE_REC_READ = 'rec.read'
+    SCOPE_SOLICREC_WRITE = 'solicrec.write'
+    SCOPE_SOLICREC_READ = 'solicrec.read'
+    SCOPE_COBR_WRITE = 'cobr.write'
+    SCOPE_COBR_READ = 'cobr.read'
+    SCOPE_LOCR_WRITE = 'locr.write'
+    SCOPE_LOCR_READ = 'locr.read'
+
     # PIX - Funcionalidades relacionadas ao PIX
     PIX = ScopeGroup(
         name='pix',
@@ -84,6 +97,42 @@ class SicoobScopes(BankScopesBase):
         name='pix_payload',
         scopes=[SCOPE_PAYLOADLOCATION_WRITE, SCOPE_PAYLOADLOCATION_READ],
         description='Payload location PIX',
+    )
+
+    # Pix Automático — fora do grupo `PIX` (o padrão do `SicoobPixAPI`): pedir
+    # um escopo que a credencial não tem faz o Sicoob recusar o token e
+    # derrubaria também o Pix comum. Solicite-os explicitamente, depois de o
+    # Sicoob liberá-los na credencial.
+    PIX_REC = ScopeGroup(
+        name='pix_rec',
+        scopes=[SCOPE_REC_WRITE, SCOPE_REC_READ],
+        description='Recorrências do PIX Automático',
+    )
+
+    PIX_SOLICREC = ScopeGroup(
+        name='pix_solicrec',
+        scopes=[SCOPE_SOLICREC_WRITE, SCOPE_SOLICREC_READ],
+        description='Solicitações de recorrência do PIX Automático',
+    )
+
+    PIX_COBR = ScopeGroup(
+        name='pix_cobr',
+        scopes=[SCOPE_COBR_WRITE, SCOPE_COBR_READ],
+        description='Cobranças recorrentes do PIX Automático',
+    )
+
+    PIX_LOCREC = ScopeGroup(
+        name='pix_locrec',
+        scopes=[SCOPE_LOCR_WRITE, SCOPE_LOCR_READ],
+        description='Locations de recorrência do PIX Automático',
+    )
+
+    PIX_AUTOMATICO = ScopeGroup(
+        name='pix_automatico',
+        scopes=(
+            PIX_REC.scopes + PIX_SOLICREC.scopes + PIX_COBR.scopes + PIX_LOCREC.scopes
+        ),
+        description='Todas as funcionalidades do PIX Automático',
     )
 
     # Boleto - Funcionalidades de boleto bancário

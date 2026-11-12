@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Sicoob: grupos de escopo do Pix Automático em `SicoobScopes` (`PIX_REC`,
+  `PIX_SOLICREC`, `PIX_COBR`, `PIX_LOCREC` e o agregado `PIX_AUTOMATICO`),
+  conforme o spec "Pix Recebimentos" 2.0.23.28. A location de recorrência usa
+  `locr.read`/`locr.write`. Os grupos ficam fora de `PIX`/`TODOS_ESCOPOS` e
+  precisam ser pedidos explicitamente. O Sicoob ainda não publica os endpoints
+  do Pix Automático; os métodos herdados não foram homologados nele.
+
 ## [0.14.0] - 2026-10-14
 
 ### Changed
