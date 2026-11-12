@@ -11,6 +11,7 @@ __license__ = 'MIT'
 
 # Exports principais
 from pypix_api.auth.oauth2 import OAuth2Client
+from pypix_api.auth.token_store import InMemoryTokenStore, TokenStore
 from pypix_api.banks.bb import BBPixAPI
 from pypix_api.banks.inter import InterPixAPI
 from pypix_api.banks.sicoob import SicoobPixAPI
@@ -27,6 +28,7 @@ from pypix_api.utils.identificadores import gerar_id_rec
 
 __all__ = [
     'BBPixAPI',
+    'InMemoryTokenStore',
     'InterPixAPI',
     'OAuth2Client',
     'PixCobranca',
@@ -37,6 +39,7 @@ __all__ = [
     'StatusCobR',
     'StatusRec',
     'StatusSolicRec',
+    'TokenStore',
     '__author__',
     '__email__',
     '__license__',

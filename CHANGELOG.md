@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- 🔐 `OAuth2Client(token_store=...)`: armazenamento plugável de tokens
+  (`pypix_api.TokenStore`, com `InMemoryTokenStore` pronto). Aplicações que
+  criam um cliente por requisição passam a reaproveitar o token entre
+  instâncias (Redis, cache do framework) em vez de pedir um novo ao PSP a cada
+  operação — o Sicredi responde `429 Limite de tokens excedido`. A chave é um
+  SHA-256 de toda a configuração de autenticação (PSP, `client_id`,
+  `client_secret`, `client_auth`, certificado pelo conteúdo, `sandbox_mode`) e
+  dos escopos; um `lock(key)` opcional do store serializa a renovação. Falha ou
+  conteúdo inválido do store nunca impedem a obtenção do token. Padrão `None`
+  mantém o cache só em memória da instância.
 - Sicoob: grupos de escopo do Pix Automático em `SicoobScopes` (`PIX_REC`,
   `PIX_SOLICREC`, `PIX_COBR`, `PIX_LOCREC` e o agregado `PIX_AUTOMATICO`),
   conforme o spec "Pix Recebimentos" 2.0.23.28. A location de recorrência usa

@@ -1,13 +1,18 @@
 import base64
+import contextlib
+import hashlib
 import logging
+import math
 import os
 import time
+from collections.abc import Iterator
 from typing import Any, BinaryIO
 
 import requests
 from dotenv import load_dotenv
 
 from pypix_api.auth.mtls import get_session_with_mtls
+from pypix_api.auth.token_store import TokenStore
 from pypix_api.exceptions import (
     PixAPIException,
     PixConexaoException,
@@ -28,6 +33,38 @@ _MAX_ESCOPOS_NO_AVISO = 20
 #: §2.3.1): HTTP Basic ou parâmetros no corpo do form.
 _CLIENT_AUTH_VALIDOS = ('basic', 'body')
 
+#: Margem, em segundos, antes de ``expires_at`` a partir da qual o token é
+#: tratado como vencido — vale para o cache local e para o ``token_store``.
+_MARGEM_EXPIRACAO = 60
+
+#: Prefixo das chaves gravadas no ``token_store``.
+_PREFIXO_STORE = 'pypix_api:token:'
+
+
+def _impressao(valor: Any) -> str:
+    """SHA-256 de um dado de credencial, para compor a chave do store.
+
+    Caminho de arquivo entra pelo **conteúdo**: uma rotação de certificado
+    no mesmo caminho precisa mudar a chave, ou a nova credencial receberia o
+    token emitido para a anterior. Arquivo aberto entra pelo nome — ler o
+    conteúdo moveria o cursor de quem vai usá-lo no mTLS.
+    """
+    if valor is None:
+        return ''
+    if isinstance(valor, bytes):
+        dado = valor
+    elif isinstance(valor, str):
+        dado = valor.encode()
+        try:
+            if os.path.isfile(valor):
+                with open(valor, 'rb') as arquivo:
+                    dado = arquivo.read()
+        except (OSError, ValueError):
+            pass
+    else:
+        dado = repr(getattr(valor, 'name', None) or id(valor)).encode()
+    return hashlib.sha256(dado).hexdigest()
+
 
 class OAuth2Client:
     """Cliente OAuth2 para autenticação com a API"""
@@ -44,6 +81,7 @@ class OAuth2Client:
         client_secret: str | None = None,
         timeout: Timeout | None = None,
         client_auth: str = 'basic',
+        token_store: TokenStore | None = None,
     ) -> None:
         """Inicializa o cliente OAuth2
 
@@ -71,6 +109,13 @@ class OAuth2Client:
                 ``Authorization: Basic`` (Sicredi); ``'body'`` envia
                 ``client_id`` e ``client_secret`` no corpo do form, como exige o
                 Banco Inter. Sem ``client_secret``, não tem efeito.
+            token_store: Armazenamento compartilhado de tokens (ver
+                :mod:`pypix_api.auth.token_store`). ``None`` (padrão) mantém o
+                cache só na memória desta instância. Informe um store
+                compartilhado quando a aplicação criar um cliente por
+                requisição: sem ele, cada instância pede um token novo ao PSP,
+                e os PSPs limitam a emissão (Sicredi: ``429 Limite de tokens
+                excedido``).
 
         Raises:
             ValueError: Se ``client_auth`` não for ``'basic'`` nem ``'body'``
@@ -97,6 +142,7 @@ class OAuth2Client:
         # sem garantia de estabilidade entre versões. Para saber se há token
         # válido para um escopo, use `_is_token_expired`, que canoniza a entrada.
         self.token_cache: dict[str, dict[str, Any]] = {}
+        self.token_store: TokenStore | None = token_store
         self.session: requests.Session = requests.Session()
         self.timeout: Timeout = DEFAULT_TIMEOUT if timeout is None else timeout
 
@@ -131,6 +177,29 @@ class OAuth2Client:
         chave = self._chave_de_cache(scope)
         if chave in self.token_cache and not self._is_token_expired(chave):
             return self.token_cache[chave]['access_token']
+
+        # Chave do store calculada uma vez por tentativa: leitura, trava e
+        # gravação ficam presas à mesma identidade de credencial.
+        chave_store = (
+            self._chave_do_store(chave) if self.token_store is not None else ''
+        )
+        compartilhado = self._token_do_store(chave_store)
+        if compartilhado is not None:
+            self.token_cache[chave] = compartilhado
+            return compartilhado['access_token']
+
+        # Renovação serializada por chave quando o store oferece trava:
+        # uma rajada de requisições num cache vazio pediria um token por
+        # instância. Quem esperou relê o token gravado por quem renovou.
+        with self._trava_do_store(chave_store):
+            compartilhado = self._token_do_store(chave_store)
+            if compartilhado is not None:
+                self.token_cache[chave] = compartilhado
+                return compartilhado['access_token']
+            return self._solicitar_token(scope, chave, chave_store)
+
+    def _solicitar_token(self, scope: str, chave: str, chave_store: str) -> str:
+        """Pede um token novo ao PSP e o guarda nos caches."""
 
         token_data: dict[str, str | None] = {
             'grant_type': 'client_credentials',
@@ -185,8 +254,108 @@ class OAuth2Client:
 
         # Armazena o token no cache por escopo
         self.token_cache[chave] = token_info
+        self._guarda_no_store(chave, chave_store, token_info)
 
         return token_info['access_token']
+
+    def _chave_do_store(self, chave: str) -> str:
+        """Chave do ``token_store``.
+
+        Isola PSP (``token_url``), toda a configuração de autenticação
+        (``client_id``, ``client_secret``, ``client_auth``, certificado e
+        ``sandbox_mode``) e os escopos: duas instâncias só compartilham token
+        quando se autenticariam exatamente do mesmo jeito. Nada disso é
+        gravado em claro — a chave é um SHA-256.
+        """
+        partes = [
+            self.token_url,
+            self.client_id or '',
+            self.client_secret or '',
+            self.client_auth,
+            str(bool(self.sandbox_mode)),
+            _impressao(self.cert),
+            _impressao(self.pvk),
+            _impressao(self.cert_pfx),
+            _impressao(self.pwd_pfx),
+            chave,
+        ]
+        base = '\n'.join(partes)
+        return _PREFIXO_STORE + hashlib.sha256(base.encode()).hexdigest()
+
+    @contextlib.contextmanager
+    def _trava_do_store(self, chave_store: str) -> Iterator[None]:
+        """Trava distribuída do store (método ``lock``), quando houver.
+
+        Falha ao obter ou liberar a trava não impede a operação: segue sem
+        ela, como num store sem trava.
+        """
+        lock = getattr(self.token_store, 'lock', None)
+        if not callable(lock):
+            yield
+            return
+        try:
+            trava = lock(chave_store + ':lock')
+            trava.__enter__()
+        except Exception:
+            logger.warning('Falha ao obter a trava do token_store', exc_info=True)
+            yield
+            return
+        try:
+            yield
+        finally:
+            try:
+                trava.__exit__(None, None, None)
+            except Exception:
+                logger.warning('Falha ao liberar a trava do token_store', exc_info=True)
+
+    def _token_do_store(self, chave_store: str) -> dict[str, Any] | None:
+        """Token válido do ``token_store``, ou ``None``.
+
+        Falha do store (rede, serialização) não pode impedir a operação:
+        registra e segue para o PSP.
+        """
+        if self.token_store is None:
+            return None
+        try:
+            token_info = self.token_store.get(chave_store)
+        except Exception:
+            logger.warning('Falha ao ler token do token_store', exc_info=True)
+            return None
+        if not isinstance(token_info, dict):
+            return None
+        access_token = token_info.get('access_token')
+        expires_at = token_info.get('expires_at')
+        if (
+            not isinstance(access_token, str)
+            or not access_token
+            or isinstance(expires_at, bool)
+            or not isinstance(expires_at, int | float)
+            or not math.isfinite(expires_at)
+            or time.time() >= expires_at - _MARGEM_EXPIRACAO
+        ):
+            return None
+        return token_info
+
+    def _guarda_no_store(
+        self, chave: str, chave_store: str, token_info: dict[str, Any]
+    ) -> None:
+        if self.token_store is None:
+            return
+        # A credencial mudou durante o pedido (ex.: certificado rotacionado
+        # no mesmo caminho): o token não pode ir para a chave da nova.
+        if self._chave_do_store(chave) != chave_store:
+            logger.warning(
+                'Credencial alterada durante a emissão do token; '
+                'token não gravado no token_store'
+            )
+            return
+        ttl = int(token_info['expires_at'] - time.time()) - _MARGEM_EXPIRACAO
+        if ttl <= 0:
+            return
+        try:
+            self.token_store.set(chave_store, dict(token_info), ttl)
+        except Exception:
+            logger.warning('Falha ao gravar token no token_store', exc_info=True)
 
     @staticmethod
     def _chave_de_cache(scope: str) -> str:
@@ -312,6 +481,4 @@ class OAuth2Client:
         chave = self._chave_de_cache(scope)
         if chave not in self.token_cache or 'expires_at' not in self.token_cache[chave]:
             return True
-        return (
-            time.time() >= self.token_cache[chave]['expires_at'] - 60
-        )  # 60s de margem
+        return time.time() >= self.token_cache[chave]['expires_at'] - _MARGEM_EXPIRACAO
